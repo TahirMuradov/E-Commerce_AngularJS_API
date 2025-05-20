@@ -2,6 +2,7 @@
 using Shop.Application.Abstraction.Token;
 using Shop.Infrastructure.Services.Token;
 using Shop.Infrastructure.Services;
+using Shop.Application.Abstraction.Services;
 
 namespace Shop.Infrastructure
 {
@@ -12,8 +13,9 @@ namespace Shop.Infrastructure
         {
            
             serviceCollection.AddScoped<ITokenHandler, TokenHandler>();
-            //serviceCollection.AddScoped<IMailService, MailService>();
-      
+            serviceCollection.AddScoped<IMailService,MailServce>();
+            serviceCollection.AddScoped<IAuthServices, AuthService>();
+
         }
 
     }

@@ -12,10 +12,7 @@ namespace Shop.Persistence
     {
         public static void AddPersistenceServices(this IServiceCollection services)
         {
-            services.AddDbContext<AppDBContext>(options =>
-            {
-                options.UseSqlServer(Configuration.config["Default"]);
-            });
+
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -33,6 +30,9 @@ namespace Shop.Persistence
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 1;
             });
+
+
+
 
           }
     }

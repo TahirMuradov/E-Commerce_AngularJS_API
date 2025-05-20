@@ -8,19 +8,10 @@ namespace Shop.Infrastructure.Services
 {
     public class FileService : IFileService
     {
-        public bool RemoveFile(string FilePaths, bool IsOrder = false)
+        public bool RemoveFile(string FilePaths)
         {
-            string filePath = string.Empty;
-            if (IsOrder)
-            {
-                filePath = Path.Combine(WebRootPathProvider.GetwwwrootPath + FilePaths);
+            string filePath = Path.Combine(WebRootPathProvider.GetwwwrootPath + FilePaths);
 
-            }
-            else
-            {
-
-                filePath = Path.Combine(WebRootPathProvider.GetwwwrootPath + FilePaths);
-            }
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -49,30 +40,47 @@ namespace Shop.Infrastructure.Services
             return true;
         }
 
-        public async Task<string> SaveFileAsync(IFormFile file, string WebRootPath)
+        public async Task<string> SaveFileAsync(IFormFile file, string WebRootPath, bool isProductPicture = false)
         {
 
-            string filePath = Path.Combine(WebRootPathProvider.GetwwwrootPath, "uploads");
+            string filePath = string.Empty;
+            filePath = isProductPicture ? Path.Combine(WebRootPathProvider.GetwwwrootPath, "uploads", "ProductPictures") :
+                Path.Combine(WebRootPathProvider.GetwwwrootPath, "uploads", "WebUIPictures");
+
             if (!Directory.Exists(filePath))
             {
                 Directory.CreateDirectory(filePath);
             }
-            var path = "/uploads/" + Guid.NewGuid().ToString() + file.FileName;
+            var path = filePath + Guid.NewGuid().ToString() + file.FileName;
             using FileStream fileStream = new(Path.Combine(WebRootPathProvider.GetwwwrootPath + path), FileMode.Create);
             await file.CopyToAsync(fileStream);
             return path;
         }
-
+        /// <summary>
+        /// /// Saves a list of files to the specified WebUIPictures folder in web root path.
+        /// 
+        /// </summary>
+        /// <param name="file">File is photo or other file type</param>
+        /// <param name="WebRootPath"> WebRootPath is wwwroot folder`s path</param>
+        /// <returns></returns>
         public async Task<List<string>> SaveFileRangeAsync(List<IFormFile> file, string WebRootPath)
         {
             List<string> urls = new List<string>();
             foreach (var x in file)
             {
-                urls.Add(await SaveFileAsync(x,WebRootPath));
+                urls.Add(await SaveFileAsync(x, WebRootPath));
             }
             return urls;
         }
-
+        /// <summary>
+        /// /// Saves an order PDF file with the specified items, shipping method, and payment method.
+        /// return a list of strings containing the file path and a unique identifier of order pdf.
+        /// list index 0 is file path and index 1 is unique identifier of order pdf.
+        /// </summary>
+        /// <param name="items">Products</param>
+        /// <param name="shippingMethod">Shipping method</param>
+        /// <param name="paymentMethod"> Payment Method</param>
+        /// <returns></returns>
         public List<string> SaveOrderPdf(List<GeneratePdfOrderProductDTO> items, ShippingMethodInOrderPdfDTO shippingMethod, PaymentMethodInOrderPdfDTO paymentMethod)
         {
             decimal totalPrice = 0;
@@ -156,8 +164,10 @@ namespace Shop.Infrastructure.Services
 
             string htmlPath = System.IO.Path.Combine(WebRootPathProvider.GetwwwrootPath + $"\\uploads\\OrderPDFs\\{guid.ToString().Substring(0, 6)}.html");
             string pdfPath = System.IO.Path.Combine(WebRootPathProvider.GetwwwrootPath + $"\\uploads\\OrderPDFs\\{guid.ToString().Substring(0, 6)}.pdf");
-            FileStream fileStream = File.Create(htmlPath);
+            using (FileStream fileStream = File.Create(htmlPath))
+            {
             fileStream.Close();
+            };
 
             File.WriteAllText(htmlPath, htmlContent);
             using (FileStream htmlSource = File.Open(System.IO.Path.Combine(htmlPath), FileMode.Open))

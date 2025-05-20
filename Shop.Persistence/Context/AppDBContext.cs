@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Shop.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace Shop.Persistence.Context
         public DbSet<CategoryLanguage> CategoryLanguages { get; set; }
 
 
-
+      
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

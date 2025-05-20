@@ -27,7 +27,7 @@ Configuration.Initialize(builder.Configuration);
 builder.Services.AddPersistenceServices();
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
-Console.WriteLine(builder.Configuration.GetConnectionString("Default"));
+
 builder.Services.AddDbContext<AppDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));

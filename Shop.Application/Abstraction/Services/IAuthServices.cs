@@ -1,6 +1,7 @@
 ﻿using Shop.Application.DTOs.AuthDTOs;
 using Shop.Application.PaginationHelper;
 using Shop.Application.ResultTypes.Abstract;
+using Shop.Domain.Entities;
 
 namespace Shop.Application.Abstraction.Services
 {
@@ -12,11 +13,11 @@ namespace Shop.Application.Abstraction.Services
         Task<IResult> DeleteUserAsnyc(Guid Id, string culture);
         Task<IResult> RegisterAsync(RegisterDTO registerDTO, string culture);
         Task<IResult> AssignRoleToUserAsnyc(AssignRoleDTO assignRoleDTO, string culture);
-        Task<IResult> SendEmailTokenForForgotPassword(string Email);
-        Task<IResult> CheckTokenForForgotPassword(string Email, string token);
-        Task<IResult> ChangePasswordForTokenForgotPassword(string Email, string token, string NewPassword);
+        Task<IResult> SendEmailTokenForForgotPasswordAsync(string Email,string LangCode);
+        Task<IResult> CheckTokenForForgotPasswordAsync(string Email, string token,string LangCode);
+        Task<IResult> ChangePasswordForTokenForgotPasswordAsync(string Email, string token, string NewPassword,string LangCode);
         IDataResult<IQueryable<GetAllUserForSelectDTO>> GetAllUserForSelect();
-        //Task<IDataResult<string>> UpdateRefreshTokenAsnyc(string refreshToken, User user, string culture);
+        Task<IDataResult<string>> UpdateRefreshTokenAsnyc(string refreshToken, User user, string culture);
         Task<IResult> RemoveRoleFromUserAsync(RemoveRoleUserDTO removeRoleUserDTO, string culture);
         Task<IDataResult<DTOs.Token>> LoginAsync(LoginDTO loginDTO, string culture);
         Task<IResult> LogOutAsync(string userId, string culture);

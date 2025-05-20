@@ -2,6 +2,18 @@
 {
     public class AuthStatusException
     {
+        public static Dictionary<string, string> EmailInvalid
+        {
+            get
+            {
+                return new Dictionary<string, string>()
+                {
+                    { "az", "Email səhvdir!" },
+                    { "ru", "Неверный адрес электронной почты!" },
+                    { "en", "Incorrect email address!" }
+                };
+            }
+        }
         public static Dictionary<string, string> UserPasswordOrEmailWrong
         {
             get

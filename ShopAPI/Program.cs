@@ -2,6 +2,7 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -18,6 +19,7 @@ using System;
 using System.Globalization;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -123,6 +125,29 @@ builder.Services
 #endregion
 var corsRuls = builder.Configuration.GetValue<string>("Domain:Front");
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder =>
+        {
+
+            builder.AllowAnyOrigin()
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+builder.Services.AddRateLimiter(option =>
+{
+    option.AddFixedWindowLimiter("Fixed", _option =>
+    {
+        _option.Window = TimeSpan.FromSeconds(20);
+        _option.PermitLimit = 4;
+        _option.QueueLimit = 3;
+        _option.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+
+
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -131,9 +156,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseRateLimiter();
+app.UseCors("AllowSpecificOrigin");
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

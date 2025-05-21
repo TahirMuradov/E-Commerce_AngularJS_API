@@ -5,20 +5,20 @@ namespace Shop.Application.ResultTypes
 {
    public class DataResult<T> : Result, IDataResult<T>
     {
-        public T Response { get; }
+        public T Data { get; }
 
 
-        public DataResult(T response, bool Issuccess, string message, HttpStatusCode statusCode) : base(Issuccess, message, statusCode)
+        public DataResult(T data, bool Issuccess, string message, HttpStatusCode statusCode) : base(Issuccess, message, statusCode)
         {
-            Response = response;
+            Data = data;
         }
-        public DataResult(T response, bool Issuccess, List<string> messages, HttpStatusCode statusCode) : base(Issuccess, messages, statusCode)
+        public DataResult(T data, bool Issuccess, List<string> messages, HttpStatusCode statusCode) : base(Issuccess, messages, statusCode)
         {
-            Response = response;
+            Data = data;
         }
-        public DataResult(T response, bool success, HttpStatusCode statusCode) : base(success, statusCode)
+        public DataResult(T data, bool success, HttpStatusCode statusCode) : base(success, statusCode)
         {
-            Response = response;
+            Data = data;
         }
     }
 }

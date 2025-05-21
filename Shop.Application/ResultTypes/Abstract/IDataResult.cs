@@ -8,6 +8,6 @@ namespace Shop.Application.ResultTypes.Abstract
 {
    public interface IDataResult<T> : IResult
     {
-        T Response { get; }
+        T Data { get; }
     }
 }

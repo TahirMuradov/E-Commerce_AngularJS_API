@@ -225,7 +225,7 @@ namespace Shop.Infrastructure
 
 
            
-            return new SuccessDataResult<PaginatedList<GetAllUserDTO>>(response: paginatedList, HttpStatusCode.OK);
+            return new SuccessDataResult<PaginatedList<GetAllUserDTO>>(data: paginatedList, HttpStatusCode.OK);
         }
 
         public IDataResult<IQueryable<GetAllUserForSelectDTO>> GetAllUserForSelect()
@@ -455,7 +455,7 @@ namespace Shop.Infrastructure
                 IdentityResult identityResult = await _userManager.UpdateAsync(user);
 
                 if (identityResult.Succeeded)
-                    return new SuccessDataResult<string>(statusCode: HttpStatusCode.OK, response: refreshToken);
+                    return new SuccessDataResult<string>(statusCode: HttpStatusCode.OK, data: refreshToken);
                 else
                     return new ErrorDataResult<string>(messages: identityResult.Errors.Select(x => x.Description).ToList(), HttpStatusCode.BadRequest);
 

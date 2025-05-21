@@ -10,7 +10,7 @@ namespace Shop.Application.ResultTypes.Concrete.ErrorResults
 {
    public class ErrorDataResult<T> : DataResult<T>
     {
-        public ErrorDataResult(T response, List<string> messages, HttpStatusCode statusCode) : base(response, false, messages, statusCode)
+        public ErrorDataResult(T data, List<string> messages, HttpStatusCode statusCode) : base(data, false, messages, statusCode)
         {
         }
         public ErrorDataResult(T response, string message, HttpStatusCode statusCode) : base(response, false, message, statusCode)

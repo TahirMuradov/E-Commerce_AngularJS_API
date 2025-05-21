@@ -4,14 +4,14 @@ namespace Shop.Application.PaginationHelper
 {
     public class PaginatedList<T>
     {
-        public List<T> Data { get; set; }
+        public List<T> PaginatedData { get; set; }
         public int Page { get; private set; }
         public int TotalPages { get; private set; }
         public int PageSize { get; set; }
         public int CollectionSize { get; set; }
         public PaginatedList(List<T> items, int count, int pageIndex, int pageSize)
         {
-            Data = items;
+            PaginatedData = items;
             Page = pageIndex;
             PageSize = pageSize;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);

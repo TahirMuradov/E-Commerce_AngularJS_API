@@ -77,7 +77,7 @@ builder.Services.AddSwaggerGen(x =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AllRole", policy =>
-                     policy.RequireClaim(ClaimTypes.Role, "Admin", "SuperAdmin")); 
+                     policy.RequireClaim(ClaimTypes.Role, "Admin", "SuperAdmin","User")); 
     options.AddPolicy("AdminRole", policy =>
                      policy.RequireClaim(ClaimTypes.Role, "Admin"));
     options.AddPolicy("SuperAdminRole", policy =>

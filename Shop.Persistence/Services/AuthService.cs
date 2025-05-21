@@ -326,9 +326,11 @@ namespace Shop.Infrastructure
 
             if (identityResult.Succeeded)
             {
-                if (_userManager.Users.Count() == 1)
+                var users = _userManager.Users.AsNoTracking();
+                var roles = _roleManager.Roles.AsNoTracking();
+                if (users.Count()==1)
                 {
-                    if (_roleManager.Roles.Count() == 0)
+                    if (roles.Count()==0)
                     {
 
                         Role Role = new Role()
@@ -339,12 +341,35 @@ namespace Shop.Infrastructure
                         {
                             Name = "Admin"
                         };
+                        Role Role2 = new Role()
+                        {
+                            Name = "User"
+                        };
                         await _roleManager.CreateAsync(Role);
                         await _roleManager.CreateAsync(Role1);
+                        await _roleManager.CreateAsync(Role2);
                     }
                     await _userManager.AddToRoleAsync(newUser, "SuperAdmin");
                 }
-                string token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
+                else
+                {
+                    if (roles.Any(x=>x.Name=="User"))
+                    {
+                     
+                      await _userManager.AddToRoleAsync(newUser, "User");
+                    }
+                    else
+                    {
+                        Role Role = new Role()
+                        {
+                            Name = "User"
+                        };
+                        await _roleManager.CreateAsync(Role);
+                        await _userManager.AddToRoleAsync(newUser, "User");
+                    }
+                    await _userManager.AddToRoleAsync(newUser, "User");
+                }
+                    string token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
 
                 string confimationLink = $"{Configuration.config.GetSection("Domain:Front").Get<string>()}/{culture}/auth/emailconfirmed/{HttpUtility.UrlEncode(newUser.Email)}/{HttpUtility.UrlEncode(token)}";
                 var resultEmail = await _emailService.SendEmailAsync(newUser.Email, confimationLink, newUser.FirstName + " " + newUser.LastName);

@@ -124,5 +124,12 @@ namespace ShopAPI.Controllers
             var result = await _authService.ChangePasswordForTokenForgotPasswordAsync(Email, Token, NewPassword,headerLocale);
              return StatusCode((int)result.StatusCode,result);;
         }
+        [Authorize(Roles ="SuperAdmin")]
+        [HttpGet("[action]")]
+        public IActionResult GetUserRole()
+        {
+            var result = _authService.GetAllUserForSelect();
+            return StatusCode((int)result.StatusCode, result); ;
+        }
     }
 }

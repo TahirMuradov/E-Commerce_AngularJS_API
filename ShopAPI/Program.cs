@@ -40,7 +40,7 @@ builder.Services.AddIdentity<User, Role>()
    .AddErrorDescriber<MultilanguageIdentityErrorDescriber>();
 builder.Services.AddControllers();
 
-
+builder.Services.AddHttpContextAccessor();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -77,11 +77,11 @@ builder.Services.AddSwaggerGen(x =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AllRole", policy =>
-                     policy.RequireClaim("Roles", "Admin", "SuperAdmin")); 
+                     policy.RequireClaim(ClaimTypes.Role, "Admin", "SuperAdmin")); 
     options.AddPolicy("AdminRole", policy =>
-                     policy.RequireClaim("Roles", "Admin"));
+                     policy.RequireClaim(ClaimTypes.Role, "Admin"));
     options.AddPolicy("SuperAdminRole", policy =>
-                 policy.RequireClaim("Roles","SuperAdmin"));
+                 policy.RequireClaim(ClaimTypes.Role,"SuperAdmin"));
 });
 // JWT Auth
 #region JWT Auth
@@ -158,6 +158,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseRateLimiter();
 app.UseCors("AllowSpecificOrigin");
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthentication();

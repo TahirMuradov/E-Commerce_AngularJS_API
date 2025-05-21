@@ -85,16 +85,16 @@ namespace Shop.Infrastructure
             }
         }
 
-        public async Task<IResult> ChangePasswordForTokenForgotPasswordAsync(string Email, string token, string NewPassword,string LangCode)
+        public async Task<IResult> ChangePasswordForTokenForgotPasswordAsync(string Email, string token, string NewPassword, string LangCode)
         {
-            if (string.IsNullOrWhiteSpace(LangCode)||!SupportedLaunguages.Contains(LangCode))
+            if (string.IsNullOrWhiteSpace(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 LangCode = DefaultLaunguage;
             if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(token) || string.IsNullOrEmpty(NewPassword))
                 return new ErrorResult(HttpStatusCode.BadRequest);
             Email = HttpUtility.UrlDecode(Email);
             var user = await _userManager.FindByEmailAsync(Email);
             if (user is null)
-                return new ErrorResult(message:AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(message: AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
 
             token = HttpUtility.UrlDecode(token);
             NewPassword = HttpUtility.UrlDecode(NewPassword);
@@ -108,8 +108,8 @@ namespace Shop.Infrastructure
 
         public async Task<IResult> ChecekdConfirmedEmailTokenAsnyc(string email, string token, string culture)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token) ) return new ErrorResult(HttpStatusCode.BadRequest);
-            if (string.IsNullOrEmpty(culture)||!SupportedLaunguages.Contains(culture))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token)) return new ErrorResult(HttpStatusCode.BadRequest);
+            if (string.IsNullOrEmpty(culture) || !SupportedLaunguages.Contains(culture))
                 culture = DefaultLaunguage;
             var checekedEmail = await _userManager.FindByEmailAsync(email);
             if (checekedEmail is null) return new ErrorResult(message: AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
@@ -135,7 +135,7 @@ namespace Shop.Infrastructure
             token = HttpUtility.UrlDecode(token);
             var user = await _userManager.FindByEmailAsync(Email);
             if (user is null)
-                return new ErrorResult(AuthStatusException.UserNotFound[LangCode],HttpStatusCode.NotFound);
+                return new ErrorResult(AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
             bool tokenResult = await _userManager.VerifyUserTokenAsync(
       user: user,
        tokenProvider: _userManager.Options.Tokens.PasswordResetTokenProvider,
@@ -197,20 +197,35 @@ namespace Shop.Infrastructure
         {
             if (page < 1)
                 page = 1;
-
-            IQueryable<GetAllUserDTO> query = _userManager.Users.Select(x => new GetAllUserDTO
+            var usersQuery = _userManager.Users.AsNoTracking();
+            List<GetAllUserDTO> result=new();
+            foreach (var user in usersQuery)
             {
-                Id = x.Id,
-                Adress = x.Adress,
-                Email = x.Email,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                PhoneNumber = x.PhoneNumber,
-                UserName = x.UserName
+                var roles = await _userManager.GetRolesAsync(user);
 
-            });
-            var result = await PaginatedList<GetAllUserDTO>.CreateAsync(query, page, 10);
-            return new SuccessDataResult<PaginatedList<GetAllUserDTO>>(response: result, HttpStatusCode.OK);
+                result.Add(new GetAllUserDTO
+                {
+                    Id = user.Id,
+                    Adress = user.Adress,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    UserName = user.UserName,
+                    Roles = roles.ToList()
+                });
+            }
+
+            var paginatedList = PaginatedList<GetAllUserDTO>.Create(result, page, 10);
+
+
+
+
+
+
+
+           
+            return new SuccessDataResult<PaginatedList<GetAllUserDTO>>(response: paginatedList, HttpStatusCode.OK);
         }
 
         public IDataResult<IQueryable<GetAllUserForSelectDTO>> GetAllUserForSelect()

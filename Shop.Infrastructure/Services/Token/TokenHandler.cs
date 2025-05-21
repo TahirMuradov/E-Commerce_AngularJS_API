@@ -35,6 +35,7 @@ namespace Shop.Infrastructure.Services.Token
                 new Claim("UserName", User.UserName),
                 new Claim("FirstName", User.FirstName),
                 new Claim("LastName", User.LastName),
+                 new Claim("Roles",string.Join(",", roles)),
                 new Claim(ClaimTypes.Role,string.Join(",", roles)),
                 new Claim("PhoneNumber",User.PhoneNumber)
             };

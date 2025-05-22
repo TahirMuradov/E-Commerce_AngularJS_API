@@ -14,8 +14,7 @@ namespace Shop.Infrastructure
            
             serviceCollection.AddScoped<ITokenHandler, TokenHandler>();
             serviceCollection.AddScoped<IMailService,MailServce>();
-            serviceCollection.AddScoped<IAuthServices, AuthService>();
-
+   
         }
 
     }

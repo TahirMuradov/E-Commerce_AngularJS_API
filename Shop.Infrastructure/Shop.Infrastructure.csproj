@@ -10,11 +10,9 @@
     <PackageReference Include="itext7.bouncy-castle-adapter" Version="9.2.0" />
     <PackageReference Include="itext7.pdfhtml" Version="6.2.0" />
     <PackageReference Include="MailKit" Version="4.12.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.16" />
     <PackageReference Include="MimeKit" Version="4.12.0" />
   </ItemGroup>
 

@@ -34,13 +34,11 @@ builder.Services.AddDbContext<AppDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
-builder.Services.AddIdentity<User, Role>()
-.AddEntityFrameworkStores<AppDBContext>()
-.AddDefaultTokenProviders()
-   .AddErrorDescriber<MultilanguageIdentityErrorDescriber>();
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddControllers();
 
-builder.Services.AddHttpContextAccessor();
+SignInManager<User> signInManager = builder.Services.BuildServiceProvider().GetRequiredService<SignInManager<User>>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

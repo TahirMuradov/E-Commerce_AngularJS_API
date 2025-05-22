@@ -39,7 +39,10 @@ namespace Shop.Persistence
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 1;
             });
-
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+            {
+                options.TokenLifespan = TimeSpan.FromMinutes(15); 
+            });
 
 
             services.AddScoped<IAuthServices, AuthService>();

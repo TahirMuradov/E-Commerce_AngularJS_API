@@ -115,7 +115,7 @@ namespace Shop.Infrastructure
             if (checekedEmail is null) return new ErrorResult(message: AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
 
             if (checekedEmail.EmailConfirmed)
-                return new ErrorResult(HttpStatusCode.BadRequest);
+                return new ErrorResult(message: AuthStatusException.ConfirmTokenAlreadyUsed[culture],HttpStatusCode.BadRequest);
             IdentityResult checekedResult = await _userManager.ConfirmEmailAsync(checekedEmail, token);
             if (checekedResult.Succeeded)
 
@@ -371,7 +371,7 @@ namespace Shop.Infrastructure
                 }
                     string token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
 
-                string confimationLink = $"{Configuration.config.GetSection("Domain:Front").Get<string>()}/{culture}/auth/emailconfirmed/{HttpUtility.UrlEncode(newUser.Email)}/{HttpUtility.UrlEncode(token)}";
+                string confimationLink = $"{Configuration.config.GetSection("Domain:Front").Get<string>()}/auth/emailconfirmed/{HttpUtility.UrlEncode(newUser.Email)}/{HttpUtility.UrlEncode(token)}";
                 var resultEmail = await _emailService.SendEmailAsync(newUser.Email, confimationLink, newUser.FirstName + " " + newUser.LastName);
                 if (!resultEmail.IsSuccess)
                 {

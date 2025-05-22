@@ -343,6 +343,18 @@
             };
             }
         }
+        public static Dictionary<string, string> ConfirmTokenAlreadyUsed
+        {
+            get
+            {
+                return new Dictionary<string, string>()
+        {
+            { "az", "Bu təsdiq linki artıq istifadə olunub və ya müddəti bitib." },
+            { "ru", "Эта ссылка для подтверждения уже использована или истек срок её действия." },
+            { "en", "This confirmation link has already been used or has expired." }
+        };
+            }
+        }
 
     }
 }

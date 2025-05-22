@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Shop.Application.Abstraction.Services;
 using Shop.Application.DTOs.AuthDTOs;
+using System.Security.Claims;
 
 
 namespace ShopAPI.Controllers
@@ -48,10 +49,11 @@ namespace ShopAPI.Controllers
  
         [HttpPut("[action]")]
         [Authorize]
-        public async Task<IActionResult> LogOut([FromQuery] Guid UserId)
+        public async Task<IActionResult> LogOut()
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"];
-            var result = await _authService.LogOutAsync(UserId.ToString(), headerLocale);
+            string? currentUserId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _authService.LogOutAsync(currentUserId, headerLocale);
 
              return StatusCode((int)result.StatusCode,result);;
         }

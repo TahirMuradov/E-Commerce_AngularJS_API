@@ -1,21 +1,15 @@
 
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shop.Application;
 using Shop.Application.CustomLanguageMessage;
-using Shop.Application.Exceptions;
-using Shop.Application.Validators.AuthValidations;
-using Shop.Domain.Entities;
 using Shop.Infrastructure;
-using Shop.Infrastructure.Filters;
 using Shop.Persistence;
 using Shop.Persistence.Context;
-using System;
 using System.Globalization;
 using System.Security.Claims;
 using System.Text;
@@ -38,7 +32,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 
-SignInManager<User> signInManager = builder.Services.BuildServiceProvider().GetRequiredService<SignInManager<User>>();
+
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Shop.Application.Abstraction.Token;
-using Shop.Application.DTOs;
 using Shop.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

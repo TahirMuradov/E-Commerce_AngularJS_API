@@ -120,10 +120,10 @@ namespace ShopAPI.Controllers
              return StatusCode((int)result.StatusCode,result);;
         }
         [HttpPut("[action]")]
-        public async Task<IActionResult> ChangePasswordForTokenForgotPassword([FromQuery] string Email, [FromQuery] string Token, [FromQuery] string NewPassword)
+        public async Task<IActionResult> ChangePasswordForTokenForgotPassword([FromBody] UpdateForgotPasswordDTO updateForgotPasswordDTO)
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"];
-            var result = await _authService.ChangePasswordForTokenForgotPasswordAsync(Email, Token, NewPassword,headerLocale);
+            var result = await _authService.ChangePasswordForTokenForgotPasswordAsync(updateForgotPasswordDTO, headerLocale);
              return StatusCode((int)result.StatusCode,result);;
         }
         [Authorize(Roles ="SuperAdmin")]

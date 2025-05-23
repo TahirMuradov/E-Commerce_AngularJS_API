@@ -15,7 +15,7 @@ namespace Shop.Application.Abstraction.Services
         Task<IResult> AssignRoleToUserAsnyc(AssignRoleDTO assignRoleDTO, string culture);
         Task<IResult> SendEmailTokenForForgotPasswordAsync(string Email,string LangCode);
         Task<IResult> CheckTokenForForgotPasswordAsync(string Email, string token,string LangCode);
-        Task<IResult> ChangePasswordForTokenForgotPasswordAsync(string Email, string token, string NewPassword,string LangCode);
+        Task<IResult> ChangePasswordForTokenForgotPasswordAsync(UpdateForgotPasswordDTO updateForgotPasswordDTO,string LangCode);
         IDataResult<IQueryable<GetAllUserForSelectDTO>> GetAllUserForSelect();
         Task<IDataResult<string>> UpdateRefreshTokenAsnyc(string refreshToken, User user, string culture);
         Task<IResult> RemoveRoleFromUserAsync(RemoveRoleUserDTO removeRoleUserDTO, string culture);

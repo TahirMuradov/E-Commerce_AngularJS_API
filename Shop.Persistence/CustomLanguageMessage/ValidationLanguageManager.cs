@@ -327,7 +327,9 @@ namespace Shop.Application.CustomLanguageMessage
             AddTranslation("en", "RealetedIdrequired", "At least one must be selected: category, subcategory, product, or user!");
 
             #endregion
-
+            AddTranslation("az", "TokenRequired", "Token boş ola bilməz!");
+            AddTranslation("en", "TokenRequired", "Token cannot be empty!");
+            AddTranslation("ru", "TokenRequired", "Токен не может быть пустым!");
         }
     }
 }

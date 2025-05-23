@@ -85,20 +85,21 @@ namespace Shop.Infrastructure
             }
         }
 
-        public async Task<IResult> ChangePasswordForTokenForgotPasswordAsync(string Email, string token, string NewPassword, string LangCode)
+        public async Task<IResult> ChangePasswordForTokenForgotPasswordAsync(UpdateForgotPasswordDTO updateForgotPasswordDTO, string LangCode)
         {
             if (string.IsNullOrWhiteSpace(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 LangCode = DefaultLaunguage;
-            if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(token) || string.IsNullOrEmpty(NewPassword))
-                return new ErrorResult(HttpStatusCode.BadRequest);
-            Email = HttpUtility.UrlDecode(Email);
-            var user = await _userManager.FindByEmailAsync(Email);
+            UpdateForgotPasswordDTOValidation validationRules = new UpdateForgotPasswordDTOValidation(LangCode);
+            var validationResult = await validationRules.ValidateAsync(updateForgotPasswordDTO);
+            if (!validationResult.IsValid)
+                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+
+            var user = await _userManager.FindByEmailAsync(updateForgotPasswordDTO.Email);
             if (user is null)
                 return new ErrorResult(message: AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
 
-            token = HttpUtility.UrlDecode(token);
-            NewPassword = HttpUtility.UrlDecode(NewPassword);
-            IdentityResult tokenResult = await _userManager.ResetPasswordAsync(user, token, NewPassword);
+    
+            IdentityResult tokenResult = await _userManager.ResetPasswordAsync(user, updateForgotPasswordDTO.Token, updateForgotPasswordDTO.NewPassword);
             if (tokenResult.Succeeded)
                 return new SuccessResult(HttpStatusCode.OK);
             return new ErrorResult(messages: tokenResult.Errors.Select(x => x.Description).ToList(), HttpStatusCode.BadRequest);
@@ -115,7 +116,7 @@ namespace Shop.Infrastructure
             if (checekedEmail is null) return new ErrorResult(message: AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
 
             if (checekedEmail.EmailConfirmed)
-                return new ErrorResult(message: AuthStatusException.ConfirmTokenAlreadyUsed[culture],HttpStatusCode.BadRequest);
+                return new ErrorResult(message: AuthStatusException.ConfirmTokenAlreadyUsed[culture], HttpStatusCode.BadRequest);
             IdentityResult checekedResult = await _userManager.ConfirmEmailAsync(checekedEmail, token);
             if (checekedResult.Succeeded)
 
@@ -198,7 +199,7 @@ namespace Shop.Infrastructure
             if (page < 1)
                 page = 1;
             var usersQuery = _userManager.Users.AsNoTracking();
-            List<GetAllUserDTO> result=new();
+            List<GetAllUserDTO> result = new();
             foreach (var user in usersQuery)
             {
                 var roles = await _userManager.GetRolesAsync(user);
@@ -224,7 +225,7 @@ namespace Shop.Infrastructure
 
 
 
-           
+
             return new SuccessDataResult<PaginatedList<GetAllUserDTO>>(data: paginatedList, HttpStatusCode.OK);
         }
 
@@ -328,9 +329,9 @@ namespace Shop.Infrastructure
             {
                 var users = _userManager.Users.AsNoTracking();
                 var roles = _roleManager.Roles.AsNoTracking();
-                if (users.Count()==1)
+                if (users.Count() == 1)
                 {
-                    if (roles.Count()==0)
+                    if (roles.Count() == 0)
                     {
 
                         Role Role = new Role()
@@ -353,10 +354,10 @@ namespace Shop.Infrastructure
                 }
                 else
                 {
-                    if (roles.Any(x=>x.Name=="User"))
+                    if (roles.Any(x => x.Name == "User"))
                     {
-                     
-                      await _userManager.AddToRoleAsync(newUser, "User");
+
+                        await _userManager.AddToRoleAsync(newUser, "User");
                     }
                     else
                     {
@@ -369,7 +370,7 @@ namespace Shop.Infrastructure
                     }
                     await _userManager.AddToRoleAsync(newUser, "User");
                 }
-                    string token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
+                string token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
 
                 string confimationLink = $"{Configuration.config.GetSection("Domain:Front").Get<string>()}/auth/emailconfirmed/{HttpUtility.UrlEncode(newUser.Email)}/{HttpUtility.UrlEncode(token)}";
                 var resultEmail = await _emailService.SendEmailAsync(newUser.Email, confimationLink, newUser.FirstName + " " + newUser.LastName);
@@ -430,7 +431,7 @@ namespace Shop.Infrastructure
                 return new ErrorResult(message: AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
             string token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var url = _configuration["Domain:Front"] + $"/auth/forgotpassword/confirmation/{HttpUtility.UrlEncode(Email)}/{HttpUtility.UrlEncode(token)}";
+            var url = _configuration["Domain:Front"] + $"/auth/changepasswordforforgot/{HttpUtility.UrlEncode(Email)}/{HttpUtility.UrlEncode(token)}";
             var emailResult = await _emailService.SendEmailAsync(user.Email, url, user.FirstName + " " + user.LastName);
 
 

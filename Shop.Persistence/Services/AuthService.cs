@@ -98,7 +98,7 @@ namespace Shop.Infrastructure
             if (user is null)
                 return new ErrorResult(message: AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
 
-    
+
             IdentityResult tokenResult = await _userManager.ResetPasswordAsync(user, updateForgotPasswordDTO.Token, updateForgotPasswordDTO.NewPassword);
             if (tokenResult.Succeeded)
                 return new SuccessResult(HttpStatusCode.OK);
@@ -112,12 +112,16 @@ namespace Shop.Infrastructure
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token)) return new ErrorResult(HttpStatusCode.BadRequest);
             if (string.IsNullOrEmpty(culture) || !SupportedLaunguages.Contains(culture))
                 culture = DefaultLaunguage;
+    
             var checekedEmail = await _userManager.FindByEmailAsync(email);
             if (checekedEmail is null) return new ErrorResult(message: AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
 
             if (checekedEmail.EmailConfirmed)
                 return new ErrorResult(message: AuthStatusException.ConfirmTokenAlreadyUsed[culture], HttpStatusCode.BadRequest);
+
+
             IdentityResult checekedResult = await _userManager.ConfirmEmailAsync(checekedEmail, token);
+
             if (checekedResult.Succeeded)
 
                 return new SuccessResult(messages: checekedResult.Errors.Select(x => x.Description).ToList(), HttpStatusCode.OK);
@@ -130,13 +134,14 @@ namespace Shop.Infrastructure
 
         public async Task<IResult> CheckTokenForForgotPasswordAsync(string Email, string token, string LangCode)
         {
-            if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(token)) return new ErrorResult(HttpStatusCode.BadRequest);
+            if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(token)) return new ErrorResult(messages:new List<string> { AuthStatusException.EmailInvalid[LangCode], AuthStatusException.InvalidToken[LangCode] },HttpStatusCode.BadRequest);
 
-            Email = HttpUtility.UrlDecode(Email);
-            token = HttpUtility.UrlDecode(token);
             var user = await _userManager.FindByEmailAsync(Email);
+
             if (user is null)
                 return new ErrorResult(AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
+            token = HttpUtility.UrlDecode(token);
+       
             bool tokenResult = await _userManager.VerifyUserTokenAsync(
       user: user,
        tokenProvider: _userManager.Options.Tokens.PasswordResetTokenProvider,
@@ -145,7 +150,7 @@ namespace Shop.Infrastructure
                   );
 
             if (tokenResult) return new SuccessResult(HttpStatusCode.OK);
-            return new ErrorResult(HttpStatusCode.BadRequest);
+            return new ErrorResult(message: AuthStatusException.InvalidToken[LangCode],HttpStatusCode.BadRequest);
         }
 
         public async Task<IResult> DeleteUserAsnyc(Guid Id, string culture)
@@ -373,7 +378,7 @@ namespace Shop.Infrastructure
                 string token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
 
                 string confimationLink = $"{Configuration.config.GetSection("Domain:Front").Get<string>()}/auth/emailconfirmed/{HttpUtility.UrlEncode(newUser.Email)}/{HttpUtility.UrlEncode(token)}";
-                var resultEmail = await _emailService.SendEmailAsync(newUser.Email, confimationLink, newUser.FirstName + " " + newUser.LastName);
+                var resultEmail = await _emailService.SendEmailAsync(newUser.Email, confimationLink, newUser.FirstName + " " + newUser.LastName, isForgotPass: false);
                 if (!resultEmail.IsSuccess)
                 {
                     await _userManager.DeleteAsync(await _userManager.FindByEmailAsync(newUser.Email));
@@ -430,9 +435,14 @@ namespace Shop.Infrastructure
             if (user is null)
                 return new ErrorResult(message: AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
             string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+           
+            var encodedToken = HttpUtility.UrlEncode(token);
+            var encodedEmail = HttpUtility.UrlEncode(Email);
 
-            var url = _configuration["Domain:Front"] + $"/auth/changepasswordforforgot/{HttpUtility.UrlEncode(Email)}/{HttpUtility.UrlEncode(token)}";
-            var emailResult = await _emailService.SendEmailAsync(user.Email, url, user.FirstName + " " + user.LastName);
+            var url = $"{_configuration["Domain:Front"]}/auth/changepasswordforforgot?email={encodedEmail}&token={encodedToken}";
+
+
+            var emailResult = await _emailService.SendEmailAsync(user.Email, url, user.FirstName + " " + user.LastName,isForgotPass:true);
 
 
             if (emailResult.IsSuccess)

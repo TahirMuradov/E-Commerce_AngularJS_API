@@ -355,6 +355,17 @@
         };
             }
         }
-
+        public static Dictionary<string, string> InvalidUserName
+        {
+            get
+            {
+                return new Dictionary<string, string>()
+        {
+            { "az", "{0} istifadəçi adı etibarsızdır. Yalnız hərflər və rəqəmlər istifadə edilə bilər." },
+            { "ru", "Недопустимое имя пользователя {0}. Можно использовать только буквы и цифры." },
+            { "en", "Username {0} is invalid, can only contain letters or digits." }
+        };
+            }
+        }
     }
 }

@@ -25,6 +25,7 @@ namespace ShopAPI.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"];
+
             var result=await _authService.LoginAsync(loginDTO, headerLocale);
             return StatusCode((int)result.StatusCode,result);
 
@@ -117,6 +118,7 @@ namespace ShopAPI.Controllers
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"];
             var result = await _authService.CheckTokenForForgotPasswordAsync(Email, Token,headerLocale);
+
              return StatusCode((int)result.StatusCode,result);;
         }
         [HttpPut("[action]")]

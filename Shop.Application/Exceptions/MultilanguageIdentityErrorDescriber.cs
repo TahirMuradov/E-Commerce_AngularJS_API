@@ -119,7 +119,7 @@ namespace Shop.Application.Exceptions
             return new IdentityError
             {
                 Code = nameof(InvalidUserName),
-                Description = AuthStatusException.UserNotFound[LangCode]
+                Description = AuthStatusException.InvalidUserName[LangCode].Replace("{0}", name)
             };
         }
 

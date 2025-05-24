@@ -123,11 +123,28 @@ namespace Shop.Infrastructure
             IdentityResult checekedResult = await _userManager.ConfirmEmailAsync(checekedEmail, token);
 
             if (checekedResult.Succeeded)
+            {
 
                 return new SuccessResult(messages: checekedResult.Errors.Select(x => x.Description).ToList(), HttpStatusCode.OK);
+            }
+
 
             else
+            {
+
+                if (checekedResult.Errors.Any(x=>x.Code== "InvalidToken"))
+                {
+                    await _userManager.DeleteAsync(checekedEmail);
+                    return new ErrorResult(messages: checekedResult.Errors.Select(x => {
+                        if (x.Code == "InvalidToken")
+                            return AuthStatusException.InvalidTokenForEmailConfirmation[culture];
+                        else
+                            return x.Description;
+
+                    }).ToList(), HttpStatusCode.BadRequest);
+                }
                 return new ErrorResult(messages: checekedResult.Errors.Select(x => x.Description).ToList(), HttpStatusCode.BadRequest);
+            }
 
 
         }

@@ -111,7 +111,18 @@
         };
             }
         }
-
+        public static Dictionary<string, string> InvalidTokenForEmailConfirmation
+        {
+            get
+            {
+                return new Dictionary<string, string>()
+        {
+            { "az", "Tokenin vaxtı bitib.Yenidən qeyydiyatdan keçin!" },
+            { "ru", "Время токена закончилось. Пройдите через вновь." },
+            { "en", "Token's time is over. Go through the newly." }
+        };
+            }
+        }
         public static Dictionary<string, string> PasswordTooShort
         {
             get

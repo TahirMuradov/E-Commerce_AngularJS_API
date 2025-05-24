@@ -103,7 +103,7 @@ namespace ShopAPI.Controllers
         public async Task<IActionResult> ChecekdConfirmedEmailToken([FromBody] ConfirmedEmailDTO confirmedEmailDTO)
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"];
-            var result = await _authService.ChecekdConfirmedEmailTokenAsnyc(confirmedEmailDTO.Email, confirmedEmailDTO.token, headerLocale);
+            var result = await _authService.ChecekdConfirmedEmailTokenAsnyc(confirmedEmailDTO.token, confirmedEmailDTO.Email, headerLocale);
              return StatusCode((int)result.StatusCode,result);;
         }
         [HttpPut("[action]")]

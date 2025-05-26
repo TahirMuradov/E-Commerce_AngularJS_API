@@ -3,8 +3,10 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using Shop.Application;
 using Shop.Application.CustomLanguageMessage;
 using Shop.Infrastructure;
@@ -29,6 +31,13 @@ builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
 builder.Services.AddHttpContextAccessor();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(new LoggerConfiguration()
+.WriteTo.Console()
+.WriteTo.File("Logs/_Log.txt", rollingInterval: RollingInterval.Day)
+.MinimumLevel.Information()
+.CreateLogger());
 
 builder.Services.AddControllers();
 

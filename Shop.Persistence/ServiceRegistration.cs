@@ -6,6 +6,7 @@ using Shop.Application.Exceptions;
 using Shop.Domain.Entities;
 using Shop.Infrastructure;
 using Shop.Persistence.Context;
+using Shop.Persistence.Services;
 
 namespace Shop.Persistence
 {
@@ -44,8 +45,12 @@ namespace Shop.Persistence
                 options.TokenLifespan = TimeSpan.FromMinutes(15); 
             });
 
-
+          
             services.AddScoped<IAuthServices, AuthService>();
+
+
+
+            services.AddScoped<ICategoryService, CategoryService>();
 
 
 

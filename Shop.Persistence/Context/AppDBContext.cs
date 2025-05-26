@@ -19,9 +19,13 @@ namespace Shop.Persistence.Context
         public DbSet<Size> Sizes { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryLanguage> CategoryLanguages { get; set; }
+        public DbSet<ShippingMethod> ShippingMethods { get; set; }
+        public DbSet<ShippingMethodLanguage> ShippingMethodLanguages { get; set; }
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
+        public DbSet<PaymentMethodLanguages> PaymentMethodLanguages { get; set; }
 
 
-      
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

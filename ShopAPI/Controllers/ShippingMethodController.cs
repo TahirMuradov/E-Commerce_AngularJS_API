@@ -1,64 +1,61 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Shop.Application.Abstraction.Services;
-using Shop.Application.DTOs.CategoryDTOs;
+using Shop.Application.DTOs.ShippingMethodDTOs;
 
 namespace ShopAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [EnableRateLimiting("Fixed")]
-    public class CategoryController : ControllerBase
+    public class ShippingMethodController : ControllerBase
     {
-        private readonly ICategoryService _categoryService;
+        private readonly IShippingMethodService _shippingMethodService;
 
-        public CategoryController(ICategoryService categoryService)
+        public ShippingMethodController(IShippingMethodService shippingMethodService)
         {
-            _categoryService = categoryService;
+            _shippingMethodService = shippingMethodService;
         }
         [HttpPost("[action]")]
-        public IActionResult AddCategory([FromBody] AddCategoryDTO categoryDTO)
+        public IActionResult AddShippingMethod([FromBody]AddShippingMethodDTO addShippingMethodDTO)
         {
             string headerLocale = HttpContext.Request.Headers["Accept-Language"];
-            var result = _categoryService.AddCategory(categoryDTO, headerLocale);
+            var result = _shippingMethodService.AddShippingMethod(addShippingMethodDTO, headerLocale);
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpPut("[action]")]
-        public IActionResult UpdateCategory([FromBody] UpdateCategoryDTO updateCategoryDTO)
+        public IActionResult UdpateShippingMethod([FromBody]UpdateShippingMethodDTO updateShippingMethodDTO)
         {
             string headerLocale = HttpContext.Request.Headers["Accept-Language"];
-            var result = _categoryService.UpdateCategory(updateCategoryDTO, headerLocale);
+            var result = _shippingMethodService.UdpateShippingMethod(updateShippingMethodDTO, headerLocale);
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpDelete("[action]")]
-        public IActionResult DeleteCategory([FromQuery] Guid Id)
+        public IActionResult DeleteShippingMethod([FromQuery]Guid id)
         {
             string headerLocale = HttpContext.Request.Headers["Accept-Language"];
-            var result = _categoryService.DeleteCategory(Id, headerLocale);
+            var result = _shippingMethodService.DeleteShippingMethod(id, headerLocale);
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetAllCategoryByPage([FromQuery] int page = 1)
+        public IActionResult GetShippingMethodById([FromQuery] Guid id)
         {
             string headerLocale = HttpContext.Request.Headers["Accept-Language"];
-            var result = await _categoryService.GetAllCategoryByPageAsync(headerLocale, page);
+            var result = _shippingMethodService.GetShippingMethodById(id, headerLocale);
             return StatusCode((int)result.StatusCode, result);
-
         }
         [HttpGet("[action]")]
-        public IActionResult GetAllCategory()
+        public IActionResult GetAllShippingMethods()
         {
             string headerLocale = HttpContext.Request.Headers["Accept-Language"];
-            var result = _categoryService.GetAllCategory(headerLocale);
+            var result = _shippingMethodService.GetAllShippingMethods(headerLocale);
             return StatusCode((int)result.StatusCode, result);
-
         }
         [HttpGet("[action]")]
-        public IActionResult GetCategoryDetailById([FromQuery] Guid Id)
+        public async Task<IActionResult> GetAllShippingMethodsByPage([FromQuery]int page = 1)
         {
-
             string headerLocale = HttpContext.Request.Headers["Accept-Language"];
-            var result = _categoryService.GetCategoryDetailById(Id, headerLocale);
+       var result= await _shippingMethodService.GetAllShippingMethodsByPageAsync(page, headerLocale);
             return StatusCode((int)result.StatusCode, result);
         }
     }

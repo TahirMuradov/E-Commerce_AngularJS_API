@@ -51,6 +51,8 @@ namespace Shop.Persistence
 
 
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<ISizeService, SizeService>();
+            services.AddScoped<IShippingMethodService, ShippingMethodService>();
 
 
 

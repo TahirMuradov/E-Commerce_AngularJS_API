@@ -47,8 +47,6 @@ namespace Shop.Persistence.Services
 
         public IResult AddCategory(AddCategoryDTO addCategoryDTO, string locale)
         {
-            try
-            {
                 if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                     return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
 
@@ -56,6 +54,8 @@ namespace Shop.Persistence.Services
                 var validationResult = validationRules.Validate(addCategoryDTO);
                 if (!validationResult.IsValid)
                     return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+            try
+            {
 
                 Category category = new Category();
                 _context.Categories.Add(category);
@@ -168,7 +168,15 @@ namespace Shop.Persistence.Services
                     _context.CategoryLanguages.Update(categoryLanguage);
                 }
                 else
-                    continue;
+                {
+                    categoryLanguage = new CategoryLanguage
+                    {
+                        CategoryId = category.Id,
+                        LanguageCode = newContent.Key,
+                        Name = newContent.Value
+                    };
+                    _context.CategoryLanguages.Add(categoryLanguage);
+                }
 
 
             }

@@ -157,7 +157,7 @@ namespace Shop.Infrastructure
 
             if (user is null)
                 return new ErrorResult(AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
-            token = HttpUtility.UrlDecode(token);
+         
        
             bool tokenResult = await _userManager.VerifyUserTokenAsync(
       user: user,

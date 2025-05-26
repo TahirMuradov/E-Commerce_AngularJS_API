@@ -8,6 +8,7 @@ using Shop.Application.PaginationHelper;
 using Shop.Application.ResultTypes.Abstract;
 using Shop.Application.ResultTypes.Concrete.ErrorResults;
 using Shop.Application.ResultTypes.Concrete.SuccessResults;
+using Shop.Application.Validators.CategoryValidations;
 using Shop.Domain.Entities;
 using Shop.Persistence.Context;
 using System.Net;
@@ -48,18 +49,14 @@ namespace Shop.Persistence.Services
         {
             try
             {
+                if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
+                    return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
 
-                var unsupportedLangs = addCategoryDTO.CategoryContent.Keys
-         .Where(k => !SupportedLaunguages.Contains(k))
-         .ToList();
+                AddCategoryDTOValidation validationRules = new AddCategoryDTOValidation(locale, SupportedLaunguages);
+                var validationResult = validationRules.Validate(addCategoryDTO);
+                if (!validationResult.IsValid)
+                    return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
 
-                if (unsupportedLangs.Any())
-                {
-                    return new ErrorResult(
-                        message: HttpStatusErrorMessages.UnsupportedLanguage[locale],
-                        HttpStatusCode.BadRequest
-                    );
-                }
                 Category category = new Category();
                 _context.Categories.Add(category);
 
@@ -68,15 +65,15 @@ namespace Shop.Persistence.Services
                 {
                     if (SupportedLaunguages.Contains(categoryContent.Key))
                     {
-                        
-                    CategoryLanguage categoryLang = new()
-                    {
-                        CategoryId = category.Id,
-                        LanguageCode = categoryContent.Key,
-                        Name = categoryContent.Value,
 
-                    };
-                    _context.CategoryLanguages.Add(categoryLang);
+                        CategoryLanguage categoryLang = new()
+                        {
+                            CategoryId = category.Id,
+                            LanguageCode = categoryContent.Key,
+                            Name = categoryContent.Value,
+
+                        };
+                        _context.CategoryLanguages.Add(categoryLang);
                     }
 
 
@@ -96,6 +93,8 @@ namespace Shop.Persistence.Services
 
         public IResult DeleteCategory(Guid Id, string locale)
         {
+            if (Id == default || string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
+                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             Category category = _context.Categories.FirstOrDefault(x => x.Id == Id);
             if (category is null)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
@@ -106,6 +105,8 @@ namespace Shop.Persistence.Services
 
         public IDataResult<IQueryable<GetCategoryDTO>> GetAllCategory(string locale)
         {
+            if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
+                return new ErrorDataResult<IQueryable<GetCategoryDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             IQueryable<GetCategoryDTO> queryCategory = _context.Categories.AsNoTracking().Select(x => new GetCategoryDTO
             {
                 CategoryId = x.Id,
@@ -116,6 +117,10 @@ namespace Shop.Persistence.Services
 
         public async Task<IDataResult<PaginatedList<GetCategoryDTO>>> GetAllCategoryByPageAsync(string locale, int page = 1)
         {
+            if ( string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
+                return new ErrorDataResult<PaginatedList<GetCategoryDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+            if (page < 1)
+                page = 1;
             IQueryable<GetCategoryDTO> queryCategory = _context.Categories.AsNoTracking().Select(x => new GetCategoryDTO
             {
                 CategoryId = x.Id,
@@ -126,22 +131,31 @@ namespace Shop.Persistence.Services
             return new SuccessDataResult<PaginatedList<GetCategoryDTO>>(data: returnData, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }
 
-        public IDataResult<GetCategoryDTO> GetCategoryDetailById(Guid Id, string locale)
+        public IDataResult<GetCategoryDetailDTO> GetCategoryDetailById(Guid Id, string locale)
         {
-            GetCategoryDTO category = _context.Categories.AsNoTracking()
+            if (Id == default || string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
+                return new ErrorDataResult<GetCategoryDetailDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+            GetCategoryDetailDTO category = _context.Categories.AsNoTracking()
                  .Where(x => x.Id == Id)
-                 .Select(x => new GetCategoryDTO
+                 .Select(x => new GetCategoryDetailDTO
                  {
-                     CategoryId = x.Id,
-                     CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name
+                     Id = x.Id,
+                     CategoryContent = x.CategoryLanguages.Select(x=>new KeyValuePair<string,string>(x.LanguageCode,x.Name)).ToDictionary()
                  }).FirstOrDefault();
             return category is null ?
-                 new ErrorDataResult<GetCategoryDTO>(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound) :
-            new SuccessDataResult<GetCategoryDTO>(data: category, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+                 new ErrorDataResult<GetCategoryDetailDTO>(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound) :
+            new SuccessDataResult<GetCategoryDetailDTO>(data: category, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }
 
         public IResult UpdateCategory(UpdateCategoryDTO updateCategoryDTO, string locale)
+
         {
+            if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
+                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+            UpdateCategoryDTOValidation validationRules = new UpdateCategoryDTOValidation(locale, SupportedLaunguages);
+            var validationResult = validationRules.Validate(updateCategoryDTO);
+            if (!validationResult.IsValid)
+                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
             var category = _context.Categories.Include(x => x.CategoryLanguages).FirstOrDefault(x => x.Id == updateCategoryDTO.Id);
             if (category is null)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);

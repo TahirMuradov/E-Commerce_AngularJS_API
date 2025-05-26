@@ -118,7 +118,7 @@ builder.Services
         configuration.LocalizationEnabled = true;
         configuration.AutomaticValidationEnabled = false;
         configuration.DisableDataAnnotationsValidation = true;
-        configuration.ValidatorOptions.LanguageManager = new ValidationLanguageManager();
+        configuration.ValidatorOptions.LanguageManager = new CustomValidationLanguageMessage();
         configuration.ValidatorOptions.LanguageManager.Culture = new CultureInfo("en");
     })
  ;

@@ -11,7 +11,7 @@ namespace Shop.Application.Abstraction.Services
         public IResult DeleteCategory(Guid Id,string locale);
         public Task<IDataResult<PaginatedList<GetCategoryDTO>>> GetAllCategoryByPageAsync(string locale, int page = 1);
         public IDataResult<IQueryable<GetCategoryDTO>> GetAllCategory(string locale);
-        public IDataResult<GetCategoryDTO> GetCategoryDetailById(Guid Id, string locale);
+        public IDataResult<GetCategoryDetailDTO> GetCategoryDetailById(Guid Id, string locale);
 
     }
 }

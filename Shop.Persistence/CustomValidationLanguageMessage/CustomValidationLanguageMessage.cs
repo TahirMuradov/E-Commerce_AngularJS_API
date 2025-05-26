@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Shop.Application.CustomLanguageMessage
 {
-   public class ValidationLanguageManager:LanguageManager
+   public class CustomValidationLanguageMessage:LanguageManager
     {
-        public ValidationLanguageManager()
+        public CustomValidationLanguageMessage()
         {
             string[] supportedLaunguages = Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
             string languagesList = string.Join(", ", supportedLaunguages);

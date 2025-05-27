@@ -8,20 +8,21 @@ namespace Shop.Application.Validators.PaymentMethodValidations
     {
         public UpdatePaymentMethodDTOValidation(string langCode, string[] SupportLanguages)
         {
+            var culture = new CultureInfo(langCode);
             RuleFor(dto => dto.Id)
-           .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("IdIsRequired", new CultureInfo(langCode)))
-           .Must(id => Guid.TryParse(id.ToString(), out _)).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidGuid", new CultureInfo(langCode)));
+           .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("IdIsRequired", culture))
+           .Must(id => Guid.TryParse(id.ToString(), out _)).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidGuid", culture));
 
             RuleFor(dto => dto.Content)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangDictionaryIsRequired", new CultureInfo(langCode)));
+                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangDictionaryIsRequired",culture));
 
             RuleForEach(dto => dto.Content)
                 .Must(pair => !string.IsNullOrEmpty(pair.Key) && !string.IsNullOrEmpty(pair.Value))
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangKeyAndValueRequired", new CultureInfo(langCode)));
+                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangKeyAndValueRequired", culture));
 
             RuleForEach(dto => dto.Content.Keys)
                 .Must(key => SupportLanguages.Contains(key))
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidLangKey", new CultureInfo(langCode)));
+                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidLangKey", culture));
         }
     }
 }

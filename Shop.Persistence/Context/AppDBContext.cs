@@ -2,7 +2,9 @@
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Shop.Domain.Entities;
+using System.Text.Json;
 
 namespace Shop.Persistence.Context
 {
@@ -31,6 +33,11 @@ namespace Shop.Persistence.Context
             base.OnModelCreating(builder);
             builder.Entity<User>().ToTable("Users");
             builder.Entity<Role>().ToTable("Roles");
+            builder.Entity<Product>()
+                .Property(p => p.ImageUrls)
+                 .HasConversion(
+    v => JsonConvert.SerializeObject(v),
+    v => JsonConvert.DeserializeObject<List<string>>(v));
 
         }
     }

@@ -1,46 +1,43 @@
 ﻿using iText.Html2pdf;
-using Microsoft.AspNetCore.Http;
+
 using Shop.Application.Abstraction.Services;
 using Shop.Application.DTOs.OrderPdfGeneratorDTOs;
+using Shop.Application.ResultTypes;
+using Shop.Application.ResultTypes.Abstract;
+using Shop.Application.ResultTypes.Concrete.ErrorResults;
+using Shop.Application.ResultTypes.Concrete.SuccessResults;
 using Shop.Persistence;
+using System.Net;
 
 namespace Shop.Infrastructure.Services
 {
     public class FileService : IFileService
     {
-        public bool RemoveFile(string FilePaths)
+        public IResult RemoveFile(string FilePaths)
         {
             string filePath = Path.Combine(WebRootPathProvider.GetwwwrootPath + FilePaths);
 
             if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-
-            }
-            else { return false; }
-            return true;
+            
+                File.Delete(filePath);            
+            else return new ErrorResult(HttpStatusCode.NotFound);
+            return new SuccessResult(HttpStatusCode.OK);
         }
 
-        public bool RemoveFileRange(List<string> FilePaths)
+        public IResult RemoveFileRange(List<string> FilePaths)
         {
             foreach (var path in FilePaths)
             {
-                string filePath = Path.Combine(WebRootPathProvider.GetwwwrootPath, path.Replace('/', '\\'));
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
+         var result= RemoveFile(path);
 
-                }
-                else
-                {
-                    continue;
-                }
+                if (!result.IsSuccess)
+                    return result;
 
             }
-            return true;
+            return new SuccessResult(HttpStatusCode.OK);
         }
 
-        public async Task<string> SaveFileAsync(IFormFile file, string WebRootPath, bool isProductPicture = false)
+        public async Task<IDataResult<string>> SaveFileAsync(Microsoft.AspNetCore.Http.IFormFile file, bool isProductPicture = false)
         {
 
             string filePath = string.Empty;
@@ -54,7 +51,7 @@ namespace Shop.Infrastructure.Services
             var path = filePath + Guid.NewGuid().ToString() + file.FileName;
             using FileStream fileStream = new(Path.Combine(WebRootPathProvider.GetwwwrootPath + path), FileMode.Create);
             await file.CopyToAsync(fileStream);
-            return path;
+            return new SuccessDataResult<string>(data:path,HttpStatusCode.OK);
         }
         /// <summary>
         /// /// Saves a list of files to the specified WebUIPictures folder in web root path.
@@ -63,14 +60,20 @@ namespace Shop.Infrastructure.Services
         /// <param name="file">File is photo or other file type</param>
         /// <param name="WebRootPath"> WebRootPath is wwwroot folder`s path</param>
         /// <returns></returns>
-        public async Task<List<string>> SaveFileRangeAsync(List<IFormFile> file, string WebRootPath)
+        public async Task<IDataResult<List<string>>> SaveFileRangeAsync(List<Microsoft.AspNetCore.Http.IFormFile> file)
         {
-            List<string> urls = new List<string>();
+            SuccessDataResult< List<string>> result = new SuccessDataResult<List<string>>(new List<string> (),HttpStatusCode.OK);
+
             foreach (var x in file)
             {
-                urls.Add(await SaveFileAsync(x, WebRootPath));
+                IDataResult<string> path = await SaveFileAsync(x);
+                if (result.IsSuccess)
+                {
+                    
+                result.Data.Add(path.Data);
+                }
             }
-            return urls;
+            return result;
         }
         /// <summary>
         /// /// Saves an order PDF file with the specified items, shipping method, and payment method.
@@ -81,7 +84,7 @@ namespace Shop.Infrastructure.Services
         /// <param name="shippingMethod">Shipping method</param>
         /// <param name="paymentMethod"> Payment Method</param>
         /// <returns></returns>
-        public List<string> SaveOrderPdf(List<GeneratePdfOrderProductDTO> items, ShippingMethodInOrderPdfDTO shippingMethod, PaymentMethodInOrderPdfDTO paymentMethod)
+        public IDataResult<List<string>> SaveOrderPdf(List<GeneratePdfOrderProductDTO> items, ShippingMethodInOrderPdfDTO shippingMethod, PaymentMethodInOrderPdfDTO paymentMethod)
         {
             decimal totalPrice = 0;
             string tableBody = "";
@@ -185,9 +188,9 @@ namespace Shop.Infrastructure.Services
 
             }
             File.Delete(htmlPath);
-            List<string> result = new List<string>();
-            result.Add($"\\uploads\\OrderPDFs\\{guid.ToString().Substring(0, 6)}.pdf");
-            result.Add(guid.ToString().Substring(0, 6));
+            SuccessDataResult <List<string>> result = new SuccessDataResult<List<string>>(new List<string>(),HttpStatusCode.OK);
+            result.Data.Add($"\\uploads\\OrderPDFs\\{guid.ToString().Substring(0, 6)}.pdf");
+            result.Data.Add(guid.ToString().Substring(0, 6));
             return result;
         }
     }

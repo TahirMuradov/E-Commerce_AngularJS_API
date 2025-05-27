@@ -13,14 +13,15 @@ namespace Shop.Application.Validators.AuthValidations
     {
         public AssignRoleDTOValidator(string LangCode)
         {
+            var culture = new CultureInfo(LangCode);
             RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("UserIdRequired", new CultureInfo(LangCode)))
-            .NotEqual(Guid.Empty).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("UserIdInvalid", new CultureInfo(LangCode)));
+            .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("UserIdRequired", culture))
+            .NotEqual(Guid.Empty).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("UserIdInvalid", culture));
 
         
             RuleFor(x => x.RoleId)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("RoleIdRequired", new CultureInfo(LangCode)))
-                .Must(x => x != null && x != default).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("RoleIdInvalid", new CultureInfo(LangCode)));
+                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("RoleIdRequired", culture))
+                .Must(x => x != null && x != default).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("RoleIdInvalid", culture));
 
         }
     }

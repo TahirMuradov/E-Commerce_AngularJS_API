@@ -45,7 +45,8 @@ namespace Shop.Persistence
                 options.TokenLifespan = TimeSpan.FromMinutes(15); 
             });
 
-          
+            services.AddTransient<IdentityErrorDescriber, MultilanguageIdentityErrorDescriber>();
+
             services.AddScoped<IAuthServices, AuthService>();
 
 
@@ -53,6 +54,11 @@ namespace Shop.Persistence
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ISizeService, SizeService>();
             services.AddScoped<IShippingMethodService, ShippingMethodService>();
+            services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IOrderService, OrderService>();
+
+
 
 
 

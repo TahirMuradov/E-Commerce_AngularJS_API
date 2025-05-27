@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Shop.Application.Abstraction.Services;
 using Shop.Application.DTOs.PaymentMethodDTOs;
-using Shop.Application.PaginationHelper;
-using Shop.Application.ResultTypes.Abstract;
+using Shop.Persistence;
 
 namespace ShopAPI.Controllers
 {
@@ -13,52 +11,67 @@ namespace ShopAPI.Controllers
     [EnableRateLimiting("Fixed")]
     public class PaymentMethodController : ControllerBase
     {
+        private string DefaultLaunguage
+        {
+            get
+            {
+                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+            }
+        }
         private readonly IPaymentMethodService _paymentMethod;
-
-        public PaymentMethodController(IPaymentMethodService paymentMethod)
+        private readonly IHttpContextAccessor _contextAccessor;
+        public PaymentMethodController(IPaymentMethodService paymentMethod, IHttpContextAccessor contextAccessor)
         {
             _paymentMethod = paymentMethod;
+            _contextAccessor = contextAccessor;
         }
         [HttpPost("[action]")]
-        public IActionResult AddPaymentMethod([FromBody]AddPaymentMethodDTO addPaymentMethodDTO)
+        public IActionResult AddPaymentMethod([FromBody] AddPaymentMethodDTO addPaymentMethodDTO)
         {
-            string headerLocale = HttpContext.Request.Headers["Accept-Language"];
+            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+
             var result = _paymentMethod.AddPaymentMethod(addPaymentMethodDTO, headerLocale);
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpPut("[action]")]
-        public IActionResult UdpatePaymentMethod([FromBody]UpdatePaymentMethodDTO updatePaymentMethodDTO)
+        public IActionResult UdpatePaymentMethod([FromBody] UpdatePaymentMethodDTO updatePaymentMethodDTO)
         {
-            string headerLocale = HttpContext.Request.Headers["Accept-Language"];
+            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+
             var result = _paymentMethod.UdpatePaymentMethod(updatePaymentMethodDTO, headerLocale);
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpDelete("[action]")]
-        public IActionResult DeletePaymentMethod([FromQuery]Guid id)
+        public IActionResult DeletePaymentMethod([FromQuery] Guid id)
         {
-            string headerLocale = HttpContext.Request.Headers["Accept-Language"];
+            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+
             var result = _paymentMethod.DeletePaymentMethod(id, headerLocale);
             return StatusCode((int)result.StatusCode, result);
 
         }
         [HttpDelete("[action]")]
-        public IActionResult GetPaymentMethodById([FromQuery]Guid id)
+        public IActionResult GetPaymentMethodById([FromQuery] Guid id)
         {
-            string headerLocale = HttpContext.Request.Headers["Accept-Language"];
+            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+
             var result = _paymentMethod.GetPaymentMethodById(id, headerLocale);
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpGet("[action]")]
-        public IActionResult GetAllPaymentMethods(){
-            string headerLocale = HttpContext.Request.Headers["Accept-Language"];
+        public IActionResult GetAllPaymentMethods()
+        {
+            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+
             var result = _paymentMethod.GetAllPaymentMethods(headerLocale);
             return StatusCode((int)result.StatusCode, result);
 
         }
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetAllPaymentMethodsByPage([FromQuery]int page)
+        public async Task<IActionResult> GetAllPaymentMethodsByPage([FromQuery] int page)
         {
-            string headerLocale = HttpContext.Request.Headers["Accept-Language"];
+            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+
             var result = await _paymentMethod.GetAllPaymentMethodsByPageAsync(page, headerLocale);
             return StatusCode((int)result.StatusCode, result);
 

@@ -17,7 +17,9 @@ namespace Shop.Infrastructure
 
 
             serviceCollection.AddScoped<ITokenHandler, TokenHandler>();
+            serviceCollection .AddScoped<IFileService,FileService>();
             serviceCollection.AddScoped<IMailService, MailServce>();
+            serviceCollection.AddScoped<IGetRequestLangService, GetRequestLangService>();
 
 
 

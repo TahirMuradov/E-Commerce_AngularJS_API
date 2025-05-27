@@ -2,6 +2,12 @@
 {
     public static class HttpStatusErrorMessages
     {
+        public static readonly Dictionary<string, string> FileUploadFailed = new()
+    {
+        { "en", "An error occurred while uploading the file. Please try again!" },
+        { "ru", "Произошла ошибка при загрузке файла. Попробуйте снова!" },
+        { "az", "Fayl yüklənərkən xəta baş verdi. Yenidən cəhd edin!" }
+    };
         public static readonly Dictionary<string, string> UnsupportedLanguage = new()
     {
         { "en", "One or more of the provided language codes are not supported." },

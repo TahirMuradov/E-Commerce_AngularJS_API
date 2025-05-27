@@ -21,7 +21,7 @@ namespace Shop.Application.CustomLanguageMessage
 
             AddTranslation("az", "ContentEmpty", "Məzmun boş ola bilməz!");
             AddTranslation("az", "InvalidLangCode", $"Dil Kodları yalnız {languagesList} ola bilər!");
-            AddTranslation("az", "LangContentTooShort", $"Məzmun siyahısının uzunluğu {supportedLaunguages.Length}-dən az ola bilməz!");
+            AddTranslation("az", "  ", $"Məzmun siyahısının uzunluğu {supportedLaunguages.Length}-dən az ola bilməz!");
 
             AddTranslation("ru", "LangContentTooShort", $"Длина списка содержимого не может быть меньше {supportedLaunguages.Length}!");
             AddTranslation("ru", "InvalidLangCode", $"Коды языков могут быть только {languagesList}!");
@@ -141,7 +141,7 @@ namespace Shop.Application.CustomLanguageMessage
             // Azerbaijani
             AddTranslation("az", "IdRequired", "Id boş olmamalıdır!");
             AddTranslation("az", "IdInvalid", "Id düzgün deyil!");
-            AddTranslation("az", "ProductNameRequired", "Məhsul adı boş olmamalıdır!");
+            AddTranslation("az", "ProductTitleRequired", "Məhsul adı boş olmamalıdır!");
             AddTranslation("az", "DescriptionRequired", "Məhsul açıqlaması boş olmamalıdır!");
             AddTranslation("az", "SubCategoriesIDRequired", "Kateqoriya boş olmamalıdır!");
             AddTranslation("az", "SubCategoriesIDLength", "Minimum 1 dənə kateqoriya olmalıdır!");
@@ -154,7 +154,7 @@ namespace Shop.Application.CustomLanguageMessage
             // Russian
             AddTranslation("ru", "IdRequired", "Id не может быть пустым!");
             AddTranslation("ru", "IdInvalid", "Id некорректен!");
-            AddTranslation("ru", "ProductNameRequired", "Название продукта не может быть пустым!");
+            AddTranslation("ru", "ProductTitleRequired", "Название продукта не может быть пустым!");
             AddTranslation("ru", "DescriptionRequired", "Описание продукта не может быть пустым!");
             AddTranslation("ru", "SubCategoriesIDRequired", "Категория не может быть пустой!");
             AddTranslation("ru", "SubCategoriesIDLength", "Должна быть хотя бы одна категория!");
@@ -168,7 +168,7 @@ namespace Shop.Application.CustomLanguageMessage
             // English
             AddTranslation("en", "IdRequired", "Id cannot be null or empty!");
             AddTranslation("en", "IdInvalid", "Id cannot be invalid!");
-            AddTranslation("en", "ProductNameRequired", "Product name cannot be null or empty!");
+            AddTranslation("en", "ProductTitleRequired", "Product name cannot be null or empty!");
             AddTranslation("en", "DescriptionRequired", "Product description cannot be null or empty!");
             AddTranslation("en", "SubCategoriesIDRequired", "Subcategories cannot be null or empty!");
             AddTranslation("en", "SubCategoriesIDLength", "At least one subcategory is required!");

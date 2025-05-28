@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Shop.Application.CustomLanguageMessage
 {
-   public class CustomValidationLanguageMessage:LanguageManager
+   public class CustomValidationLanguageMessage: LanguageManager
     {
         public CustomValidationLanguageMessage()
         {
@@ -216,16 +216,13 @@ namespace Shop.Application.CustomLanguageMessage
             AddTranslation("ru", "EmailInvalid", "Email недействителен!");
             AddTranslation("en", "EmailInvalid", "Email is invalid!");
 
-            AddTranslation("az", "PhoneNumberRequired", "Telefon nömrəsi tələb olunur!");
-            AddTranslation("ru", "PhoneNumberRequired", "Номер телефона обязателен!");
+            AddTranslation("az", "PhoneNumberRequired", "Telefon nömrəsi boş ola bilməz!!");
+            AddTranslation("ru", "PhoneNumberRequired", "Номер телефона не может быть пустым!");
             AddTranslation("en", "PhoneNumberRequired", "Phone number is required!");
 
-            AddTranslation("az", "PhoneNumberInvalid", "Telefon nömrəsi yanlışdır!");
-            AddTranslation("ru", "PhoneNumberInvalid", "Номер телефона недействителен!");
-            AddTranslation("en", "PhoneNumberInvalid", "Phone number is invalid!");
 
-            AddTranslation("az", "AddressRequired", "Ünvan tələb olunur!");
-            AddTranslation("ru", "AddressRequired", "Адрес обязателен!");
+            AddTranslation("az", "AddressRequired", "Ünvan boş ola bilməz!");
+            AddTranslation("ru", "AddressRequired", "Адрес не может быть пустым!");
             AddTranslation("en", "AddressRequired", "Address is required!");
 
             AddTranslation("az", "UsernameRequired", "İstifadəçi adı tələb olunur!");
@@ -330,6 +327,104 @@ namespace Shop.Application.CustomLanguageMessage
             AddTranslation("az", "TokenRequired", "Token boş ola bilməz!");
             AddTranslation("en", "TokenRequired", "Token cannot be empty!");
             AddTranslation("ru", "TokenRequired", "Токен не может быть пустым!");
+
+            #region AddOrderDTOValidationMessage
+            AddTranslation("az", "IdIsRequired", "ID boş ola bilməz!");
+            AddTranslation("ru", "IdIsRequired", "ID не может быть пустым!");
+            AddTranslation("en", "IdIsRequired", "ID is required!");
+
+            AddTranslation("az", "FullNameIsRequired", "Ad və soyad boş ola bilməz!");
+            AddTranslation("ru", "FullNameIsRequired", "Имя и фамилия не могут быть пустыми!");
+            AddTranslation("en", "FullNameIsRequired", "Full name is required!");
+
+            AddTranslation("az", "FullNameMaxLength", "Ad və soyad maksimum 100 simvol ola bilər!");
+            AddTranslation("ru", "FullNameMaxLength", "Имя и фамилия не могут превышать 100 символов!");
+            AddTranslation("en", "FullNameMaxLength", "Full name must be at most 100 characters!");
+
+         
+
+            AddTranslation("az", "PhoneNumberInvalid", "Telefon nömrəsi +994-xx-xxx-xx-xx formatında olmalıdır!");
+            AddTranslation("ru", "PhoneNumberInvalid", "Номер должен быть в формате +994-xx-xxx-xx-xx!");
+            AddTranslation("en", "PhoneNumberInvalid", "Phone number must be in format +994-xx-xxx-xx-xx!");
+
+       
+
+            AddTranslation("az", "AddressMaxLength", "Ünvan maksimum 200 simvol ola bilər!");
+            AddTranslation("ru", "AddressMaxLength", "Адрес не может превышать 200 символов!");
+            AddTranslation("en", "AddressMaxLength", "Address must be at most 200 characters!");
+
+            AddTranslation("az", "NoteMaxLength", "Qeyd maksimum 500 simvol ola bilər!");
+            AddTranslation("ru", "NoteMaxLength", "Примечание не может превышать 500 символов!");
+            AddTranslation("en", "NoteMaxLength", "Note must be at most 500 characters!");
+
+            AddTranslation("az", "ProductsAreRequired", "Məhsul siyahısı boş ola bilməz!");
+            AddTranslation("ru", "ProductsAreRequired", "Список товаров не может быть пустым!");
+            AddTranslation("en", "ProductsAreRequired", "Product list cannot be empty!");
+
+            AddTranslation("az", "ShippingMethodIsRequired", "Çatdırılma metodu seçilməlidir!");
+            AddTranslation("ru", "ShippingMethodIsRequired", "Метод доставки обязателен!");
+            AddTranslation("en", "ShippingMethodIsRequired", "Shipping method is required!");
+
+            AddTranslation("az", "PaymentMethodIsRequired", "Ödəniş metodu seçilməlidir!");
+            AddTranslation("ru", "PaymentMethodIsRequired", "Метод оплаты обязателен!");
+            AddTranslation("en", "PaymentMethodIsRequired", "Payment method is required!");
+
+
+            #endregion
+
+            #region OrderProductDTOValidationMessage
+            AddTranslation("az", "ProductIdIsRequired", "Məhsul ID-si boş ola bilməz!");
+            AddTranslation("ru", "ProductIdIsRequired", "ID товара не может быть пустым!");
+            AddTranslation("en", "ProductIdIsRequired", "Product ID is required!");
+
+            AddTranslation("az", "ProductCodeIsRequired", "Məhsul kodu boş ola bilməz!");
+            AddTranslation("ru", "ProductCodeIsRequired", "Код товара не может быть пустым!");
+            AddTranslation("en", "ProductCodeIsRequired", "Product code is required!");
+
+            AddTranslation("az", "ProductNameIsRequired", "Məhsul adı boş ola bilməz!");
+            AddTranslation("ru", "ProductNameIsRequired", "Название товара не может быть пустым!");
+            AddTranslation("en", "ProductNameIsRequired", "Product name is required!");
+
+            AddTranslation("az", "SizeIsRequired", "Ölçü boş ola bilməz!");
+            AddTranslation("ru", "SizeIsRequired", "Размер не может быть пустым!");
+            AddTranslation("en", "SizeIsRequired", "Size is required!");
+
+            AddTranslation("az", "QuantityMustBeGreaterThanZero", "Say 0-dan böyük olmalıdır!");
+            AddTranslation("ru", "QuantityMustBeGreaterThanZero", "Количество должно быть больше 0!");
+            AddTranslation("en", "QuantityMustBeGreaterThanZero", "Quantity must be greater than zero!");
+
+            AddTranslation("az", "PriceMustBeNonNegative", "Qiymət mənfi ola bilməz!");
+            AddTranslation("ru", "PriceMustBeNonNegative", "Цена не может быть отрицательной!");
+            AddTranslation("en", "PriceMustBeNonNegative", "Price must not be negative!");
+
+
+            #endregion
+            #region OrderShippingMethodDTOValidationMessage
+            AddTranslation("az", "ShippingIdIsRequired", "Çatdırılma ID-si boş ola bilməz!");
+            AddTranslation("ru", "ShippingIdIsRequired", "ID доставки не может быть пустым!");
+            AddTranslation("en", "ShippingIdIsRequired", "Shipping ID is required!");
+
+            AddTranslation("az", "ShippingContentIsRequired", "Çatdırılma məzmunu boş ola bilməz!");
+            AddTranslation("ru", "ShippingContentIsRequired", "Содержание доставки не может быть пустым!");
+            AddTranslation("en", "ShippingContentIsRequired", "Shipping content is required!");
+
+            AddTranslation("az", "ShippingPriceMustBeNonNegative", "Çatdırılma qiyməti mənfi ola bilməz!");
+            AddTranslation("ru", "ShippingPriceMustBeNonNegative", "Цена доставки не может быть отрицательной!");
+            AddTranslation("en", "ShippingPriceMustBeNonNegative", "Shipping price must not be negative!");
+
+            #endregion
+
+
+            #region OrderPaymentMethodDTOValidationMessage
+            AddTranslation("az", "PaymentIdIsRequired", "Ödəniş ID-si boş ola bilməz!");
+            AddTranslation("ru", "PaymentIdIsRequired", "ID оплаты не может быть пустым!");
+            AddTranslation("en", "PaymentIdIsRequired", "Payment ID is required!");
+
+            AddTranslation("az", "PaymentContentIsRequired", "Ödəniş məzmunu boş ola bilməz!");
+            AddTranslation("ru", "PaymentContentIsRequired", "Содержание оплаты не может быть пустым!");
+            AddTranslation("en", "PaymentContentIsRequired", "Payment content is required!");
+            #endregion
         }
+
     }
 }

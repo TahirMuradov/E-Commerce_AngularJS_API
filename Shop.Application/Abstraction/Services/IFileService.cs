@@ -10,7 +10,7 @@ namespace Shop.Application.Abstraction.Services
         public Task<IDataResult< List<string>>> SaveFileRangeAsync(List<IFormFile> file);
         public IResult RemoveFileRange(List<string> FilePaths);
         public IResult RemoveFile(string FilePaths);
-        public IDataResult< List<string>> SaveOrderPdf(List<GeneratePdfOrderProductDTO> items, ShippingMethodInOrderPdfDTO shippingMethod, PaymentMethodInOrderPdfDTO paymentMethod);
+        public IDataResult< List<string>> SaveOrderPdf(List<OrderProductDTO> items, OrderShippingMethodDTO shippingMethod, OrderPaymentMethodDTO paymentMethod, OrderUserInfoDTO userInfoDTO);
     }
 
 

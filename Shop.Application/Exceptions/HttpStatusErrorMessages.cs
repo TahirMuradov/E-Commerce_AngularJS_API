@@ -2,6 +2,34 @@
 {
     public static class HttpStatusErrorMessages
     {
+        public static readonly Dictionary<string, string> StockQuantityNotEnough = new()
+{
+    { "en", "The requested quantity exceeds available stock!" },
+    { "ru", "Запрашиваемое количество превышает доступный остаток!" },
+    { "az", "İstənilən say mövcud stokdan çoxdur!" }
+};
+
+        public static readonly Dictionary<string, string> SizeNotFound = new()
+{
+    { "en", "The selected size was not found!" },
+    { "ru", "Выбранный размер не найден!" },
+    { "az", "Seçilmiş ölçü tapılmadı!" }
+};
+
+        public static readonly Dictionary<string, string> PriceNotMatch = new()
+{
+    { "en", "Product price does not match the current price!" },
+    { "ru", "Цена товара не соответствует текущей цене!" },
+    { "az", "Məhsulun qiyməti cari qiymətlə uyğun gəlmir!" }
+};
+
+        public static readonly Dictionary<string, string> NotFoundProduct = new()
+{
+    { "en", "Product not found!" },
+    { "ru", "Товар не найден!" },
+    { "az", "Məhsul tapılmadı!" }
+};
+
         public static readonly Dictionary<string, string> FileUploadFailed = new()
     {
         { "en", "An error occurred while uploading the file. Please try again!" },

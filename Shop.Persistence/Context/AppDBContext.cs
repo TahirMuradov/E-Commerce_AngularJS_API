@@ -4,18 +4,17 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Shop.Domain.Entities;
-using System.Text.Json;
 
 namespace Shop.Persistence.Context
 {
-  public  class AppDBContext: IdentityDbContext<User,Role, Guid>
+    public class AppDBContext : IdentityDbContext<User, Role, Guid>
     {
-       
+
         public AppDBContext(DbContextOptions<AppDBContext> options) : base(options)
         {
         }
 
-       public DbSet<Product> Products { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<ProductLanguage> ProductLanguages { get; set; }
         public DbSet<SizeProduct> SizeProducts { get; set; }
         public DbSet<Size> Sizes { get; set; }
@@ -25,6 +24,9 @@ namespace Shop.Persistence.Context
         public DbSet<ShippingMethodLanguage> ShippingMethodLanguages { get; set; }
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<PaymentMethodLanguages> PaymentMethodLanguages { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<SoldProduct> SoldProducts { get; set; }
+
 
 
 
@@ -38,6 +40,7 @@ namespace Shop.Persistence.Context
                  .HasConversion(
     v => JsonConvert.SerializeObject(v),
     v => JsonConvert.DeserializeObject<List<string>>(v));
+
 
         }
     }

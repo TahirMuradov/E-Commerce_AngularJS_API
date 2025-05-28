@@ -11,8 +11,9 @@ namespace Shop.Domain.Entities
         public List<string> ImageUrls { get; set; }
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }
-        public List<SizeProduct> SizeProducts { get; set; }
+        public List<SizeProduct>? SizeProducts { get; set; }
         public List<ProductLanguage> ProductLanguages { get; set; }
+        public List<SoldProduct>? SoldProducts { get; set; }
 
 
     }

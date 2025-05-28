@@ -12,5 +12,6 @@ namespace Shop.Domain.Entities
         public string Content { get; set; }
 
         public List<SizeProduct> SizeProducts { get; set; }
+        public List<SoldProduct>? SoldProducts { get; set; }
     }
 }

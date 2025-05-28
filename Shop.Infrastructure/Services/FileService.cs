@@ -8,6 +8,8 @@ using Shop.Application.ResultTypes.Concrete.ErrorResults;
 using Shop.Application.ResultTypes.Concrete.SuccessResults;
 using Shop.Persistence;
 using System.Net;
+using System.Text;
+using System.Web;
 
 namespace Shop.Infrastructure.Services
 {
@@ -84,114 +86,240 @@ namespace Shop.Infrastructure.Services
         /// <param name="shippingMethod">Shipping method</param>
         /// <param name="paymentMethod"> Payment Method</param>
         /// <returns></returns>
-        public IDataResult<List<string>> SaveOrderPdf(List<GeneratePdfOrderProductDTO> items, ShippingMethodInOrderPdfDTO shippingMethod, PaymentMethodInOrderPdfDTO paymentMethod)
+        public IDataResult<List<string>> SaveOrderPdf(List<OrderProductDTO> items, OrderShippingMethodDTO shippingMethod, OrderPaymentMethodDTO paymentMethod, OrderUserInfoDTO userInfoDTO)
         {
-            decimal totalPrice = 0;
-            string tableBody = "";
-            Guid guid = Guid.NewGuid();
+            decimal totalPrice = items.Sum(x => x.Price);
+            var tableProductBuilder = new StringBuilder();
+            var guid = Guid.NewGuid();
+            var shortGuid = guid.ToString().Substring(0, 6);
+
             foreach (var item in items)
             {
-                totalPrice += item.Price;
-                tableBody += "  <tr>\r\n               " +
-                   "     <td style=\"border: 1px solid #ebebeb; padding: 10px;\">\r\n           " +
-                  $"           {item.ProductCode}\r\n     " +
-                   "               </td>\r\n      " +
-                   "              <td style=\"border: 1px solid #ebebeb; padding: 10px;\">\r\n         " +
-                   $"              {item.ProductName}\r\n            " +
-                   "        </td>\r\n       " +
-                   "             <td style=\"border: 1px solid #ebebeb; padding: 10px;\">\r\n         " +
-                   $"               {item.size}\r\n             " +
-                   "       </td>\r\n       " +
-                   "             <td style=\"border: 1px solid #ebebeb; padding: 10px;\">\r\n    " +
-                   $"                    {item.Quantity}\r\n     " +
-                   "               </td>\r\n  " +
-                   "                  <td style=\"border: 1px solid #ebebeb; padding: 10px;\">\r\n  " +
-                   $"                     {item.Price} &#x20BC;\r\n      " +
-                   "              </td>\r\n       " +
-                   "         </tr>\r\n    ";
+                tableProductBuilder.AppendLine($@"
+<tr>
+    <td style='border: 1px solid #ebebeb; padding: 10px;'>{HttpUtility.HtmlEncode(item.ProductCode)}</td>
+    <td style='border: 1px solid #ebebeb; padding: 10px;'>{HttpUtility.HtmlEncode(item.ProductName)}</td>   
+    <td style='border: 1px solid #ebebeb; padding: 10px;'>{HttpUtility.HtmlEncode(item.ProductName)}</td>
+    <td style='border: 1px solid #ebebeb; padding: 10px;'>{HttpUtility.HtmlEncode(item.size)}</td>
+    <td style='border: 1px solid #ebebeb; padding: 10px;'>{item.Quantity}</td>
+    <td style='border: 1px solid #ebebeb; padding: 10px;'>{item.Price} &#x20BC;</td>
+</tr>");
             }
+
             totalPrice += shippingMethod.Price;
-            string htmlContent = "<!DOCTYPE html>\r\n" +
-                "<html lang=\"en\">\r\n" +
-                "<head>\r\n   " +
-                " <meta charset=\"UTF-8\">\r\n   " +
-                " <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n\r\n  " +
-                "  <title>Document</title>\r\n" +
-                "</head>\r\n" +
-                "<body>\r\n  " +
-                "  <div style=\"width: 90%; border: 2px solid #ebebeb; padding: 40px; height: auto;margin: auto;\">\r\n\r\n " +
-                "       <div style=\"text-align: center; margin-bottom: 20px;\">\r\n  " +
-                "          <h5>Elektron Çek Məzmunu</h5>\r\n   " +
-              $"   <span>Çek №{guid.ToString().Substring(0, 6)}</span>" +
-                "        \r\n        </div>\r\n    \r\n    " +
-                "    <table style=\"width: 100%; border-collapse: collapse;\">\r\n  " +
-                "          <thead>\r\n   " +
-                "             <tr>\r\n  " +
-                "                  <th style=\"font-weight: bold; border: 1px solid #ebebeb; padding: 10px;\">Məhsul Kodu</th>\r\n   " +
-                "                 <th style=\"font-weight: bold; border: 1px solid #ebebeb; padding: 10px;\">Məhsul Adı</th>\r\n    " +
-                "                <th style=\"font-weight: bold; border: 1px solid #ebebeb; padding: 10px;\">Ölçü</th>\r\n           " +
-                "         <th style=\"font-weight: bold; border: 1px solid #ebebeb; padding: 10px;\">Say</th>\r\n          " +
-                "          <th style=\"font-weight: bold; border: 1px solid #ebebeb; padding: 10px;\">Qiyməti</th>\r\n   " +
-                "             </tr>\r\n     " +
-                "       </thead>\r\n     " +
-                "       <tbody style=\"text-align: center;\">\r\n  " +
 
+            var htmlContent = $@"
+<!DOCTYPE html>
+<html lang='az'>
+<head>
+    <meta charset='UTF-8'>
+    <title>Sifariş Detalları</title>
 
-             $"  {tableBody}" +
-                " <tr style=\"text-align: end;\">\r\n                  " +
-                "  <td></td>\r\n                 " +
-                "   <td></td>\r\n                  " +
-                "  <td></td>\r\n                 " +
-                "   <td style=\"border: 1px solid #ebebeb; padding: 10px;\">Çatdirilma Haqqı</td>\r\n                 " +
-                $"   <td style=\"border: 1px solid #ebebeb; padding: 10px;\">{shippingMethod.Price} &#x20BC;</td>\r\n               " +
-                " </tr>\r\n              " +
-                "  <tr style=\"text-align: end;\">\r\n                 " +
-                "   <td></td>\r\n               " +
-                "     <td></td>\r\n                 " +
-                "   <td></td>\r\n                  " +
-                "  <td style=\"border: 1px solid #ebebeb; padding: 10px;\">Cəmi</td>\r\n                 " +
-               $"   <td style=\"border: 1px solid #ebebeb; padding: 10px;\">{totalPrice} &#x20BC;</td>\r\n                </tr>\r\n              " +
-                "  <tr style=\"text-align: end;\">\r\n                  " +
-                "  <td></td>\r\n                   " +
-                " <td></td>\r\n                    " +
-                "<td>" +
-                "</td>\r\n                  " +
-                "  <td style=\"border: 1px solid #ebebeb; padding: 10px;\">Ödəniş Üsulu</td>\r\n               " +
-                $"     <td style=\"border: 1px solid #ebebeb; padding: 10px;\">{paymentMethod.Content}</td>\r\n              " +
-                "  </tr>\r\n         " +
-                "   </tbody>\r\n       " +
-                " </table>\r\n        \r\n       \r\n    \r\n     \r\n    \r\n   " +
-                " </div>\r\n   " +
-                " \r\n</body>\r\n" +
-                "</html>";
+</head>
+<body>
+   <body style=' margin: 0;
+        padding: 2rem;
+        font-size: 12px;
+        line-height: 1.4;
+        color: #000;
+         box-sizing: border-box;
+        font-family: Arial, sans-serif;
+            '>
+    <div style='width: 100%;
+        max-width: 21cm;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;'>
+      <div style='width: 100%; border-collapse: collapse;margin-bottom: 20px;'>
+        <div style='width: 100%; border-collapse: collapse;margin-bottom: 20px;'>
+        <p>
+          <h5 style='margin: 0;
+        font-size: 16px;'>Elektron Çek</h5>
+          <p>№123456</p>
+          <span>Tarix: 12.12.25</span>
+        </p>
+        <p style='text-align:center;font-weight: bold;'>
+         KARL FASHION
+         <hr>
+          Tel: +994552784344
+        </p>
+      </div>
 
-            string htmlPath = System.IO.Path.Combine(WebRootPathProvider.GetwwwrootPath + $"\\uploads\\OrderPDFs\\{guid.ToString().Substring(0, 6)}.html");
-            string pdfPath = System.IO.Path.Combine(WebRootPathProvider.GetwwwrootPath + $"\\uploads\\OrderPDFs\\{guid.ToString().Substring(0, 6)}.pdf");
-            using (FileStream fileStream = File.Create(htmlPath))
+      <div style='margin-bottom: 20px;'>
+        <table style='width: 100%;
+        border-collapse: collapse;
+        word-break: break-word;
+        table-layout: fixed;'>
+          <thead>
+            <tr>
+              <th style='width: 15%'>Məhsul Kodu</th>
+              <th style='width: 35%'>Məhsul adı</th>
+              <th style='width: 35%'>Məhsul Kateqoriyası</th>
+              <th style='width: 10%'>Ölçü</th>
+              <th style='width: 10%'>Say</th>
+              <th style='width: 15%'>Qiymət</th>
+            </tr>
+          </thead>
+       
+            <tbody>
+                {tableProductBuilder.ToString()}
+    <tr>
+         
+              <td style='text-align: left;border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;' colspan=""5"">Çatdırılma -{shippingMethod.ShippingContent}</td>
+              <td style='
+              font-weight: bold;
+        text-align: right;border: 1px solid #ccc;
+        padding: 8px;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;'>{shippingMethod.Price} AZN</td>
+            </tr>
+            <tr>
+              
+              <td style='text-align: left;border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;' colspan='5'>Cəmi</td>
+              <td style='border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;
+              font-weight: bold;
+        text-align: right;'>{totalPrice} AZN</td>
+            </tr>
+            </body>
+        </table>
+      </div>
+
+      <div>
+        <label style='font-weight: bold;
+        font-size: 14px;
+        display: block;
+        margin: 15px 0 10px;'>Müştəri Məlumatları</label>
+        <table style='  width: 100%;
+        border-collapse: collapse;
+        word-break: break-word;
+        table-layout: fixed;'>
+          <tbody>
+
+     <tr>
+              <th style='background-color: #f0f0f0;
+        font-weight: bold;   border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;'>Ad Soyad</th>
+              <td style=' border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;'>{HttpUtility.HtmlEncode(userInfoDTO.FullName)}</td>
+            </tr>
+            <tr>
+              <th style='background-color: #f0f0f0;
+        font-weight: bold;   border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;'>Əlaqə nömrəsi</th>
+              <td style=' border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;'>{HttpUtility.HtmlEncode(userInfoDTO.PhoneNumber)}</td>
+            </tr>
+            <tr>
+              <th style='background-color: #f0f0f0;
+        font-weight: bold;   border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;'>Ünvan</th>
+              <td style=' border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;'>
+{HttpUtility.HtmlEncode(userInfoDTO.Address)}
+              </td>
+            </tr>
+            <tr>
+              <th style='background-color: #f0f0f0;
+        font-weight: bold;   border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;'>Qeyd</th>
+              <td style=' border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;'>
+           {HttpUtility.HtmlEncode(userInfoDTO.Note)}
+              </td>
+            </tr>
+
+</tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>";
+
+            string folderPath = Path.Combine(WebRootPathProvider.GetwwwrootPath, "uploads", "OrderPDFs");
+            Directory.CreateDirectory(folderPath);
+            string htmlPath = Path.Combine(folderPath, $"{shortGuid}.html");
+            string pdfPath = Path.Combine(folderPath, $"{shortGuid}.pdf");
+
+            File.WriteAllText(htmlPath, htmlContent, Encoding.UTF8);
+
+            using (FileStream htmlSource = File.Open(htmlPath, FileMode.Open))
+            using (FileStream pdfDest = File.Open(pdfPath, FileMode.Create))
             {
-            fileStream.Close();
-            };
-
-            File.WriteAllText(htmlPath, htmlContent);
-            using (FileStream htmlSource = File.Open(System.IO.Path.Combine(htmlPath), FileMode.Open))
-
-
-            using (FileStream pdfDest = File.Open(System.IO.Path.Combine(pdfPath), FileMode.Create))
-
-            {
-                ConverterProperties converterProperties = new ConverterProperties();
+                var converterProperties = new ConverterProperties();
                 converterProperties.SetCharset("UTF-8");
-
-
-                converterProperties.IsContinuousContainerEnabled();
                 HtmlConverter.ConvertToPdf(htmlSource, pdfDest, converterProperties);
-
             }
+
             File.Delete(htmlPath);
-            SuccessDataResult <List<string>> result = new SuccessDataResult<List<string>>(new List<string>(),HttpStatusCode.OK);
-            result.Data.Add($"\\uploads\\OrderPDFs\\{guid.ToString().Substring(0, 6)}.pdf");
-            result.Data.Add(guid.ToString().Substring(0, 6));
+
+            var result = new SuccessDataResult<List<string>>(new List<string>
+    {
+        $"\\uploads\\OrderPDFs\\{shortGuid}.pdf",
+        shortGuid
+    }, HttpStatusCode.OK);
+
             return result;
         }
+
     }
 }

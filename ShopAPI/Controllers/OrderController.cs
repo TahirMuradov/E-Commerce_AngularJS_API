@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.RateLimiting;
 using Shop.Application.Abstraction.Services;
 using Shop.Application.DTOs.OrderPdfGeneratorDTOs;
+using Shop.Domain.Enums;
 using Shop.Persistence;
 
 namespace ShopAPI.Controllers
@@ -42,6 +43,25 @@ namespace ShopAPI.Controllers
             var result = await _orderService.GetOrderByIdAsync(orderId, langCode);
             
             return StatusCode((int)result.StatusCode, result);
+        }
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetOrderByPage([FromQuery]int page)
+        {
+            string langCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString()?.ToLower() ?? DefaultLaunguage;
+            var result = await _orderService.GetAllOrdersByPageAsync(page, langCode);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpPut("[action]")]
+        public async Task<IActionResult> UpdateOrderStatus([FromQuery] Guid orderId, [FromBody] OrderStatus status)
+        {
+            string langCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString()?.ToLower() ?? DefaultLaunguage;
+            var result = await _orderService.UpdateOrderStatusAsync(orderId, status, langCode);
+            return StatusCode((int)result.StatusCode, result);
+
+
+
+
         }
     }
 }

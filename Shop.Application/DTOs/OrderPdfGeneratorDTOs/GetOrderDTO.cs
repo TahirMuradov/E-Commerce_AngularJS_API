@@ -1,4 +1,5 @@
 ﻿using Shop.Application.DTOs.AuthDTOs;
+using Shop.Domain.Enums;
 
 namespace Shop.Application.DTOs.OrderPdfGeneratorDTOs
 {
@@ -13,7 +14,8 @@ namespace Shop.Application.DTOs.OrderPdfGeneratorDTOs
         public string Address { get; set; }
         public string Note { get; set; }
         public decimal TotalPrice { get; set; }
-       
+        public OrderStatus  Status { get; set; }
+
         public GetUserDTO OrderBy { get; set; }
 
     }

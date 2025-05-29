@@ -10,6 +10,7 @@ namespace Shop.Application.Abstraction.Services
     {
         public Task<IResult> AddOrderAsync(AddOrderDTO addOrderDTO,string LangCode);
         public Task<IDataResult<GetOrderDetailDTO>> GetOrderByIdAsync(Guid orderId, string LangCode);
+        public Task<IDataResult<PaginatedList<GetOrderByUserDTO>>> GetAllOrdersByUserIdAsync(string userId, int page, string LangCode);
         public Task<IResult> UpdateOrderStatusAsync(Guid orderId, OrderStatus status, string LangCode);
         public Task<IResult> UpdateOrderAsync(UpdateOrderDTO updateOrderDTO, string LangCode);
         public Task<IDataResult<PaginatedList<GetOrderDTO>>> GetAllOrdersByPageAsync(int page, string LangCode);

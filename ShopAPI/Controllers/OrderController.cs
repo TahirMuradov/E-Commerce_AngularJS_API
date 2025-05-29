@@ -4,6 +4,7 @@ using Shop.Application.Abstraction.Services;
 using Shop.Application.DTOs.OrderPdfGeneratorDTOs;
 using Shop.Domain.Enums;
 using Shop.Persistence;
+using System.Security.Claims;
 
 namespace ShopAPI.Controllers
 {
@@ -37,15 +38,15 @@ namespace ShopAPI.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetOrderById([FromQuery]Guid orderId)
+        public async Task<IActionResult> GetOrderById([FromQuery] Guid orderId)
         {
             string langCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString()?.ToLower() ?? DefaultLaunguage;
             var result = await _orderService.GetOrderByIdAsync(orderId, langCode);
-            
+
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetOrderByPage([FromQuery]int page)
+        public async Task<IActionResult> GetOrderByPage([FromQuery] int page)
         {
             string langCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString()?.ToLower() ?? DefaultLaunguage;
             var result = await _orderService.GetAllOrdersByPageAsync(page, langCode);
@@ -61,6 +62,29 @@ namespace ShopAPI.Controllers
 
 
 
+        }
+        [HttpPut("[action]")]
+        public async Task<IActionResult> UpdateOrder([FromBody] UpdateOrderDTO updateOrderDTO)
+        {
+            string langCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString()?.ToLower() ?? DefaultLaunguage;
+            var result = await _orderService.UpdateOrderAsync(updateOrderDTO, langCode);
+            return StatusCode((int)result.StatusCode, result);
+        }
+        [HttpDelete("[action]")]
+        public async Task<IActionResult> DeleteOrder([FromQuery] Guid orderId)
+        {
+            string langCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString()?.ToLower() ?? DefaultLaunguage;
+            var result = await _orderService.DeleteOrderAsync(orderId, langCode);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllOrdersByUserId([FromQuery] int page)
+        {
+            string langCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString()?.ToLower() ?? DefaultLaunguage;
+            string userId = _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _orderService.GetAllOrdersByUserIdAsync(userId, page, langCode);
+            return StatusCode((int)result.StatusCode, result);
 
         }
     }

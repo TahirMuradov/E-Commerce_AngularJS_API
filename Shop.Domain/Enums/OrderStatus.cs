@@ -6,6 +6,7 @@
         Processing,
         Shipped,
         Delivered,
+        UpdateCustomerInfo,
         Cancelled
     }
 }

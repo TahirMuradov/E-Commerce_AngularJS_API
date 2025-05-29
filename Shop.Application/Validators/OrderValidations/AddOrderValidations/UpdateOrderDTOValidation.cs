@@ -28,18 +28,18 @@ namespace Shop.Application.Validators.OrderValidations.AddOrderValidations
                     .MaximumLength(500).WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("NoteMaxLength", culture));
 
 
-                RuleFor(x => x.Products)
-                    .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("ProductsRequired", culture));
+                //RuleFor(x => x.Products)
+                //    .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("ProductsRequired", culture));
 
-                RuleForEach(x => x.Products).SetValidator(new OrderProductDTOValidator(langCode));
+                //RuleForEach(x => x.Products).SetValidator(new OrderProductDTOValidator(langCode));
 
                 RuleFor(x => x.ShippingMethod)
                     .NotNull().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("ShippingMethodRequired", culture))
                     .SetValidator(new OrderShippingMethodDTOValidator(langCode));
 
-                RuleFor(x => x.PaymentMethod)
-                    .NotNull().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("PaymentMethodRequired", culture))
-                    .SetValidator(new OrderPaymentMethodDTOValidator(langCode));
+                //RuleFor(x => x.PaymentMethod)
+                //    .NotNull().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("PaymentMethodRequired", culture))
+                //    .SetValidator(new OrderPaymentMethodDTOValidator(langCode));
             }
         
     }

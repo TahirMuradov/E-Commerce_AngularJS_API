@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Shop.Application.DTOs.AuthDTOs
+﻿namespace Shop.Application.DTOs.AuthDTOs
 {
-   public class GetAllUserDTO
+   public class GetUserDTO
     {
         public Guid Id { get; set; }
         public string UserName { get; set; }

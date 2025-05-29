@@ -2,7 +2,6 @@
 
 using Shop.Application.Abstraction.Services;
 using Shop.Application.DTOs.OrderPdfGeneratorDTOs;
-using Shop.Application.ResultTypes;
 using Shop.Application.ResultTypes.Abstract;
 using Shop.Application.ResultTypes.Concrete.ErrorResults;
 using Shop.Application.ResultTypes.Concrete.SuccessResults;

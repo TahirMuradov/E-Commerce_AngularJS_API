@@ -7,7 +7,7 @@ namespace Shop.Application.Abstraction.Services
 {
    public interface IAuthServices
     {
-        Task<IDataResult<PaginatedList<GetAllUserDTO>>> GetAllUserAsnyc(int page);
+        Task<IDataResult<PaginatedList<GetUserDTO>>> GetAllUserAsnyc(int page);
         Task<IResult> ChecekdConfirmedEmailTokenAsnyc(string email, string token, string culture);
         Task<IResult> EditUserProfileAsnyc(UpdateUserDTO updateUserDTO, string culture);
         Task<IResult> DeleteUserAsnyc(Guid Id, string culture);
@@ -16,7 +16,7 @@ namespace Shop.Application.Abstraction.Services
         Task<IResult> SendEmailTokenForForgotPasswordAsync(string Email,string LangCode);
         Task<IResult> CheckTokenForForgotPasswordAsync(string Email, string token,string LangCode);
         Task<IResult> ChangePasswordForTokenForgotPasswordAsync(UpdateForgotPasswordDTO updateForgotPasswordDTO,string LangCode);
-        IDataResult<IQueryable<GetAllUserForSelectDTO>> GetAllUserForSelect();
+        IDataResult<IQueryable<GetUserForSelectDTO>> GetAllUserForSelect();
         Task<IDataResult<string>> UpdateRefreshTokenAsnyc(string refreshToken, User user, string culture);
         Task<IResult> RemoveRoleFromUserAsync(RemoveRoleUserDTO removeRoleUserDTO, string culture);
         Task<IDataResult<DTOs.Token>> LoginAsync(LoginDTO loginDTO, string culture);

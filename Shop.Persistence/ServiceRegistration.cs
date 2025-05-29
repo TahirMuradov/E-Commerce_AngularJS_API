@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Shop.Application.Abstraction.Services;
-using Shop.Application.Exceptions;
+using Shop.Domain.Exceptions;
 using Shop.Domain.Entities;
 using Shop.Infrastructure;
 using Shop.Persistence.Context;

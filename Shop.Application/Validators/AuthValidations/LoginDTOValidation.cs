@@ -1,11 +1,6 @@
 ﻿using FluentValidation;
 using Shop.Application.DTOs.AuthDTOs;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shop.Application.Validators.AuthValidations
 {

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Shop.Application.DTOs.OrderPdfGeneratorDTOs;
-using System.Globalization;
 
 namespace Shop.Application.Validators.OrderValidations.AddOrderValidations
 {

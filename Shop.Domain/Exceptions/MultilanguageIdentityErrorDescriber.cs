@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 
 
-namespace Shop.Application.Exceptions
+namespace Shop.Domain.Exceptions
 {
    public class MultilanguageIdentityErrorDescriber:IdentityErrorDescriber
     {

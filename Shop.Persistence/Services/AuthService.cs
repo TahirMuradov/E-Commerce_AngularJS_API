@@ -5,7 +5,7 @@ using Shop.Application.Abstraction.Services;
 using Shop.Application.Abstraction.Token;
 using Shop.Application.DTOs;
 using Shop.Application.DTOs.AuthDTOs;
-using Shop.Application.Exceptions;
+using Shop.Domain.Exceptions;
 using Shop.Application.PaginationHelper;
 using Shop.Application.ResultTypes.Abstract;
 using Shop.Application.ResultTypes.Concrete.ErrorResults;
@@ -216,17 +216,17 @@ namespace Shop.Infrastructure
 
         }
 
-        public async Task<IDataResult<PaginatedList<GetAllUserDTO>>> GetAllUserAsnyc(int page)
+        public async Task<IDataResult<PaginatedList<GetUserDTO>>> GetAllUserAsnyc(int page)
         {
             if (page < 1)
                 page = 1;
             var usersQuery = _userManager.Users.AsNoTracking();
-            List<GetAllUserDTO> result = new();
+            List<GetUserDTO> result = new();
             foreach (var user in usersQuery)
             {
                 var roles = await _userManager.GetRolesAsync(user);
 
-                result.Add(new GetAllUserDTO
+                result.Add(new GetUserDTO
                 {
                     Id = user.Id,
                     Adress = user.Adress,
@@ -239,7 +239,7 @@ namespace Shop.Infrastructure
                 });
             }
 
-            var paginatedList = PaginatedList<GetAllUserDTO>.Create(result, page, 10);
+            var paginatedList = PaginatedList<GetUserDTO>.Create(result, page, 10);
 
 
 
@@ -248,12 +248,12 @@ namespace Shop.Infrastructure
 
 
 
-            return new SuccessDataResult<PaginatedList<GetAllUserDTO>>(data: paginatedList, HttpStatusCode.OK);
+            return new SuccessDataResult<PaginatedList<GetUserDTO>>(data: paginatedList, HttpStatusCode.OK);
         }
 
-        public IDataResult<IQueryable<GetAllUserForSelectDTO>> GetAllUserForSelect()
+        public IDataResult<IQueryable<GetUserForSelectDTO>> GetAllUserForSelect()
         {
-            return new SuccessDataResult<IQueryable<GetAllUserForSelectDTO>>(_userManager.Users.Select(x => new GetAllUserForSelectDTO
+            return new SuccessDataResult<IQueryable<GetUserForSelectDTO>>(_userManager.Users.Select(x => new GetUserForSelectDTO
             {
                 Userid = x.Id,
                 Email = x.Email

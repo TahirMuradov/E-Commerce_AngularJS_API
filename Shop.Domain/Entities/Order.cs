@@ -1,4 +1,5 @@
 ﻿using Shop.Domain.Entities.Common;
+using Shop.Domain.Enums;
 
 namespace Shop.Domain.Entities
 {
@@ -11,7 +12,9 @@ namespace Shop.Domain.Entities
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
         public string Note { get; set; }
+        public string OrderPdfPath { get; set; }
         public decimal ShippingPrice { get; set; }
+        public OrderStatus OrderStatus { get; set; }
         public List<SoldProduct>  SoldProducts { get; set; }
         public Guid ShippingMethodId { get; set; }
         public ShippingMethod ShippingMethod { get; set; }

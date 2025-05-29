@@ -1,4 +1,4 @@
-﻿namespace Shop.Application.Exceptions
+﻿namespace Shop.Domain.Exceptions
 {
     public class AuthStatusException
     {

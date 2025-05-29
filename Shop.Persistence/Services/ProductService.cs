@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Shop.Application.Abstraction.Services;
 using Shop.Application.DTOs.ProductDTOs;
-using Shop.Application.Exceptions;
+using Shop.Domain.Exceptions;
 using Shop.Application.PaginationHelper;
 using Shop.Application.ResultTypes.Abstract;
 using Shop.Application.ResultTypes.Concrete.ErrorResults;

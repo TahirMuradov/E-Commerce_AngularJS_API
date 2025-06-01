@@ -5,7 +5,7 @@ using Shop.Domain.Entities;
 
 namespace Shop.Application.Abstraction.Services
 {
-   public interface IAuthServices
+   public interface IAuthService
     {
         Task<IDataResult<PaginatedList<GetUserDTO>>> GetAllUserAsnyc(int page);
         Task<IResult> ChecekdConfirmedEmailTokenAsnyc(string email, string token, string culture);

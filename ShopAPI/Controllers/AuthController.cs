@@ -21,9 +21,9 @@ namespace ShopAPI.Controllers
                 return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
             }
         }
-        private readonly IAuthServices _authService;
+        private readonly IAuthService _authService;
         private readonly IHttpContextAccessor _contextAccessor;
-        public AuthController(IAuthServices authService, IHttpContextAccessor contextAccessor)
+        public AuthController(IAuthService authService, IHttpContextAccessor contextAccessor)
         {
             _authService = authService;
             _contextAccessor = contextAccessor;

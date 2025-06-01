@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Shop.Domain.Entities;
+using Shop.Domain.Entities.WebUIEntites;
 
 namespace Shop.Persistence.Context
 {
@@ -26,6 +27,14 @@ namespace Shop.Persistence.Context
         public DbSet<PaymentMethodLanguages> PaymentMethodLanguages { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<SoldProduct> SoldProducts { get; set; }
+
+
+        public DbSet<HomeSliderItem> HomeSliderItems { get; set; }
+        public DbSet<HomeSliderLanguage> HomeSliderLanguages { get; set; }
+        public DbSet<TopCategoryArea> TopCategoryAreas { get; set; }
+        public DbSet<TopCategoryAreaLanguage> TopCategoryAreaLanguages { get; set; }
+        public DbSet<DisCountArea> DisCountAreas { get; set; }
+        public DbSet<DisCountAreaLanguage> DisCountAreaLanguages { get; set; }
 
 
 

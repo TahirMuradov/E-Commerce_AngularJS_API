@@ -7,6 +7,9 @@ using Shop.Domain.Entities;
 using Shop.Infrastructure;
 using Shop.Persistence.Context;
 using Shop.Persistence.Services;
+using Shop.Application.Abstraction.Services.WebUI;
+using Shop.Domain.Entities.WebUIEntites;
+using Shop.Persistence.Services.WebUI;
 
 namespace Shop.Persistence
 {
@@ -47,7 +50,7 @@ namespace Shop.Persistence
 
             services.AddTransient<IdentityErrorDescriber, MultilanguageIdentityErrorDescriber>();
 
-            services.AddScoped<IAuthServices, AuthService>();
+            services.AddScoped<IAuthService, AuthService>();
 
 
 
@@ -59,7 +62,12 @@ namespace Shop.Persistence
             services.AddScoped<IOrderService, OrderService>();
 
 
-
+            //WebUIService
+            services.AddScoped<IDiscountAreaService, DisCountAreaService>();
+            services.AddScoped<IHomeSliderService,HomeSliderService >();
+            services.AddScoped<IHomeService, HomeService>();
+            services.AddScoped<ITopCategoryAreaService, TopCategoryAreaService>();
+            services.AddScoped<INewArriwalAreaService, NewArriwalAreaService>();
 
 
 

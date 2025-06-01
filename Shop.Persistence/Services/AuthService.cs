@@ -18,7 +18,7 @@ using System.Web;
 
 namespace Shop.Infrastructure
 {
-    public class AuthService : IAuthServices
+    public class AuthService : IAuthService
     {
         private string[] SupportedLaunguages
         {

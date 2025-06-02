@@ -9,5 +9,6 @@
         /// value is the localized name of the category.
         /// </summary>
         public Dictionary<string, string> CategoryContent { get; set; }
+        public bool IsFeatured { get; set; }
     }
 }

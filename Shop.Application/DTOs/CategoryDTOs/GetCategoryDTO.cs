@@ -4,5 +4,7 @@
     {
         public Guid CategoryId { get; set; }
         public string CategoryName { get; set; }
+        public bool IsFEatured { get; set; }
+
     }
 }

@@ -6,6 +6,7 @@ using Shop.Application.Abstraction.Services;
 using Shop.Application.Abstraction.Services.WebUI;
 using Shop.Application.DTOs.WebUI.HomeSliderItemDTOs;
 using Shop.Persistence;
+using System.Threading.Tasks;
 
 namespace ShopAPI.Controllers
 {
@@ -67,10 +68,10 @@ namespace ShopAPI.Controllers
         }
        
         [HttpGet("[action]")]
-        public IActionResult GetHomeSliderItemForUpdate([FromQuery] Guid Id)
+        public async Task<IActionResult> GetHomeSliderItemForUpdate([FromQuery] Guid Id)
         {
             string LangCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString() ?? DefaultLaunguage;
-            var result = _homeSliderItemService.GetHomeSliderItemForUpdate(Id, LangCode);
+            var result = await _homeSliderItemService.GetHomeSliderItemForUpdateAsync(Id, LangCode);
 
             return StatusCode((int)result.StatusCode, result);
         }

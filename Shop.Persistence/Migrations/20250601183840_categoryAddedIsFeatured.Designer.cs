@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shop.Persistence.Context;
 
@@ -11,9 +12,11 @@ using Shop.Persistence.Context;
 namespace Shop.Persistence.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250601183840_categoryAddedIsFeatured")]
+    partial class categoryAddedIsFeatured
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,7 +139,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.CategoryLanguage", b =>
@@ -160,7 +163,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("CategoryLanguages", (string)null);
+                    b.ToTable("CategoryLanguages");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.Order", b =>
@@ -219,7 +222,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.PaymentMethod", b =>
@@ -233,7 +236,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods", (string)null);
+                    b.ToTable("PaymentMethods");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.PaymentMethodLanguages", b =>
@@ -257,7 +260,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("PaymentMethodId");
 
-                    b.ToTable("PaymentMethodLanguages", (string)null);
+                    b.ToTable("PaymentMethodLanguages");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.Product", b =>
@@ -290,7 +293,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.ProductLanguage", b =>
@@ -318,7 +321,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductLanguages", (string)null);
+                    b.ToTable("ProductLanguages");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.Role", b =>
@@ -363,7 +366,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShippingMethods", (string)null);
+                    b.ToTable("ShippingMethods");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.ShippingMethodLanguage", b =>
@@ -387,7 +390,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("ShippingMethodId");
 
-                    b.ToTable("ShippingMethodLanguages", (string)null);
+                    b.ToTable("ShippingMethodLanguages");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.Size", b =>
@@ -402,7 +405,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sizes", (string)null);
+                    b.ToTable("Sizes");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.SizeProduct", b =>
@@ -426,7 +429,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("SizeId");
 
-                    b.ToTable("SizeProducts", (string)null);
+                    b.ToTable("SizeProducts");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.SoldProduct", b =>
@@ -469,7 +472,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("SizeId");
 
-                    b.ToTable("SoldProducts", (string)null);
+                    b.ToTable("SoldProducts");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.User", b =>
@@ -564,7 +567,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DisCountAreas", (string)null);
+                    b.ToTable("DisCountAreas");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.WebUIEntites.DisCountAreaLanguage", b =>
@@ -591,7 +594,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("DisCountAreaId");
 
-                    b.ToTable("DisCountAreaLanguages", (string)null);
+                    b.ToTable("DisCountAreaLanguages");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.WebUIEntites.HomeSliderItem", b =>
@@ -606,7 +609,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("HomeSliderItems", (string)null);
+                    b.ToTable("HomeSliderItems");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.WebUIEntites.HomeSliderLanguage", b =>
@@ -634,7 +637,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("HomeSliderItemId");
 
-                    b.ToTable("HomeSliderLanguages", (string)null);
+                    b.ToTable("HomeSliderLanguages");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.WebUIEntites.TopCategoryArea", b =>
@@ -657,7 +660,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("TopCategoryAreas", (string)null);
+                    b.ToTable("TopCategoryAreas");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.WebUIEntites.TopCategoryAreaLanguage", b =>
@@ -685,7 +688,7 @@ namespace Shop.Persistence.Migrations
 
                     b.HasIndex("TopCategoryAreaId");
 
-                    b.ToTable("TopCategoryAreaLanguages", (string)null);
+                    b.ToTable("TopCategoryAreaLanguages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

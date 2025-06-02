@@ -63,7 +63,7 @@ namespace ShopAPI.Controllers
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
             var result = await _productService.GetAllProductByPageAsync(page, headerLocale);
-            return StatusCode((int)result.StatusCode);
+            return StatusCode((int)result.StatusCode,result);
 
         }
         [HttpGet("[action]")]

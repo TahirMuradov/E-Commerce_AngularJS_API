@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Shop.Application.DTOs.WebUI.TopCategoryAreaDTOs;
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace Shop.Application.Validators.WebUIValidators.TopCategoryAreaDTOValidations
 {

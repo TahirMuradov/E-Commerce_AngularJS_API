@@ -57,7 +57,10 @@ namespace Shop.Persistence.Services
             try
             {
 
-                Category category = new Category();
+                Category category = new Category()
+                {
+                    IsFeatured = addCategoryDTO.IsFeatured,
+                };
                 _context.Categories.Add(category);
 
 
@@ -110,7 +113,8 @@ namespace Shop.Persistence.Services
             IQueryable<GetCategoryDTO> queryCategory = _context.Categories.AsNoTracking().Select(x => new GetCategoryDTO
             {
                 CategoryId = x.Id,
-                CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name
+                CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name,
+                IsFEatured=x.IsFeatured
             });
             return new SuccessDataResult<IQueryable<GetCategoryDTO>>(data: queryCategory, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }
@@ -124,7 +128,8 @@ namespace Shop.Persistence.Services
             IQueryable<GetCategoryDTO> queryCategory = _context.Categories.AsNoTracking().Select(x => new GetCategoryDTO
             {
                 CategoryId = x.Id,
-                CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name
+                CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name,
+                IsFEatured = x.IsFeatured
 
             });
             var returnData = await PaginatedList<GetCategoryDTO>.CreateAsync(queryCategory, page, 10);
@@ -140,7 +145,8 @@ namespace Shop.Persistence.Services
                  .Select(x => new GetCategoryDetailDTO
                  {
                      Id = x.Id,
-                     CategoryContent = x.CategoryLanguages.Select(x=>new KeyValuePair<string,string>(x.LanguageCode,x.Name)).ToDictionary()
+                     CategoryContent = x.CategoryLanguages.Select(x=>new KeyValuePair<string,string>(x.LanguageCode,x.Name)).ToDictionary(),
+                     IsFeatured=x.IsFeatured
                  }).FirstOrDefault();
             return category is null ?
                  new ErrorDataResult<GetCategoryDetailDTO>(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound) :
@@ -159,6 +165,7 @@ namespace Shop.Persistence.Services
             var category = _context.Categories.Include(x => x.CategoryLanguages).FirstOrDefault(x => x.Id == updateCategoryDTO.Id);
             if (category is null)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
+            category.IsFeatured = updateCategoryDTO.IsFeatured;
             foreach (var newContent in updateCategoryDTO.CategoryContent)
             {
                 CategoryLanguage categoryLanguage = category.CategoryLanguages.FirstOrDefault(x => x.LanguageCode == newContent.Key);

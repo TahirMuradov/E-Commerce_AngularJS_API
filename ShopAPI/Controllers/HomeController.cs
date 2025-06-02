@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Shop.Application.Abstraction.Services;
 using Shop.Application.Abstraction.Services.WebUI;
 using Shop.Persistence;
 

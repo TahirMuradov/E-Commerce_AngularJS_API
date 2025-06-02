@@ -10,7 +10,7 @@ namespace Shop.Application.Abstraction.Services.WebUI
         public Task<IResult> UpdateHomeSliderItemAsync(UpdateHomeSliderItemDTO updateHomeSliderItemDTO,string LangCode);
         public IResult DeleteHomeSliderItem(Guid Id, string LangCode);
         public Task<IDataResult<PaginatedList<GetHomeSliderItemDTO>>> GetAllHomeSliderAsync(string LangCode, int page);
-        public IDataResult<GetHomeSliderItemForUpdateDTO> GetHomeSliderItemForUpdate(Guid Id, string LangCode);
+        public Task<IDataResult<GetHomeSliderItemForUpdateDTO>> GetHomeSliderItemForUpdateAsync(Guid Id, string LangCode);
         public IDataResult<IQueryable<GetHomeSliderItemForUIDTO>> GetHomeSliderItemForUI(string LangCode);
     }
 }

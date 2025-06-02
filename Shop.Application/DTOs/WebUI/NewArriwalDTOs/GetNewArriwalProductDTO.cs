@@ -7,6 +7,6 @@ public class GetNewArriwalProductDTO
         public decimal Price { get; set; }
         public decimal DisCount { get; set; }
         public string Title { get; set; }
-        public List<GetIsFeaturedCategoryDTO> Category { get; set; }
+        public GetIsFeaturedCategoryDTO Category { get; set; }
     }
 }

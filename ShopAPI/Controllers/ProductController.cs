@@ -59,10 +59,10 @@ namespace ShopAPI.Controllers
 
         }
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetAllProductByPage([FromQuery] int page)
+        public async Task<IActionResult> GetAllProductByPage([FromQuery] int page, [FromQuery] string? search = null)
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _productService.GetAllProductByPageAsync(page, headerLocale);
+            var result = await _productService.GetAllProductByPageOrSearchAsync(page, headerLocale, search);
             return StatusCode((int)result.StatusCode,result);
 
         }

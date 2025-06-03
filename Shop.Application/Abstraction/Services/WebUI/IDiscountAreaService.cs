@@ -10,7 +10,7 @@ namespace Shop.Application.Abstraction.Services.WebUI
         public IResult UpdateDisCountArea(UpdateDisCountAreaDTO updateDisCountAreaDTO, string LangCode);
         public Task<IDataResult<GetDisCountAreaForUpdateDTO>> GetDisCountAreaForUpdateAsync(Guid Id, string LangCode);
         public IDataResult<IQueryable<GetDisCountAreaDTO>> GetAllDisCountArea(string LangCode);
-        public Task<IDataResult<PaginatedList<GetDisCountAreaDTO>>> GetAllDisCountForTableAsync(string LangCode, int page);
+        public Task<IDataResult<PaginatedList<GetDisCountAreaDTO>>> GetAllDisCountByPageOrSearchAsync(string LangCode, int page,string? search=null);
         public IResult Delete(Guid Id, string LangCode);
     }
 }

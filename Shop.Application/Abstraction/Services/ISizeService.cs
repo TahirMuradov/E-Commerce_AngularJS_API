@@ -12,7 +12,7 @@ namespace Shop.Application.Abstraction.Services
         public IResult DeleteSize(Guid id, string locale);
         public IDataResult<GetSizeDTO> GetSizeById(Guid id, string locale);
         public IDataResult<IQueryable<GetSizeDTO>> GetAllSizes(string locale);
-        public Task<IDataResult<PaginatedList<GetSizeDTO>>> GetAllSizesByPageAsync(int page, string locale);
+        public Task<IDataResult<PaginatedList<GetSizeDTO>>> GetAllSizesByPageOrSearchAsync(int page, string locale, string? search = null);
 
     }
 }

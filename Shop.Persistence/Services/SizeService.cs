@@ -110,17 +110,24 @@ namespace Shop.Persistence.Services
             return new SuccessDataResult<IQueryable<GetSizeDTO>>(querySize, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }
 
-        public async Task<IDataResult<PaginatedList<GetSizeDTO>>> GetAllSizesByPageAsync(int page, string locale)
+        public async Task<IDataResult<PaginatedList<GetSizeDTO>>> GetAllSizesByPageOrSearchAsync(int page, string locale,string? search=null)
         {
             if (string.IsNullOrEmpty(locale)||!SupportedLanguages.Contains(locale))
         return new ErrorDataResult<PaginatedList<GetSizeDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             if (page < 1)
                 page = 1;
-            IQueryable<GetSizeDTO> querySize = _context.Sizes.Select(size => new GetSizeDTO
+            IQueryable<GetSizeDTO> querySize = search is null? _context.Sizes.Select(size => new GetSizeDTO
             {
                 Id = size.Id,
                 Size = size.Content
-            }).AsNoTracking();
+            }).AsNoTracking().AsSplitQuery():
+            _context.Sizes.Select(size => new GetSizeDTO
+            {
+                Id = size.Id,
+                Size = size.Content
+            }).AsNoTracking().AsSplitQuery().Where(x=>x.Size.ToLower().Contains(search.ToLower())||x.Id.ToString().ToLower().Contains(search.ToLower()));
+
+
             PaginatedList<GetSizeDTO> paginatedList = await PaginatedList<GetSizeDTO>.CreateAsync(querySize, page, 10);
             return new SuccessDataResult<PaginatedList<GetSizeDTO>>(paginatedList, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
 

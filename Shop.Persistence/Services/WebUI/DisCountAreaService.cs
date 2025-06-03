@@ -123,17 +123,28 @@ namespace Shop.Persistence.Services.WebUI
             return new SuccessDataResult<IQueryable<GetDisCountAreaDTO>>(disCountAreas, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
         }
 
-        public async Task<IDataResult<PaginatedList<GetDisCountAreaDTO>>> GetAllDisCountForTableAsync(string LangCode, int page)
+        public async Task<IDataResult<PaginatedList<GetDisCountAreaDTO>>> GetAllDisCountByPageOrSearchAsync(string LangCode, int page, string? search = null)
         {
             if (string.IsNullOrEmpty(LangCode)||SupportedLaunguages.Contains(LangCode))
         return new ErrorDataResult<PaginatedList<GetDisCountAreaDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
-            IQueryable<GetDisCountAreaDTO> disCountAreas = _context.DisCountAreas.AsNoTracking()
+            IQueryable<GetDisCountAreaDTO> disCountAreas = search is null? _context.DisCountAreas.AsNoTracking().AsSplitQuery()
                 .Select(x => new GetDisCountAreaDTO
                 {
                     Id = x.Id,
                     Description = x.Languages.Where(y => y.LangCode == LangCode).Select(y => y.Description).FirstOrDefault(),
                     Title = x.Languages.Where(y => y.LangCode == LangCode).Select(y => y.Title).FirstOrDefault()
-                });
+                }):
+                _context.DisCountAreas.AsNoTracking().AsSplitQuery()
+                .Select(x => new GetDisCountAreaDTO
+                {
+                    Id = x.Id,
+                    Description = x.Languages.Where(y => y.LangCode == LangCode).Select(y => y.Description).FirstOrDefault(),
+                    Title = x.Languages.Where(y => y.LangCode == LangCode).Select(y => y.Title).FirstOrDefault()
+                }).Where(x=>x.Title.ToLower().Contains(search.ToLower())||
+                x.Description.ToLower().Contains(search.ToLower())
+                || x.Id.ToString().ToLower().Contains(search.ToLower())
+                )
+                ;
             PaginatedList<GetDisCountAreaDTO> paginatedList = await PaginatedList<GetDisCountAreaDTO>.CreateAsync(disCountAreas, page, 10);
             return new SuccessDataResult<PaginatedList<GetDisCountAreaDTO>>(paginatedList, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
 

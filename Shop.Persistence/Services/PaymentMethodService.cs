@@ -126,18 +126,24 @@ namespace Shop.Persistence.Services
 
         }
 
-        public async Task<IDataResult<PaginatedList<GetPaymentMethodDTO>>> GetAllPaymentMethodsByPageAsync(int page, string locale)
+        public async Task<IDataResult<PaginatedList<GetPaymentMethodDTO>>> GetAllPaymentMethodsByPageOrSearchAsync(int page, string locale,string? search=null)
         {
             if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<PaginatedList<GetPaymentMethodDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (page < 1)
                 page = 1;
-            var query = _context.PaymentMethods.AsNoTracking().Select(x => new GetPaymentMethodDTO
+            var query = search is null ? _context.PaymentMethods.AsNoTracking().AsSplitQuery().Select(x => new GetPaymentMethodDTO
             {
                 Id = x.Id,
                 IsCash = x.IsCash,
                 Content = x.PaymentMethodLanguages.FirstOrDefault(y => y.LangCode == locale).Content
-            });
+            }) : _context.PaymentMethods.AsNoTracking().AsSplitQuery().Select(x => new GetPaymentMethodDTO
+            {
+                Id = x.Id,
+                IsCash = x.IsCash,
+                Content = x.PaymentMethodLanguages.FirstOrDefault(y => y.LangCode == locale).Content
+            }).Where(x=>x.Content.ToLower().Contains(search.ToLower()));
+
             var paginatedList = await PaginatedList<GetPaymentMethodDTO>.CreateAsync(query, page, 10);
             return new SuccessDataResult<PaginatedList<GetPaymentMethodDTO>>(paginatedList, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }

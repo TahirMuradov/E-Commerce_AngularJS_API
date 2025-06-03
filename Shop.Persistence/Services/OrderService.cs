@@ -388,7 +388,7 @@ namespace Shop.Persistence.Services
 
         }
 
-        public async Task<IDataResult<PaginatedList<GetOrderDTO>>> GetAllOrdersByPageAsync(int page, string LangCode)
+        public async Task<IDataResult<PaginatedList<GetOrderDTO>>> GetAllOrdersByPageOrSearchAsync(int page, string LangCode, string? search = null)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
@@ -400,7 +400,7 @@ namespace Shop.Persistence.Services
             try
             {
 
-           IQueryable<GetOrderDTO> queryOrder =  _context.Orders.AsNoTracking().Select(x => new GetOrderDTO
+           IQueryable<GetOrderDTO> queryOrder = search is null?  _context.Orders.AsNoTracking().AsSplitQuery().Select(x => new GetOrderDTO
            {
                 Id = x.Id,
                 FullName = x.FullName,
@@ -425,7 +425,42 @@ namespace Shop.Persistence.Services
                 }
                
 
-            });
+            }):
+            _context.Orders.AsNoTracking().AsSplitQuery().Select(x => new GetOrderDTO
+            {
+                Id = x.Id,
+                FullName = x.FullName,
+                Address = x.Address,
+                PhoneNumber = x.PhoneNumber,
+                Note = x.Note,
+                CreatedDate = x.CreatedAt,
+                OrderNumber = x.OrderNumber,
+                OrderPdfPath = x.OrderPdfPath,
+                Status = x.OrderStatus,
+                TotalPrice = x.SoldProducts.Sum(sp => sp.SoldPrice * sp.Quantity),
+                OrderBy = new GetUserDTO
+                {
+                    Adress = x.User.Adress,
+                    Email = x.User.Email,
+                    FirstName = x.User.FirstName,
+                    LastName = x.User.LastName,
+                    PhoneNumber = x.User.PhoneNumber,
+                    Id = x.User.Id,
+                    UserName = x.User.UserName,
+
+                }
+
+
+            }).Where(x=>x.FullName.ToLower().Contains(search.ToLower()) || 
+            x.OrderNumber.ToLower().Contains(search.ToLower())||
+            x.OrderBy.UserName.ToLower().Contains(search.ToLower()) ||
+            x.Address.ToLower().Contains(search.ToLower())||
+            x.PhoneNumber.ToLower().Contains(search.ToLower())||
+            x.Note.ToLower().Contains(search.ToLower())||
+            x.CreatedDate.ToString().Contains(search.ToLower())||
+            x.Status.ToString().ToLower().Contains(search.ToLower())||
+            x.TotalPrice.ToString().Contains(search.ToLower())
+            );
                 var paginatedData = await PaginatedList<GetOrderDTO>.CreateAsync(queryOrder, page, 10);
                 return new SuccessDataResult<PaginatedList<GetOrderDTO>>(data: paginatedData, message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
 

@@ -101,13 +101,13 @@ namespace Shop.Persistence.Services.WebUI
 
         }
 
-        public async Task<IDataResult<PaginatedList<GetTopCategoryAreaDTO>>> GetTopCategoryAreaAsync(string LangCode, int page)
+        public async Task<IDataResult<PaginatedList<GetTopCategoryAreaDTO>>> GetTopCategoryAreaByPageOrSearchAsync(string LangCode, int page, string? search = null)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 return new ErrorDataResult<PaginatedList<GetTopCategoryAreaDTO>>(HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (page < 1)
                 page = 1;
-            IQueryable<GetTopCategoryAreaDTO> queryData = _context.TopCategoryAreas.AsNoTracking().Select(x => new GetTopCategoryAreaDTO 
+            IQueryable<GetTopCategoryAreaDTO> queryData = search is null? _context.TopCategoryAreas.AsNoTracking().AsSplitQuery().Select(x => new GetTopCategoryAreaDTO 
             {
                 Id = x.Id,
                 PictureUrl = x.ImageUrl,
@@ -118,7 +118,22 @@ namespace Shop.Persistence.Services.WebUI
 
 
 
-            });
+            }):
+            _context.TopCategoryAreas.AsNoTracking().AsSplitQuery().Select(x => new GetTopCategoryAreaDTO
+            {
+                Id = x.Id,
+                PictureUrl = x.ImageUrl,
+                CategoryId = x.Category != null ? x.Category.Id.ToString() : null,
+                Description = x.TopCategoryAreaLanguages.Where(lang => lang.LangCode == LangCode).Select(lang => lang.Description).FirstOrDefault(),
+                Title = x.TopCategoryAreaLanguages.Where(lang => lang.LangCode == LangCode).Select(lang => lang.Title).FirstOrDefault()
+
+
+
+
+            }).Where(x=>x.Title.ToLower().Contains(search.ToLower()) ||
+            x.Description.ToLower().Contains(search.ToLower()) ||
+            x.Id.ToString().ToLower().Contains(search.ToLower()))
+            ;
 
             var paginatedList = await PaginatedList<GetTopCategoryAreaDTO>.CreateAsync(queryData, page, 10);
 

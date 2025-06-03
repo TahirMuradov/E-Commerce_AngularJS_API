@@ -10,7 +10,7 @@ namespace Shop.Application.Abstraction.Services.WebUI
         public Task<IResult> UpdateTopCategoryAreaAsync(UpdateTopCategoryAreaDTO updateTopCategoryAreaDTO, string LangCode);
         public IResult ChangeVisibleTopCategoryArea(Guid Id, string LangCode);
         public IResult RemoveTopCategoryArea(Guid Id, string LangCode);
-        public Task<IDataResult<PaginatedList<GetTopCategoryAreaDTO>>> GetTopCategoryAreaAsync(string LangCode, int page);
+        public Task<IDataResult<PaginatedList<GetTopCategoryAreaDTO>>> GetTopCategoryAreaByPageOrSearchAsync(string LangCode, int page, string? search = null);
         public IDataResult<IQueryable<GetTopCategoryAreaForUIDTO>> GetTopCategoryAreaForUI(string LangCode);
         public Task<IDataResult<GetTopCategoryAreaForUpdateDTO>> GetTopcategoryAreaForUpdateAsync(Guid Id, string LangCode);
 

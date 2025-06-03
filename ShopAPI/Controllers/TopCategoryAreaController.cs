@@ -53,10 +53,10 @@ namespace ShopAPI.Controllers
         }
     
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetTopCategoryArea([FromQuery] int page)
+        public async Task<IActionResult> GetTopCategoryArea([FromQuery] int page, [FromQuery] string? search=null)
         {
             string LangCode = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _topCategoryAreaService.GetTopCategoryAreaAsync(LangCode, page);
+            var result = await _topCategoryAreaService.GetTopCategoryAreaByPageOrSearchAsync(LangCode, page);
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpGet("[action]")]

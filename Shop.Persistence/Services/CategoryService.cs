@@ -119,19 +119,29 @@ namespace Shop.Persistence.Services
             return new SuccessDataResult<IQueryable<GetCategoryDTO>>(data: queryCategory, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }
 
-        public async Task<IDataResult<PaginatedList<GetCategoryDTO>>> GetAllCategoryByPageAsync(string locale, int page = 1)
+        public async Task<IDataResult<PaginatedList<GetCategoryDTO>>> GetAllCategoryByPageOrSearchAsync(string locale, int page = 1, string? search = null)
         {
             if ( string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<PaginatedList<GetCategoryDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (page < 1)
                 page = 1;
-            IQueryable<GetCategoryDTO> queryCategory = _context.Categories.AsNoTracking().Select(x => new GetCategoryDTO
+            IQueryable<GetCategoryDTO> queryCategory =   search is null? _context.Categories.AsNoTracking().AsSplitQuery().Select(x => new GetCategoryDTO
             {
                 CategoryId = x.Id,
                 CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name,
                 IsFEatured = x.IsFeatured
 
-            });
+            }):
+            _context.Categories.AsNoTracking().AsSplitQuery().Select(x => new GetCategoryDTO
+            {
+                CategoryId = x.Id,
+                CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name,
+                IsFEatured = x.IsFeatured
+
+            }).Where(x=>x.CategoryName.ToLower().Contains(search.ToLower())||
+            x.CategoryId.ToString().ToLower().Contains(search.ToLower())
+            )
+            ;
             var returnData = await PaginatedList<GetCategoryDTO>.CreateAsync(queryCategory, page, 10);
             return new SuccessDataResult<PaginatedList<GetCategoryDTO>>(data: returnData, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }

@@ -144,9 +144,9 @@ namespace Shop.Persistence.Services
             }
         }
 
-        public async Task<IDataResult<PaginatedList<GetProductDTO>>> GetAllProductByPageAsync(int page, string LangCode)
+        public async Task<IDataResult<PaginatedList<GetProductDTO>>> GetAllProductByPageOrSearchAsync(int page, string LangCode, string? search = null)
         {
-            IQueryable<GetProductDTO> productQuery = _context.Products.AsNoTracking().Select(x => new GetProductDTO
+            IQueryable<GetProductDTO> productQuery = search is null? _context.Products.AsNoTracking().AsSplitQuery().Select(x => new GetProductDTO
             {
                 Id = x.Id,
                 ProductCode = x.ProductCode,
@@ -159,7 +159,25 @@ namespace Shop.Persistence.Services
 
 
 
-            });
+            }): _context.Products.AsNoTracking().AsSplitQuery().Select(x => new GetProductDTO
+            {
+                Id = x.Id,
+                ProductCode = x.ProductCode,
+                Price = x.Price,
+                Discount = x.DisCount,
+                Title = x.ProductLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Title,
+                CategoryName = x.Category.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Name,
+                ImageUrl = x.ImageUrls.FirstOrDefault(),
+
+
+
+
+            }).Where(x=>x.Title.ToLower().Contains(search.ToLower())||
+            x.CategoryName.ToLower().Contains(search.ToLower()) ||
+            x.ProductCode.ToLower().Contains(search.ToLower())||
+            x.Discount.ToString().Contains(search)||
+            x.Id.ToString().ToLower().Contains(search.ToLower())
+            );
             PaginatedList<GetProductDTO> paginatedProducts = await PaginatedList<GetProductDTO>.CreateAsync(productQuery, page, 10);
             return new SuccessDataResult<PaginatedList<GetProductDTO>>(paginatedProducts, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
         }

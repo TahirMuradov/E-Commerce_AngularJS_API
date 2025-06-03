@@ -11,7 +11,7 @@ namespace Shop.Application.Abstraction.Services
         public IResult DeleteShippingMethod(Guid id, string locale);
         public IDataResult<GetShippingMethodDetailDTO> GetShippingMethodById(Guid id, string locale);
         public IDataResult<IQueryable<GetShippingMethodDTO>> GetAllShippingMethods(string locale);
-        public Task<IDataResult<PaginatedList<GetShippingMethodDTO>>> GetAllShippingMethodsByPageAsync(int page, string locale);
+        public Task<IDataResult<PaginatedList<GetShippingMethodDTO>>> GetAllShippingMethodsByPageOrSearchAsync(int page, string locale, string? search = null);
 
     }
 }

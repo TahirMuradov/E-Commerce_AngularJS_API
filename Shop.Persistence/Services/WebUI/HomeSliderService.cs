@@ -118,7 +118,7 @@ namespace Shop.Persistence.Services.WebUI
 
         }
 
-        public async Task<IDataResult<PaginatedList<GetHomeSliderItemDTO>>> GetAllHomeSliderAsync(string LangCode, int page)
+        public async Task<IDataResult<PaginatedList<GetHomeSliderItemDTO>>> GetAllHomeSliderByPageOrSearchAsync(string LangCode, int page,string? search=null)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 return new ErrorDataResult<PaginatedList<GetHomeSliderItemDTO>> (message: HttpStatusErrorMessages.UnsupportedLanguage[LangCode], HttpStatusCode.BadRequest);
@@ -126,13 +126,23 @@ namespace Shop.Persistence.Services.WebUI
                 page = 1;
             try
             {
-                IQueryable<GetHomeSliderItemDTO> queryData = _context.HomeSliderItems.AsNoTracking().AsSplitQuery().Select(x => new GetHomeSliderItemDTO
+                IQueryable<GetHomeSliderItemDTO> queryData = search is null? _context.HomeSliderItems.AsNoTracking().AsSplitQuery().Select(x => new GetHomeSliderItemDTO
                 {
                     Id = x.Id,
                     ImageUrl=x.BackgroundImageUrl,
                     Description = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Description).FirstOrDefault(),
                     Title = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Title).FirstOrDefault(),
-                });
+                }):
+                _context.HomeSliderItems.AsNoTracking().AsSplitQuery().Select(x => new GetHomeSliderItemDTO
+                {
+                    Id = x.Id,
+                    ImageUrl = x.BackgroundImageUrl,
+                    Description = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Description).FirstOrDefault(),
+                    Title = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Title).FirstOrDefault(),
+                }).Where(x=>x.Title.ToLower().Contains(search.ToLower())||
+                x.Description.ToLower().Contains(search.ToLower()) ||
+                x.Id.ToString().ToLower().Contains(search.ToLower()))
+                ;
                 PaginatedList<GetHomeSliderItemDTO> paginatedList = await PaginatedList<GetHomeSliderItemDTO>.CreateAsync(queryData, page, 10);
                 return new SuccessDataResult<PaginatedList<GetHomeSliderItemDTO>>(data: paginatedList, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
 

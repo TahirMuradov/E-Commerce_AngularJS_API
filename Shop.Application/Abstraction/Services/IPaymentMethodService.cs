@@ -11,6 +11,6 @@ namespace Shop.Application.Abstraction.Services
         public IResult DeletePaymentMethod(Guid id, string locale);
         public IDataResult<GetPaymentMethodDetailDTO> GetPaymentMethodById(Guid id, string locale);
         public IDataResult<IQueryable<GetPaymentMethodDTO>> GetAllPaymentMethods(string locale);
-        public Task<IDataResult<PaginatedList<GetPaymentMethodDTO>>> GetAllPaymentMethodsByPageAsync(int page, string locale);
+        public Task<IDataResult<PaginatedList<GetPaymentMethodDTO>>> GetAllPaymentMethodsByPageOrSearchAsync(int page, string locale, string? search = null);
     }
 }

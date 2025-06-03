@@ -72,10 +72,10 @@ namespace ShopAPI.Controllers
         }
     
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetDisCountAreaForTable([FromQuery] int page)
+        public async Task<IActionResult> GetDisCountAreaForTable([FromQuery] int page, [FromQuery] string?search=null)
         {
             string LangCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString() ?? DefaultLaunguage;
-            var result = await _countAreaService.GetAllDisCountForTableAsync(LangCode, page);
+            var result = await _countAreaService.GetAllDisCountByPageOrSearchAsync(LangCode, page,search);
             return StatusCode((int)result.StatusCode, result);
         }
     }

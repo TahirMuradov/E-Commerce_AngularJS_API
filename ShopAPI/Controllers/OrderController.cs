@@ -46,10 +46,10 @@ namespace ShopAPI.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetOrderByPage([FromQuery] int page)
+        public async Task<IActionResult> GetOrderByPage([FromQuery] int page, [FromQuery] string? search = null)
         {
             string langCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString()?.ToLower() ?? DefaultLaunguage;
-            var result = await _orderService.GetAllOrdersByPageAsync(page, langCode);
+            var result = await _orderService.GetAllOrdersByPageOrSearchAsync(page, langCode,search);
             return StatusCode((int)result.StatusCode, result);
         }
 

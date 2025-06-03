@@ -117,7 +117,7 @@ namespace Shop.Persistence.Services
 
         }
 
-        public async Task<IDataResult<PaginatedList<GetShippingMethodDTO>>> GetAllShippingMethodsByPageAsync(int page, string locale)
+        public async Task<IDataResult<PaginatedList<GetShippingMethodDTO>>> GetAllShippingMethodsByPageOrSearchAsync(int page, string locale, string? search = null)
         {
             if ( string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<PaginatedList<GetShippingMethodDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
@@ -125,7 +125,7 @@ namespace Shop.Persistence.Services
             if (page < 1)
                 page = 1;
 
-                 IQueryable<GetShippingMethodDTO> queryShippingMethod = _context.ShippingMethods.Select(x => new GetShippingMethodDTO {
+                 IQueryable<GetShippingMethodDTO> queryShippingMethod = search is null? _context.ShippingMethods.Select(x => new GetShippingMethodDTO {
 
                      content = x.ShippingMethodLanguages.FirstOrDefault(y => y.LangCode == locale).Content,
                      DisCount = x.DisCountPrice,
@@ -134,7 +134,23 @@ namespace Shop.Persistence.Services
 
 
 
-                 }).AsNoTracking();
+                 }).AsNoTracking().AsSplitQuery():
+                 _context.ShippingMethods.Select(x => new GetShippingMethodDTO
+                 {
+
+                     content = x.ShippingMethodLanguages.FirstOrDefault(y => y.LangCode == locale).Content,
+                     DisCount = x.DisCountPrice,
+                     Id = x.Id,
+                     Price = x.Price
+
+
+
+                 }).AsNoTracking().AsSplitQuery().Where(x => x.content.ToLower().Contains(search.ToLower())||
+                 x.Price.ToString().Contains(search.ToLower()) ||
+                    x.DisCount.ToString().Contains(search.ToLower())||
+                    x.Id.ToString().ToLower().Contains(search.ToLower())
+                    )
+                 ;
             PaginatedList<GetShippingMethodDTO>paginatedData =await PaginatedList<GetShippingMethodDTO>.CreateAsync(queryShippingMethod, page, 10);
             return new SuccessDataResult<PaginatedList<GetShippingMethodDTO>>(data: paginatedData, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
 

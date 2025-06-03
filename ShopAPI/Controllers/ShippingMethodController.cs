@@ -66,11 +66,11 @@ namespace ShopAPI.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetAllShippingMethodsByPage([FromQuery] int page = 1)
+        public async Task<IActionResult> GetAllShippingMethodsByPage([FromQuery] int page = 1, [FromQuery] string? search=null)
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
 
-            var result = await _shippingMethodService.GetAllShippingMethodsByPageAsync(page, headerLocale);
+            var result = await _shippingMethodService.GetAllShippingMethodsByPageOrSearchAsync(page, headerLocale,search);
             return StatusCode((int)result.StatusCode, result);
         }
     }

@@ -68,11 +68,11 @@ namespace ShopAPI.Controllers
 
         }
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetAllPaymentMethodsByPage([FromQuery] int page)
+        public async Task<IActionResult> GetAllPaymentMethodsByPage([FromQuery] int page, [FromQuery] string? search = null)
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
 
-            var result = await _paymentMethod.GetAllPaymentMethodsByPageAsync(page, headerLocale);
+            var result = await _paymentMethod.GetAllPaymentMethodsByPageOrSearchAsync(page, headerLocale, search);
             return StatusCode((int)result.StatusCode, result);
 
         }

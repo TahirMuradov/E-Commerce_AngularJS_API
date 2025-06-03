@@ -50,7 +50,7 @@ namespace Shop.Persistence.Services.WebUI
                 return new ErrorDataResult<IQueryable<GetIsFeaturedCategoryDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[LangCode], HttpStatusCode.BadRequest);
             IQueryable<GetIsFeaturedCategoryDTO> categories =  _context.Categories.AsNoTracking().AsSplitQuery().Where(x => x.IsFeatured).Select(x => new GetIsFeaturedCategoryDTO
             {
-                CategoryId = x.Id,
+                Id = x.Id,
                 CategoryName = x.CategoryLanguages.Where(y => y.LanguageCode == LangCode).Select(s => s.Name).FirstOrDefault(),
                 
             }) ;
@@ -71,7 +71,7 @@ namespace Shop.Persistence.Services.WebUI
                 ImgUrls = x.ImageUrls,
                 Category = new GetIsFeaturedCategoryDTO
                 {
-                    CategoryId = x.CategoryId,
+                    Id = x.CategoryId,
                     CategoryName = x.Category.CategoryLanguages.Where(y => y.LanguageCode == LangCode).Select(s => s.Name).FirstOrDefault()
                 },
                 

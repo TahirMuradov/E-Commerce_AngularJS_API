@@ -95,7 +95,7 @@ namespace Shop.Persistence.Services
 
             foreach (var product in addOrderDTO.Products)
             {
-                Product? checkProduct = await _context.Products.AsNoTracking().Where(x => x.Id == product.ProductId)
+                Product? checkProduct = await _context.Products.AsNoTracking().Where(x => x.Id == product.Id)
                     .Include(x => x.ProductLanguages)
                     .Include(x => x.SizeProducts)
                     .ThenInclude(y => y.Size)
@@ -124,7 +124,7 @@ namespace Shop.Persistence.Services
                     SoldTime = DateTime.UtcNow,
                     ProductCode = checkProduct.ProductCode,
                     ProductName = checkProduct.ProductLanguages.FirstOrDefault(x => x.LanguageCode == LangCode)?.Title ?? checkProduct.ProductLanguages.FirstOrDefault().Title,
-                    ProductId = product.ProductId,
+                    ProductId = product.Id,
                     SizeId = checkSize.SizeId,
                     OrderId = order.Id,
 
@@ -331,7 +331,7 @@ namespace Shop.Persistence.Services
                     List<OrderProductDTO> orderProductDTOs=await _context.Orders.Where(x => x.Id == updateOrderDTO.OrderId)
                         .SelectMany(x => x.SoldProducts.Select(sp => new OrderProductDTO
                         {
-                            ProductId = sp.ProductId,
+                                Id = sp.ProductId,
                             Price = sp.SoldPrice,
                             Quantity = sp.Quantity,
                             size = sp.Size.Content,

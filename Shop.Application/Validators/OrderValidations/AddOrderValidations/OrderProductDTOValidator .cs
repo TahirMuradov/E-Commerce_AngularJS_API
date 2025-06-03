@@ -9,7 +9,7 @@ namespace Shop.Application.Validators.OrderValidations.AddOrderValidations
         {
             var culture= new System.Globalization.CultureInfo(langCode);
 
-            RuleFor(x => x.ProductId)
+            RuleFor(x => x.Id)
                 .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("ProductIdIsRequired", culture));
 
             RuleFor(x => x.ProductCode)

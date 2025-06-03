@@ -140,9 +140,9 @@ namespace Shop.Persistence.Services.WebUI
                     Id = x.Id,
                     Description = x.Languages.Where(y => y.LangCode == LangCode).Select(y => y.Description).FirstOrDefault(),
                     Title = x.Languages.Where(y => y.LangCode == LangCode).Select(y => y.Title).FirstOrDefault()
-                }).Where(x=>x.Title.ToLower().Contains(search.ToLower())||
-                x.Description.ToLower().Contains(search.ToLower())
-                || x.Id.ToString().ToLower().Contains(search.ToLower())
+                }).Where(x=>x.Title.Contains(search,StringComparison.InvariantCultureIgnoreCase) ||
+                x.Description.Contains(search,StringComparison.InvariantCultureIgnoreCase)
+                || x.Id.ToString().Contains(search,StringComparison.InvariantCultureIgnoreCase)
                 )
                 ;
             PaginatedList<GetDisCountAreaDTO> paginatedList = await PaginatedList<GetDisCountAreaDTO>.CreateAsync(disCountAreas, page, 10);

@@ -125,7 +125,7 @@ namespace Shop.Persistence.Services
             {
                 Id = size.Id,
                 Size = size.Content
-            }).AsNoTracking().AsSplitQuery().Where(x=>x.Size.ToLower().Contains(search.ToLower())||x.Id.ToString().ToLower().Contains(search.ToLower()));
+            }).AsNoTracking().AsSplitQuery().Where(x=>x.Size.Contains(search, StringComparison.InvariantCultureIgnoreCase)||x.Id.ToString().Contains(search,StringComparison.InvariantCultureIgnoreCase));
 
 
             PaginatedList<GetSizeDTO> paginatedList = await PaginatedList<GetSizeDTO>.CreateAsync(querySize, page, 10);

@@ -142,7 +142,7 @@ namespace Shop.Persistence.Services
                 Id = x.Id,
                 IsCash = x.IsCash,
                 Content = x.PaymentMethodLanguages.FirstOrDefault(y => y.LangCode == locale).Content
-            }).Where(x=>x.Content.ToLower().Contains(search.ToLower()));
+            }).Where(x=>x.Content.Contains(search,StringComparison.InvariantCultureIgnoreCase));
 
             var paginatedList = await PaginatedList<GetPaymentMethodDTO>.CreateAsync(query, page, 10);
             return new SuccessDataResult<PaginatedList<GetPaymentMethodDTO>>(paginatedList, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);

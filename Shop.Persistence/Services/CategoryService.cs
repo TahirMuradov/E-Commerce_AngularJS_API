@@ -125,24 +125,25 @@ namespace Shop.Persistence.Services
                 return new ErrorDataResult<PaginatedList<GetCategoryDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (page < 1)
                 page = 1;
-            IQueryable<GetCategoryDTO> queryCategory =   search is null? _context.Categories.AsNoTracking().AsSplitQuery().Select(x => new GetCategoryDTO
+
+            IQueryable<GetCategoryDTO> queryCategory =   search is null? _context.Categories.AsNoTracking().Select(x => new GetCategoryDTO
             {
                 CategoryId = x.Id,
                 CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name,
                 IsFEatured = x.IsFeatured
 
             }):
-            _context.Categories.AsNoTracking().AsSplitQuery().Select(x => new GetCategoryDTO
+            _context.Categories.AsNoTracking().Select(x => new GetCategoryDTO
             {
                 CategoryId = x.Id,
                 CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name,
                 IsFEatured = x.IsFeatured
 
-            }).Where(x=>x.CategoryName.ToLower().Contains(search.ToLower())||
-            x.CategoryId.ToString().ToLower().Contains(search.ToLower())
+            }).Where(x=>x.CategoryName.Contains(search, StringComparison.InvariantCultureIgnoreCase)||
+            x.CategoryId.ToString().Contains(search, StringComparison.InvariantCultureIgnoreCase)
             )
             ;
-            var returnData = await PaginatedList<GetCategoryDTO>.CreateAsync(queryCategory, page, 10);
+            var returnData = await PaginatedList<GetCategoryDTO>.CreateAsync(queryCategory, page, 1);
             return new SuccessDataResult<PaginatedList<GetCategoryDTO>>(data: returnData, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }
 

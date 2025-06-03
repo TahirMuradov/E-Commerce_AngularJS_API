@@ -172,11 +172,11 @@ namespace Shop.Persistence.Services
 
 
 
-            }).Where(x=>x.Title.ToLower().Contains(search.ToLower())||
-            x.CategoryName.ToLower().Contains(search.ToLower()) ||
-            x.ProductCode.ToLower().Contains(search.ToLower())||
-            x.Discount.ToString().Contains(search)||
-            x.Id.ToString().ToLower().Contains(search.ToLower())
+            }).Where(x=>x.Title.Contains(search, StringComparison.InvariantCultureIgnoreCase) ||
+            x.CategoryName.Contains(search, StringComparison.InvariantCultureIgnoreCase) ||
+            x.ProductCode.Contains(search,StringComparison.InvariantCultureIgnoreCase) ||
+            x.Discount.ToString().Contains(search, StringComparison.InvariantCultureIgnoreCase) ||
+            x.Id.ToString().Contains(search, StringComparison.InvariantCultureIgnoreCase)
             );
             PaginatedList<GetProductDTO> paginatedProducts = await PaginatedList<GetProductDTO>.CreateAsync(productQuery, page, 10);
             return new SuccessDataResult<PaginatedList<GetProductDTO>>(paginatedProducts, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);

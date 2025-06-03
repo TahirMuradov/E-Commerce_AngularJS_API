@@ -30,6 +30,7 @@ namespace Shop.Infrastructure.Services.Token
             {
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, User.Id.ToString()),
+                new Claim("Id", User.Id.ToString()),
                 new Claim("Email", User.Email),
                 new Claim("UserName", User.UserName),
                 new Claim("FirstName", User.FirstName),

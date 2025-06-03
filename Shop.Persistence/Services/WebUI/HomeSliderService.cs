@@ -139,9 +139,9 @@ namespace Shop.Persistence.Services.WebUI
                     ImageUrl = x.BackgroundImageUrl,
                     Description = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Description).FirstOrDefault(),
                     Title = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Title).FirstOrDefault(),
-                }).Where(x=>x.Title.Contains(search,StringComparison.InvariantCultureIgnoreCase) ||
-                x.Description.Contains(search, StringComparison.InvariantCultureIgnoreCase) ||
-                x.Id.ToString().Contains(search,StringComparison.InvariantCultureIgnoreCase))
+                }).Where(x=>x.Title.ToLower().Contains(search.ToLower())||
+                x.Description.ToLower().Contains(search.ToLower()) ||
+                x.Id.ToString().ToLower().Contains(search.ToLower()))
                 ;
                 PaginatedList<GetHomeSliderItemDTO> paginatedList = await PaginatedList<GetHomeSliderItemDTO>.CreateAsync(queryData, page, 10);
                 return new SuccessDataResult<PaginatedList<GetHomeSliderItemDTO>>(data: paginatedList, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);

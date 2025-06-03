@@ -451,15 +451,15 @@ namespace Shop.Persistence.Services
                 }
 
 
-            }).Where(x=>x.FullName.Contains(search,StringComparison.InvariantCultureIgnoreCase) || 
-            x.OrderNumber.Contains(search, StringComparison.InvariantCultureIgnoreCase) ||
-            x.OrderBy.UserName.Contains(search,StringComparison.InvariantCultureIgnoreCase) ||
-            x.Address.Contains(search,StringComparison.InvariantCultureIgnoreCase) ||
-            x.PhoneNumber.Contains(search,StringComparison.InvariantCultureIgnoreCase) ||
-            x.Note.Contains(search,StringComparison.InvariantCultureIgnoreCase) ||
-            x.CreatedDate.ToString().Contains(search,StringComparison.InvariantCultureIgnoreCase) ||
-            x.Status.ToString().Contains(search, StringComparison.InvariantCultureIgnoreCase) ||
-            x.TotalPrice.ToString().Contains(search, StringComparison.InvariantCultureIgnoreCase)
+            }).Where(x=>x.FullName.ToLower().Contains(search.ToLower()) || 
+            x.OrderNumber.ToLower().Contains(search.ToLower())||
+            x.OrderBy.UserName.ToLower().Contains(search.ToLower()) ||
+            x.Address.ToLower().Contains(search.ToLower())||
+            x.PhoneNumber.ToLower().Contains(search.ToLower())||
+            x.Note.ToLower().Contains(search.ToLower())||
+            x.CreatedDate.ToString().Contains(search.ToLower())||
+            x.Status.ToString().ToLower().Contains(search.ToLower())||
+            x.TotalPrice.ToString().Contains(search.ToLower())
             );
                 var paginatedData = await PaginatedList<GetOrderDTO>.CreateAsync(queryOrder, page, 10);
                 return new SuccessDataResult<PaginatedList<GetOrderDTO>>(data: paginatedData, message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);

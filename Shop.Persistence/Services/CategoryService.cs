@@ -112,7 +112,7 @@ namespace Shop.Persistence.Services
                 return new ErrorDataResult<IQueryable<GetCategoryDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             IQueryable<GetCategoryDTO> queryCategory = _context.Categories.AsNoTracking().Select(x => new GetCategoryDTO
             {
-                CategoryId = x.Id,
+                Id = x.Id,
                 CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name,
                 IsFEatured=x.IsFeatured
             });
@@ -125,22 +125,21 @@ namespace Shop.Persistence.Services
                 return new ErrorDataResult<PaginatedList<GetCategoryDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (page < 1)
                 page = 1;
-
-            IQueryable<GetCategoryDTO> queryCategory =   search is null? _context.Categories.AsNoTracking().Select(x => new GetCategoryDTO
+            IQueryable<GetCategoryDTO> queryCategory =   search is null? _context.Categories.AsNoTracking().AsSplitQuery().Select(x => new GetCategoryDTO
             {
-                CategoryId = x.Id,
+                Id = x.Id,
                 CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name,
                 IsFEatured = x.IsFeatured
 
             }):
-            _context.Categories.AsNoTracking().Select(x => new GetCategoryDTO
+            _context.Categories.AsNoTracking().AsSplitQuery().Select(x => new GetCategoryDTO
             {
-                CategoryId = x.Id,
+                Id = x.Id,
                 CategoryName = x.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == locale).Name,
                 IsFEatured = x.IsFeatured
 
-            }).Where(x=>x.CategoryName.Contains(search, StringComparison.InvariantCultureIgnoreCase)||
-            x.CategoryId.ToString().Contains(search, StringComparison.InvariantCultureIgnoreCase)
+            }).Where(x=>x.CategoryName.ToLower().Contains(search.ToLower())||
+            x.Id.ToString().ToLower().Contains(search.ToLower())
             )
             ;
             var returnData = await PaginatedList<GetCategoryDTO>.CreateAsync(queryCategory, page, 1);

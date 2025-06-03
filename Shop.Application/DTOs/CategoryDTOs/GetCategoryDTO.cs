@@ -2,7 +2,7 @@
 {
     public class GetCategoryDTO
     {
-        public Guid CategoryId { get; set; }
+        public Guid Id { get; set; }
         public string CategoryName { get; set; }
         public bool IsFEatured { get; set; }
 

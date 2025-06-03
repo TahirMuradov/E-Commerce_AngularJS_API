@@ -145,10 +145,10 @@ namespace Shop.Persistence.Services
 
 
 
-                 }).AsNoTracking().AsSplitQuery().Where(x => x.content.Contains(search, StringComparison.InvariantCultureIgnoreCase)||
-                 x.Price.ToString().Contains(search, StringComparison.InvariantCultureIgnoreCase) ||
-                    x.DisCount.ToString().Contains(search, StringComparison.InvariantCultureIgnoreCase)||
-                    x.Id.ToString().Contains(search, StringComparison.InvariantCultureIgnoreCase)
+                 }).AsNoTracking().AsSplitQuery().Where(x => x.content.ToLower().Contains(search.ToLower())||
+                 x.Price.ToString().Contains(search.ToLower()) ||
+                    x.DisCount.ToString().Contains(search.ToLower())||
+                    x.Id.ToString().ToLower().Contains(search.ToLower())
                     )
                  ;
             PaginatedList<GetShippingMethodDTO>paginatedData =await PaginatedList<GetShippingMethodDTO>.CreateAsync(queryShippingMethod, page, 10);

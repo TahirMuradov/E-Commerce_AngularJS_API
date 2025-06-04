@@ -179,7 +179,7 @@ namespace Shop.Persistence.Services
             foreach (var newContent in updateCategoryDTO.CategoryContent)
             {
                 CategoryLanguage categoryLanguage = category.CategoryLanguages.FirstOrDefault(x => x.LanguageCode == newContent.Key);
-                if (categoryLanguage.Name != newContent.Value)
+                if (categoryLanguage.LanguageCode != newContent.Value)
                 {
                     categoryLanguage.Name = newContent.Value;
                     _context.CategoryLanguages.Update(categoryLanguage);

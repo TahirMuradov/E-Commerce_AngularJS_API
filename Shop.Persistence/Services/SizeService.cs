@@ -19,11 +19,16 @@ namespace Shop.Persistence.Services
     {
         private readonly AppDBContext _context;
         private readonly ILogger<SizeService> _logger;
-        private string[] SupportedLanguages
+        private string[] SupportedLaunguages
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Languages").Get<string[]>();
+
+
+
+                return Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+
+
             }
         }
         private string DefaultLanguage
@@ -43,7 +48,7 @@ namespace Shop.Persistence.Services
 
         public IResult AddSize(AddSizeDTO addSizeDTO, string locale)
         {
-            if (string.IsNullOrEmpty(locale) || !SupportedLanguages.Contains(locale))
+            if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
 
 
@@ -76,7 +81,7 @@ namespace Shop.Persistence.Services
 
         public IResult DeleteSize(Guid id, string locale)
         {
-            if (id==default||string.IsNullOrEmpty(locale)||!SupportedLanguages.Contains(locale))
+            if (id==default||string.IsNullOrEmpty(locale)||!SupportedLaunguages.Contains(locale))
                 return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             Size size = _context.Sizes.FirstOrDefault(x => x.Id == id);
             if (size == null)
@@ -99,7 +104,7 @@ namespace Shop.Persistence.Services
 
         public IDataResult<IQueryable<GetSizeDTO>> GetAllSizes(string locale)
         {
-            if (string.IsNullOrEmpty(locale)||!SupportedLanguages.Contains(locale))
+            if (string.IsNullOrEmpty(locale)|| !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<IQueryable<GetSizeDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             IQueryable<GetSizeDTO> querySize=_context.Sizes
                 .Select(size => new GetSizeDTO
@@ -112,7 +117,7 @@ namespace Shop.Persistence.Services
 
         public async Task<IDataResult<PaginatedList<GetSizeDTO>>> GetAllSizesByPageOrSearchAsync(int page, string locale,string? search=null)
         {
-            if (string.IsNullOrEmpty(locale)||!SupportedLanguages.Contains(locale))
+            if (string.IsNullOrEmpty(locale)||!SupportedLaunguages.Contains(locale))
         return new ErrorDataResult<PaginatedList<GetSizeDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             if (page < 1)
                 page = 1;
@@ -137,7 +142,7 @@ namespace Shop.Persistence.Services
         public IDataResult<GetSizeDTO> GetSizeById(Guid id, string locale)
         {
 
-            if (id==default|| string.IsNullOrEmpty(locale) || !SupportedLanguages.Contains(locale))
+            if (id==default|| string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<GetSizeDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             GetSizeDTO getSizeDTO = _context.Sizes
                 .Where(size => size.Id == id)
@@ -154,7 +159,7 @@ namespace Shop.Persistence.Services
 
         public IResult UpdateSize(UpdateSizeDTO updateSizeDTO, string locale)
         {
-            if ( string.IsNullOrEmpty(locale) || !SupportedLanguages.Contains(locale))
+            if ( string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<GetSizeDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             UpdateSizeDTOValidation validationRules = new UpdateSizeDTOValidation(locale);
             var validationResult = validationRules.Validate(updateSizeDTO);

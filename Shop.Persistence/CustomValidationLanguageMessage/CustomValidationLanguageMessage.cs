@@ -16,7 +16,7 @@ namespace Shop.Application.CustomLanguageMessage
 
             AddTranslation("az", "ContentEmpty", "Məzmun boş ola bilməz!");
             AddTranslation("az", "InvalidLangCode", $"Dil Kodları yalnız {languagesList} ola bilər!");
-            AddTranslation("az", "  ", $"Məzmun siyahısının uzunluğu {supportedLaunguages.Length}-dən az ola bilməz!");
+            AddTranslation("az", "LangContentTooShort", $"Məzmun siyahısının uzunluğu {supportedLaunguages.Length}-dən az ola bilməz!");
 
             AddTranslation("ru", "LangContentTooShort", $"Длина списка содержимого не может быть меньше {supportedLaunguages.Length}!");
             AddTranslation("ru", "InvalidLangCode", $"Коды языков могут быть только {languagesList}!");

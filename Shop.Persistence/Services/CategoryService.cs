@@ -200,5 +200,19 @@ namespace Shop.Persistence.Services
             _context.SaveChanges();
             return new SuccessResult(message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }
+
+        public IDataResult<IQueryable<GetCategoryForSelectDTO>> GetAllCategoryForSelect(string locale)
+        {
+            if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
+                return new ErrorDataResult<IQueryable<GetCategoryForSelectDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+
+
+            IQueryable<GetCategoryForSelectDTO> queryCategory = _context.Categories.AsNoTracking().Select(x => new GetCategoryForSelectDTO
+            {
+                Id = x.Id,
+                CategoryName = x.CategoryLanguages.Where(y => y.LanguageCode == locale).Select(s => s.Name).FirstOrDefault(),
+            });
+            return new SuccessDataResult<IQueryable<GetCategoryForSelectDTO>>(data: queryCategory, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+        }
     }
 }

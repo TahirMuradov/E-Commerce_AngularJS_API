@@ -11,7 +11,7 @@ namespace ShopAPI.Controllers
     [EnableRateLimiting("Fixed")]
     public class CategoryController : ControllerBase
     {
-              private string DefaultLaunguage
+        private string DefaultLaunguage
         {
             get
             {
@@ -53,7 +53,7 @@ namespace ShopAPI.Controllers
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
 
-            var result = await _categoryService.GetAllCategoryByPageOrSearchAsync(headerLocale, page,search);
+            var result = await _categoryService.GetAllCategoryByPageOrSearchAsync(headerLocale, page, search);
             return StatusCode((int)result.StatusCode, result);
 
         }
@@ -73,6 +73,13 @@ namespace ShopAPI.Controllers
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
 
             var result = _categoryService.GetCategoryDetailById(Id, headerLocale);
+            return StatusCode((int)result.StatusCode, result);
+        }
+        [HttpGet("[action]")]
+        public IActionResult GetAllCategoryForSelect()
+        {
+            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+            var result = _categoryService.GetAllCategoryForSelect(headerLocale);
             return StatusCode((int)result.StatusCode, result);
         }
     }

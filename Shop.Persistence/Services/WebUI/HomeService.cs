@@ -63,14 +63,14 @@ namespace Shop.Persistence.Services.WebUI
             {
                 Title = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Title).FirstOrDefault(),
                 Description = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Description).FirstOrDefault(),
-                ImageUrl = x.BackgroundImageUrl
+                ImageUrl = x.Image.Path
             });
 
             IQueryable<GetTopCategoryAreaForUIDTO> TopCategoryAreas = _context.TopCategoryAreas.AsNoTracking().AsSplitQuery().Select(x => new GetTopCategoryAreaForUIDTO
             {
                 Title = x.TopCategoryAreaLanguages.FirstOrDefault(y => y.LangCode == LangCode).Title,
                 Description = x.TopCategoryAreaLanguages.FirstOrDefault(y => y.LangCode == LangCode).Description,
-                PictureUrl = x.ImageUrl,
+                PictureUrl = x.Image.Path,
                 CategoryId = x.CategoryId.ToString(),
             });
             IQueryable<GetNewArriwalProductDTO> NewArriwalProducts = _context.Products.AsNoTracking().AsSplitQuery().Select(x => new GetNewArriwalProductDTO
@@ -79,7 +79,7 @@ namespace Shop.Persistence.Services.WebUI
                 Title = x.ProductLanguages.Where(y => y.LanguageCode == LangCode).Select(s => s.Title).FirstOrDefault(),
                 Price = x.Price,
                 DisCount = x.DisCount,
-                ImgUrls = x.ImageUrls,
+                ImgUrls = x.Images.Select(sl=>sl.Path).ToList(),
                 Category = new GetIsFeaturedCategoryDTO
                 {
                     Id = x.CategoryId,

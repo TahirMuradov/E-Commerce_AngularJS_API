@@ -38,20 +38,22 @@ namespace Shop.Infrastructure.Services
             return new SuccessResult(HttpStatusCode.OK);
         }
 
-        public async Task<IDataResult<string>> SaveFileAsync(Microsoft.AspNetCore.Http.IFormFile file, bool isProductPicture = false)
+        public async Task<IDataResult<string>> SaveImageAsync(Microsoft.AspNetCore.Http.IFormFile image, bool isProductImage = false)
         {
 
             string filePath = string.Empty;
-            filePath = isProductPicture ? Path.Combine(WebRootPathProvider.GetwwwrootPath, "uploads", "ProductPictures") :
+            filePath = isProductImage ? Path.Combine(WebRootPathProvider.GetwwwrootPath, "uploads", "ProductPictures") :
                 Path.Combine(WebRootPathProvider.GetwwwrootPath, "uploads", "WebUIPictures");
 
             if (!Directory.Exists(filePath))
             {
                 Directory.CreateDirectory(filePath);
             }
-            var path = filePath + Guid.NewGuid().ToString() + file.FileName;
+            var path = isProductImage ? "/uploads/ProductPictures/" + Guid.NewGuid().ToString() + image.FileName.Replace(' ', '_') :
+        "/uploads/WebUIPictures/" + Guid.NewGuid().ToString() + image.FileName.Replace(' ', '_');
+      
             using FileStream fileStream = new(Path.Combine(WebRootPathProvider.GetwwwrootPath + path), FileMode.Create);
-            await file.CopyToAsync(fileStream);
+            await image.CopyToAsync(fileStream);
             return new SuccessDataResult<string>(data:path,HttpStatusCode.OK);
         }
         /// <summary>
@@ -61,13 +63,13 @@ namespace Shop.Infrastructure.Services
         /// <param name="file">File is photo or other file type</param>
         /// <param name="WebRootPath"> WebRootPath is wwwroot folder`s path</param>
         /// <returns></returns>
-        public async Task<IDataResult<List<string>>> SaveFileRangeAsync(List<Microsoft.AspNetCore.Http.IFormFile> file)
+        public async Task<IDataResult<List<string>>> SaveImageRangeAsync(Microsoft.AspNetCore.Http.IFormFileCollection images, bool isProductImages = false)
         {
             SuccessDataResult< List<string>> result = new SuccessDataResult<List<string>>(new List<string> (),HttpStatusCode.OK);
 
-            foreach (var x in file)
+            foreach (var image in images)
             {
-                IDataResult<string> path = await SaveFileAsync(x);
+                IDataResult<string> path = await SaveImageAsync(image,isProductImages);
                 if (result.IsSuccess)
                 {
                     

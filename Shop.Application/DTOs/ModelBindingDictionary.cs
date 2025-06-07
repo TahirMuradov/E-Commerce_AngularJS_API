@@ -54,9 +54,9 @@ namespace Shop.Application.DTOs
             try
             {
                 var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-                var keyValuePairs = JsonSerializer.Deserialize<List<KeyValuePair<Tkey, TValue>>>(value, options);
+                var dictionary = JsonSerializer.Deserialize<Dictionary<Tkey, TValue>>(value, options);
 
-                var dictionary = keyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+              
 
                 bindingContext.Result = ModelBindingResult.Success(dictionary);
             }

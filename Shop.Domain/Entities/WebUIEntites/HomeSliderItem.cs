@@ -4,7 +4,8 @@ namespace Shop.Domain.Entities.WebUIEntites
 {
   public  class HomeSliderItem : BaseEntity
     {
-        public string BackgroundImageUrl { get; set; }
+        public Guid ImageId { get; set; }
+        public Image Image { get; set; }
         public bool IsActive { get; set; }
         public List<HomeSliderLanguage> Languages { get; set; }
 

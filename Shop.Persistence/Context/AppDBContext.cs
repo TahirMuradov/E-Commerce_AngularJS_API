@@ -27,7 +27,7 @@ namespace Shop.Persistence.Context
         public DbSet<PaymentMethodLanguages> PaymentMethodLanguages { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<SoldProduct> SoldProducts { get; set; }
-
+        public DbSet<Image> Images { get; set; }
 
         public DbSet<HomeSliderItem> HomeSliderItems { get; set; }
         public DbSet<HomeSliderLanguage> HomeSliderLanguages { get; set; }
@@ -44,11 +44,19 @@ namespace Shop.Persistence.Context
             base.OnModelCreating(builder);
             builder.Entity<User>().ToTable("Users");
             builder.Entity<Role>().ToTable("Roles");
-            builder.Entity<Product>()
-                .Property(p => p.ImageUrls)
-                 .HasConversion(
-    v => JsonConvert.SerializeObject(v),
-    v => JsonConvert.DeserializeObject<List<string>>(v));
+       builder.Entity<HomeSliderItem>()
+                .HasOne(h => h.Image)
+                .WithOne(i => i.HomeSliderItem)
+                .HasForeignKey<Image>(i => i.HomeSliderItemId);
+            builder.Entity<TopCategoryArea>()
+                .HasOne(t => t.Image)
+                .WithOne(i => i.TopCategoryArea)
+                .HasForeignKey<Image>(i => i.TopCategoryAreaId);
+            //        builder.Entity<Product>()
+            //            .Property(p => p.ImageUrls)
+            //             .HasConversion(
+            //v => JsonConvert.SerializeObject(v),
+            //v => JsonConvert.DeserializeObject<List<string>>(v));
 
 
         }

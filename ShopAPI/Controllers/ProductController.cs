@@ -31,6 +31,7 @@ namespace ShopAPI.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> AddProduct([FromForm] AddProductDTO addProductDTO)
         {
+            
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"]?? DefaultLaunguage;
             var result = await _productService.AddProductAsync(addProductDTO, headerLocale);
             return StatusCode((int)result.StatusCode, result);

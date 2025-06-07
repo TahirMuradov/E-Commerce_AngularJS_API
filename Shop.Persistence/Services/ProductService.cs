@@ -54,7 +54,7 @@ namespace Shop.Persistence.Services
                 return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
             AddProductDTOValidation validationRules = new AddProductDTOValidation(LangCode, SupportedLaunguages);
             var validationResult = validationRules.Validate(addProductDTO);
-            if (validationResult.IsValid)
+            if (!validationResult.IsValid)
                 return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
             Category? category = _context.Categories.AsNoTracking().FirstOrDefault(x => x.Id == addProductDTO.CategoryId);
             if (category is null)
@@ -67,10 +67,11 @@ namespace Shop.Persistence.Services
                 Price = addProductDTO.Price,
                 DisCount = addProductDTO.Discount,
                 ProductCode = addProductDTO.ProductCode,
-                ImageUrls = new List<string>(),
+               
 
             };
             _context.Products.Add(product);
+          await  _context.SaveChangesAsync();
             var existingSizeIds = _context.Sizes
          .AsNoTracking()
          .Select(s => s.Id)
@@ -98,15 +99,36 @@ namespace Shop.Persistence.Services
             {
                 if (image.Length > 0)
                 {
-                    IDataResult<string> imageUrl = await _fileService.SaveFileAsync(image, true);
+                    IDataResult<string> imageUrl = await _fileService.SaveImageAsync(image, true);
                     if (!imageUrl.IsSuccess)
                         return new ErrorResult(message: HttpStatusErrorMessages.FileUploadFailed[LangCode], HttpStatusCode.InternalServerError);
-                    product.ImageUrls.Add(imageUrl.Data);
+                    
+
+                    Image imageEntity = new Image()
+                    {
+                        Path = imageUrl.Data,
+                        ProductId = product.Id
+                    };
+              
+                    _context.Images.Add(imageEntity);
 
                 }
 
             }
-            _context.Products.Update(product);
+            foreach (var content in addProductDTO.Title)
+            {
+                ProductLanguage productLanguage = new()
+                {
+                    ProductId = product.Id,
+                    Description = addProductDTO.Description[content.Key],
+                    LanguageCode = content.Key,
+                    Title = content.Value
+                };
+                _context.ProductLanguages.Add(productLanguage);
+
+                
+            }
+        
             try
             {
                 await _context.SaveChangesAsync();
@@ -127,11 +149,14 @@ namespace Shop.Persistence.Services
         {
             if (id == Guid.Empty)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.BadRequest);
-            Product product = _context.Products.FirstOrDefault(x => x.Id == id);
+            Product product = _context.Products.Include(x=>x.Images).FirstOrDefault(x => x.Id == id);
             if (product is null)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
-            _fileService.RemoveFileRange(product.ImageUrls);
+           IResult removingResult=  _fileService.RemoveFileRange(product.Images.Select(x=>x.Path).ToList());
+            if (removingResult.IsSuccess)          
             _context.Products.Remove(product);
+            else
+                return new ErrorResult(message: removingResult.Message, removingResult.StatusCode);
             try
             {
                 _context.SaveChanges();
@@ -146,7 +171,7 @@ namespace Shop.Persistence.Services
 
         public async Task<IDataResult<PaginatedList<GetProductDTO>>> GetAllProductByPageOrSearchAsync(int page, string LangCode, string? search = null)
         {
-            IQueryable<GetProductDTO> productQuery = search is null? _context.Products.AsNoTracking().AsSplitQuery().Select(x => new GetProductDTO
+            IQueryable<GetProductDTO> productQuery = search is null? _context.Products.AsNoTracking().Select(x => new GetProductDTO
             {
                 Id = x.Id,
                 ProductCode = x.ProductCode,
@@ -154,12 +179,17 @@ namespace Shop.Persistence.Services
                 Discount = x.DisCount,
                 Title = x.ProductLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Title,
                 CategoryName = x.Category.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Name,
-                ImageUrl = x.ImageUrls.FirstOrDefault(),
+                ImageUrl = x.Images[0].Path,
+                SizeInfo=x.SizeProducts.Select(sp => new GetSizeForProduct
+                {
+                 
+                    Size = sp.Size.Content,
+                    StockCount = sp.StockQuantity
+                }).ToList()
 
 
 
-
-            }): _context.Products.AsNoTracking().AsSplitQuery().Select(x => new GetProductDTO
+            }): _context.Products.AsNoTracking().Select(x => new GetProductDTO
             {
                 Id = x.Id,
                 ProductCode = x.ProductCode,
@@ -167,8 +197,13 @@ namespace Shop.Persistence.Services
                 Discount = x.DisCount,
                 Title = x.ProductLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Title,
                 CategoryName = x.Category.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Name,
-                ImageUrl = x.ImageUrls.FirstOrDefault(),
-
+                ImageUrl = x.Images[0].Path,
+                SizeInfo = x.SizeProducts.Select(sp => new GetSizeForProduct
+                {
+                  
+                    Size = sp.Size.Content,
+                    StockCount = sp.StockQuantity
+                }).ToList()
 
 
 
@@ -194,7 +229,7 @@ namespace Shop.Persistence.Services
                     Discount = x.DisCount,
                     Title = x.ProductLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Title,
                     CategoryName = x.Category.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Name,
-                    ImageUrl = x.ImageUrls.FirstOrDefault(),
+                    ImageUrl = x.Images[0].Path,
 
 
 
@@ -220,26 +255,24 @@ namespace Shop.Persistence.Services
             {
                 GetProductDetailDTO productQuery = _context.Products
    .AsNoTracking()
-   .Where(x => x.Id == id)
+
    .Select(x => new GetProductDetailDTO
    {
        Id = x.Id,
        CategoryName = x.Category.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Name,
        Discount = x.DisCount,
        Title = x.ProductLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Title,
-       ImageUrls = x.ImageUrls,
+       ImageUrls = x.Images.Select(sl => sl.Path).ToList(),
        Description = x.ProductLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Description,
        Price = x.Price,
        ProductCode = x.ProductCode,
-       Sizes = x.SizeProducts.Select(sp => new GetSizeForProductDTO
+       Sizes = x.SizeProducts.Select(sp => new GetSizeForProductDetailDTO
        {
            Id = sp.Size.Id,
            Size = sp.Size.Content,
            StockCount = sp.StockQuantity
        }).ToList(),
-       RelatedProducts = _context.Products
-           .AsNoTracking()
-           .Where(p => p.CategoryId == x.CategoryId && p.Id != x.Id)
+       RelatedProducts = _context.Products.Where(p => p.CategoryId == x.CategoryId && p.Id != x.Id)
            .Select(p => new GetProductDTO
            {
                Id = p.Id,
@@ -248,10 +281,13 @@ namespace Shop.Persistence.Services
                Discount = p.DisCount,
                Title = p.ProductLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Title,
                CategoryName = p.Category.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Name,
-               ImageUrl = p.ImageUrls.FirstOrDefault()
+               ImageUrl = p.Images[0].Path
            }).ToList()
    })
+
+      .Where(x => x.Id == id)
    .FirstOrDefault();
+
 
                 return productQuery is null ?
                   new ErrorDataResult<GetProductDetailDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound) :
@@ -281,6 +317,7 @@ namespace Shop.Persistence.Services
             var product = await _context.Products
                 .Include(p => p.ProductLanguages)
                 .Include(p => p.SizeProducts)
+                .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == updateProductDTO.Id);
 
             if (product == null)
@@ -342,16 +379,19 @@ namespace Shop.Persistence.Services
                 }
             }
 
-            // Delete images by URL if any
             if (updateProductDTO.DeletedImageUrls != null && updateProductDTO.DeletedImageUrls.Any())
             {
                 foreach (var urlToDelete in updateProductDTO.DeletedImageUrls)
                 {
-                    if (product.ImageUrls.Contains(urlToDelete))
+            Image deletedImage=product.Images.FirstOrDefault(img => img.Path == urlToDelete);
+                    if (deletedImage is not  null)
                     {
-                        product.ImageUrls.Remove(urlToDelete);
-                        // Optionally, delete file physically via file service if needed
-                        _fileService.RemoveFile(urlToDelete);
+                     
+                        var fileRemovalResult = _fileService.RemoveFile(deletedImage.Path);
+                       
+                        if (!fileRemovalResult.IsSuccess)
+                            return new ErrorResult(message: fileRemovalResult.Message, fileRemovalResult.StatusCode);
+                        _context.Images.Remove(deletedImage);
                     }
                 }
             }
@@ -363,11 +403,18 @@ namespace Shop.Persistence.Services
                 {
                     if (newImage.Length > 0)
                     {
-                        var imageUrlResult = await _fileService.SaveFileAsync(newImage, true);
+                        var imageUrlResult = await _fileService.SaveImageAsync(newImage, true);
                         if (!imageUrlResult.IsSuccess)
                             return new ErrorResult(message: HttpStatusErrorMessages.FileUploadFailed[LangCode], HttpStatusCode.InternalServerError);
 
-                        product.ImageUrls.Add(imageUrlResult.Data);
+                        Image newPicture = new Image
+                        {
+                            Path = imageUrlResult.Data,
+                            ProductId = product.Id
+                        };
+
+                      _context.Images.Add(newPicture);
+
                     }
                 }
             }

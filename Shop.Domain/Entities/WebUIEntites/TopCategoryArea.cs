@@ -4,8 +4,9 @@ namespace Shop.Domain.Entities.WebUIEntites
 {
    public class TopCategoryArea:BaseEntity
     {
-        public string ImageUrl { get; set; }
         public bool IsActive { get; set; }
+        public Guid ImageId { get; set; }
+        public Image Image { get; set; }
         public Guid? CategoryId { get; set; }
         public Category? Category { get; set; }
 

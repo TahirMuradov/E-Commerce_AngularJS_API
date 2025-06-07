@@ -10,7 +10,7 @@
         public decimal Price { get; set; }
         public decimal Discount { get; set; }
         public List<string> ImageUrls { get; set; }
-        public ICollection<GetSizeForProductDTO> Sizes { get; set; }
+        public ICollection<GetSizeForProductDetailDTO> Sizes { get; set; }
         public ICollection<GetProductDTO> RelatedProducts { get; set; }
     }
 }

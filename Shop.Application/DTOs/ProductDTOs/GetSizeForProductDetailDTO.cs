@@ -1,6 +1,6 @@
 ﻿namespace Shop.Application.DTOs.ProductDTOs
 {
-   public class GetSizeForProductDTO
+   public class GetSizeForProductDetailDTO
     {
         public Guid Id { get; set; }
         public string Size { get; set; }

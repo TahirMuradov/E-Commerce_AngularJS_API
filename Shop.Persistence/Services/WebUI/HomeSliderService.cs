@@ -9,6 +9,7 @@ using Shop.Application.ResultTypes.Abstract;
 using Shop.Application.ResultTypes.Concrete.ErrorResults;
 using Shop.Application.ResultTypes.Concrete.SuccessResults;
 using Shop.Application.Validators.WebUIValidators.HomeSliderItemDTOValidations;
+using Shop.Domain.Entities;
 using Shop.Domain.Entities.WebUIEntites;
 using Shop.Domain.Exceptions;
 using Shop.Persistence.Context;
@@ -75,11 +76,16 @@ namespace Shop.Persistence.Services.WebUI
                     _context.HomeSliderLanguages.Add(homeSliderLanguage);
                 }
 
-              var resultFile=   await    _fileService.SaveFileAsync(addHomeSliderItemDTO.BackgroundImage, false);
+              var resultFile=   await    _fileService.SaveImageAsync(addHomeSliderItemDTO.BackgroundImage, false);
                 if (!resultFile.IsSuccess)
                     return new ErrorResult(messages: resultFile.Messages, HttpStatusCode.BadRequest);
-                newSliderItem.BackgroundImageUrl = resultFile.Data;
-                _context.Update(newSliderItem);
+              Image ımage = new Image
+              {
+                  Path = resultFile.Data,
+                  HomeSliderItemId = newSliderItem.Id
+
+              };
+     _context.Images.Add(ımage);
                 await _context.SaveChangesAsync();
                 return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.Created);
             }
@@ -129,14 +135,14 @@ namespace Shop.Persistence.Services.WebUI
                 IQueryable<GetHomeSliderItemDTO> queryData = search is null? _context.HomeSliderItems.AsNoTracking().AsSplitQuery().Select(x => new GetHomeSliderItemDTO
                 {
                     Id = x.Id,
-                    ImageUrl=x.BackgroundImageUrl,
+                    ImageUrl=x.Image.Path,
                     Description = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Description).FirstOrDefault(),
                     Title = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Title).FirstOrDefault(),
                 }):
                 _context.HomeSliderItems.AsNoTracking().AsSplitQuery().Select(x => new GetHomeSliderItemDTO
                 {
                     Id = x.Id,
-                    ImageUrl = x.BackgroundImageUrl,
+                    ImageUrl = x.Image.Path,
                     Description = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Description).FirstOrDefault(),
                     Title = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Title).FirstOrDefault(),
                 }).Where(x=>x.Title.ToLower().Contains(search.ToLower())||
@@ -165,7 +171,7 @@ namespace Shop.Persistence.Services.WebUI
                 IQueryable<GetHomeSliderItemForUIDTO> queryData = _context.HomeSliderItems.AsNoTracking().AsSplitQuery().Select(x => new GetHomeSliderItemForUIDTO
                 {
           
-                    ImageUrl = x.BackgroundImageUrl,
+                    ImageUrl = x.Image.Path,
                     Description = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Description).FirstOrDefault(),
                     Title = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Title).FirstOrDefault(),
                 });
@@ -187,7 +193,7 @@ namespace Shop.Persistence.Services.WebUI
             GetHomeSliderItemForUpdateDTO? getHomeSliderItemForUpdateDTO= await _context.HomeSliderItems.AsNoTracking().AsSplitQuery().Where(x=>x.Id==Id).Select(x => new GetHomeSliderItemForUpdateDTO
             {
                 Id = x.Id,
-                ImageUrl = x.BackgroundImageUrl,
+                ImageUrl = x.Image.Path,
                 Title = x.Languages.Where(y => y.LangCode == LangCode).ToDictionary(s => s.LangCode, s => s.Title),
                 Description = x.Languages.Where(y => y.LangCode == LangCode).ToDictionary(s => s.LangCode, s => s.Description),
             }).FirstOrDefaultAsync();
@@ -233,15 +239,18 @@ namespace Shop.Persistence.Services.WebUI
                 }
                 if (updateHomeSliderItemDTO.NewImage is not null)
                 {
-                    var fileResult = await _fileService.SaveFileAsync(updateHomeSliderItemDTO.NewImage, false);
+                    var fileResult = await _fileService.SaveImageAsync(updateHomeSliderItemDTO.NewImage, false);
                     if (!fileResult.IsSuccess)
                         return new ErrorResult(messages: fileResult.Messages, HttpStatusCode.BadRequest);
-                    var deleteOldFileResult =  _fileService.RemoveFile(homeSliderItem.BackgroundImageUrl);
+
+                    Image ımage= new Image { Path = fileResult.Data, HomeSliderItemId = homeSliderItem.Id };
+                    _context.Images.Add(ımage);
+
+                    var deleteOldFileResult =  _fileService.RemoveFile(homeSliderItem.Image.Path);
                     if (!deleteOldFileResult.IsSuccess)
                         return new ErrorResult(messages: deleteOldFileResult.Messages, HttpStatusCode.BadRequest);
-                    homeSliderItem.BackgroundImageUrl = fileResult.Data;
-                    _context.HomeSliderItems.Update(homeSliderItem);
-
+                  
+                
                 }
              await   _context.SaveChangesAsync();
                 return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);

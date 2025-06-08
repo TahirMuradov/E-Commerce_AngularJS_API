@@ -13,6 +13,7 @@ using Shop.Application.Validators.ProductValidations;
 using Shop.Domain.Entities;
 using Shop.Persistence.Context;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Shop.Persistence.Services
 {
@@ -148,7 +149,7 @@ namespace Shop.Persistence.Services
         public IResult DeleteProduct(Guid id, string LangCode)
         {
             if (id == Guid.Empty)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             Product product = _context.Products.Include(x=>x.Images).FirstOrDefault(x => x.Id == id);
             if (product is null)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
@@ -249,11 +250,11 @@ namespace Shop.Persistence.Services
      
         }
 
-        public IDataResult<GetProductDetailDTO> GetProductById(Guid id, string LangCode)
+        public async Task<IDataResult<GetProductDetailDTO>> GetProductByIdAsync(Guid id, string LangCode)
         {
             try
             {
-                GetProductDetailDTO productQuery = _context.Products
+                GetProductDetailDTO productQuery =await _context.Products
    .AsNoTracking()
 
    .Select(x => new GetProductDetailDTO
@@ -286,7 +287,7 @@ namespace Shop.Persistence.Services
    })
 
       .Where(x => x.Id == id)
-   .FirstOrDefault();
+   .FirstOrDefaultAsync();
 
 
                 return productQuery is null ?
@@ -433,5 +434,36 @@ namespace Shop.Persistence.Services
             }
         }
 
+        public async Task<IDataResult<GetProductForUpdateDTO>> GetProductByIdForUpdateAsync(Guid id, string LangCode)
+        {
+            if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
+                return new ErrorDataResult<GetProductForUpdateDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
+            if (id == Guid.Empty)
+                return new ErrorDataResult<GetProductForUpdateDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+            var product = await _context.Products.AsNoTracking().Where(x => x.Id == id)
+                .Select(x => new GetProductForUpdateDTO
+                {
+                    Id = x.Id,
+                    ProductCode = x.ProductCode,
+                    Price = x.Price,
+                    IsFeature = x.IsFeatured,
+                    CategoryId = x.CategoryId,
+                    Discount = x.DisCount,
+                    ImageUrls = x.Images.Select(i => i.Path).ToList(),
+                    Title = x.ProductLanguages.Select(x => new KeyValuePair<string, string>(x.LanguageCode, x.Title)).ToDictionary(),
+                    Description = x.ProductLanguages.Select(x => new KeyValuePair<string, string>(x.LanguageCode, x.Description)).ToDictionary(),
+                    Sizes=x.SizeProducts.Select(sp => new GetSizeForProductDetailDTO
+                    {
+                        Id = sp.Size.Id,
+                        Size = sp.Size.Content,
+                        StockCount = sp.StockQuantity
+                    }).ToList()
+
+                }).FirstOrDefaultAsync();
+            if (product is null)           
+                return new ErrorDataResult<GetProductForUpdateDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+            return new SuccessDataResult<GetProductForUpdateDTO>(data: product, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+
+        }
     }
 }

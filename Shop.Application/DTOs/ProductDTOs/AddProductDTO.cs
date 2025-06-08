@@ -31,7 +31,7 @@ namespace Shop.Application.DTOs.ProductDTOs
         /// key is the Id of Size .
         /// value is the product`s Size of stock count.
         /// </summary>
-        public Dictionary<Guid,int> Sizes { get; set; }
+        public Dictionary<Guid,int>? Sizes { get; set; }
         public Guid CategoryId { get; set; }
         public bool Isfeature { get; set; }
         public IFormFileCollection ProductImages { get; set; }

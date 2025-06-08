@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Shop.Application.Abstraction.Services;
 using Shop.Application.DTOs.ProductDTOs;
 using Shop.Persistence;
+using System.Threading.Tasks;
 
 namespace ShopAPI.Controllers
 {
@@ -52,12 +53,19 @@ namespace ShopAPI.Controllers
 
         }
         [HttpGet("[action]")]
-        public IActionResult GetProductById([FromQuery] Guid id)
+        public async Task<IActionResult> GetProductById([FromQuery] Guid id)
         {
             string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = _productService.GetProductById(id, headerLocale);
+            var result = await _productService.GetProductByIdAsync(id, headerLocale);
             return StatusCode((int)result.StatusCode, result);
 
+        }
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetProductByIdForUpdate([FromQuery] Guid id)
+        {
+            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+            var result = await _productService.GetProductByIdForUpdateAsync(id, headerLocale);
+            return StatusCode((int)result.StatusCode, result);
         }
         [HttpGet("[action]")]
         public async Task<IActionResult> GetAllProductByPage([FromQuery] int page, [FromQuery] string? search = null)

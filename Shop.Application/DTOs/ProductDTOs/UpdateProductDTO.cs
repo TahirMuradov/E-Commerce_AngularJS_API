@@ -34,8 +34,8 @@ namespace Shop.Application.DTOs.ProductDTOs
         /// value is the product`s Size of stock count.
         /// </summary>
         public Dictionary<Guid, int> Sizes { get; set; }
-        public IFormFileCollection NewImages { get; set; }
-        public ICollection<string> DeletedImageUrls { get; set; }
+        public IFormFileCollection? NewImages { get; set; }
+        public ICollection<string>? DeletedImageUrls { get; set; }
 
     }
 }

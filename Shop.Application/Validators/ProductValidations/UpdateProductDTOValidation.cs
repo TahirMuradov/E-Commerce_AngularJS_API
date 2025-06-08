@@ -14,9 +14,11 @@ namespace Shop.Application.Validators.ProductValidations
             var culture = new CultureInfo(langCode);
 
             RuleFor(x => x.Id)
-                .NotEmpty()
-                .Must(id => id != Guid.Empty)
+                         .Must(id => id != Guid.Empty)
                 .WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("IdIsRequired", culture));
+            RuleFor(x => x.CategoryId)
+           .Must(id => id != Guid.Empty)
+           .WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("CategoryIdInvalid", culture));
 
             RuleFor(x => x.ProductCode)
                 .NotEmpty()

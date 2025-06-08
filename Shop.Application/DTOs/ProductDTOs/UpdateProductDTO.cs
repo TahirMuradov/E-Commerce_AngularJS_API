@@ -24,8 +24,10 @@ namespace Shop.Application.DTOs.ProductDTOs
         public Dictionary<string, string> Description { get; set; }
         public decimal Price { get; set; }
         public decimal Discount { get; set; }
+        public Guid CategoryId { get; set; }
+        public bool Isfeature { get; set; }
 
-        [ModelBinder(BinderType = typeof(ModelBindingDictionary<Guid, string>))]
+        [ModelBinder(BinderType = typeof(ModelBindingDictionary<Guid, int>))]
         /// <summary>
         /// The name of the category to be added.
         /// key is the Id of Size .

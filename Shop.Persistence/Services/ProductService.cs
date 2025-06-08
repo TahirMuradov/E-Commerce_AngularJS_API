@@ -323,11 +323,15 @@ namespace Shop.Persistence.Services
 
             if (product == null)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
-
+            Category? category = _context.Categories.AsNoTracking().FirstOrDefault(x => x.Id == updateProductDTO.CategoryId);
+            if (category is null)
+                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             // Update basic fields
             product.ProductCode = updateProductDTO.ProductCode;
             product.Price = updateProductDTO.Price;
             product.DisCount = updateProductDTO.Discount;
+            product.IsFeatured = updateProductDTO.Isfeature;
+            product.CategoryId = category.Id;
 
             // Update localized titles and descriptions
             foreach (var langKey in updateProductDTO.Title.Keys)

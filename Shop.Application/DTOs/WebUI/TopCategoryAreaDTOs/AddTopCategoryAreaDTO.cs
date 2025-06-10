@@ -11,7 +11,6 @@ namespace Shop.Application.DTOs.WebUI.TopCategoryAreaDTOs
 
         public Dictionary<string, string> Description { get; set; }
         public Guid? CategoryId { get; set; }
-        public Guid? SubCategoryId { get; set; }
         public IFormFile Image { get; set; }
     }
 }

@@ -62,15 +62,27 @@ namespace Shop.Persistence.Services.WebUI
             try
             {
                 Category? category = await _context.Categories.AsNoTracking().Where(x=>x.Id==addTopCategoryAreaDTO.CategoryId).FirstOrDefaultAsync();
+                if (category is null)
+                    return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+     
+                IDataResult<string> fileSaveResult = await _fileService.SaveImageAsync(addTopCategoryAreaDTO.Image, false);
+
+                if (!fileSaveResult.IsSuccess)
+                    return new ErrorResult(message: fileSaveResult.Message, fileSaveResult.StatusCode);
+                Image ımage = new Image
+                {
+                    Path = fileSaveResult.Data
+                };
+                _context.Images.Add(ımage);
                 TopCategoryArea topCategoryArea = new()
                 {
                     IsActive=true,
+                    CategoryId = category?.Id,
+                    ImageId = ımage.Id,
                 };
-                if (category is not null)
-                {
-                    topCategoryArea.CategoryId = category.Id;
-                }
                 _context.TopCategoryAreas.Add(topCategoryArea);
+                ımage.TopCategoryAreaId = topCategoryArea.Id;
+
                 foreach (var langContent in addTopCategoryAreaDTO.Title)
                 {
 
@@ -85,6 +97,7 @@ namespace Shop.Persistence.Services.WebUI
                     _context.TopCategoryAreaLanguages.Add(topCategoryAreaLanguage);
 
                 }
+           
                 await _context.SaveChangesAsync();
                 return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.Created);
 
@@ -111,7 +124,7 @@ namespace Shop.Persistence.Services.WebUI
             {
                 Id = x.Id,
                 PictureUrl = x.Image.Path,
-                CategoryId = x.Category != null ? x.Category.Id.ToString() : null,
+                CategoryName = x.Category != null ? x.Category.CategoryLanguages.FirstOrDefault(y=>y.LanguageCode==LangCode).Name : null,
                 Description = x.TopCategoryAreaLanguages.Where(lang => lang.LangCode == LangCode).Select(lang => lang.Description).FirstOrDefault(),
                 Title = x.TopCategoryAreaLanguages.Where(lang => lang.LangCode == LangCode).Select(lang => lang.Title).FirstOrDefault()
                 
@@ -123,7 +136,7 @@ namespace Shop.Persistence.Services.WebUI
             {
                 Id = x.Id,
                 PictureUrl = x.Image.Path,
-                CategoryId = x.Category != null ? x.Category.Id.ToString() : null,
+                CategoryName = x.Category != null ? x.Category.CategoryLanguages.FirstOrDefault(y => y.LanguageCode == LangCode).Name : null,
                 Description = x.TopCategoryAreaLanguages.Where(lang => lang.LangCode == LangCode).Select(lang => lang.Description).FirstOrDefault(),
                 Title = x.TopCategoryAreaLanguages.Where(lang => lang.LangCode == LangCode).Select(lang => lang.Title).FirstOrDefault()
 
@@ -158,7 +171,8 @@ namespace Shop.Persistence.Services.WebUI
 
         public async Task<IDataResult<GetTopCategoryAreaForUpdateDTO>> GetTopcategoryAreaForUpdateAsync(Guid Id, string LangCode)
         {
-            if (string.IsNullOrEmpty(LangCode) || SupportedLaunguages.Contains(LangCode))
+            
+            if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
 
                 return new ErrorDataResult<GetTopCategoryAreaForUpdateDTO>(HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (Id == default || Id == Guid.Empty)
@@ -168,8 +182,8 @@ namespace Shop.Persistence.Services.WebUI
                 Id = x.Id,
                 CategoryId = x.Category != null ? x.Category.Id.ToString() : null,
                 PictureUrl = x.Image.Path,
-                Title = x.TopCategoryAreaLanguages.Where(lang => lang.LangCode == LangCode).Select(lang =>new KeyValuePair<string,string>(lang.LangCode,lang.Title)).ToDictionary(),
-                Description = x.TopCategoryAreaLanguages.Where(lang => lang.LangCode == LangCode).Select(lang => new KeyValuePair<string, string>(lang.LangCode, lang.Description)).ToDictionary()
+                Title = x.TopCategoryAreaLanguages.Select(lang =>new KeyValuePair<string,string>(lang.LangCode,lang.Title)).ToDictionary(),
+                Description = x.TopCategoryAreaLanguages.Select(lang => new KeyValuePair<string, string>(lang.LangCode, lang.Description)).ToDictionary()
             }).FirstOrDefaultAsync();
 
             return topCategoryArea is not null
@@ -205,7 +219,7 @@ namespace Shop.Persistence.Services.WebUI
         }
         public IResult RemoveTopCategoryArea(Guid Id, string LangCode)
         {
-            if (string.IsNullOrEmpty(LangCode) || SupportedLaunguages.Contains(LangCode))
+            if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
 
                 return new ErrorDataResult<GetTopCategoryAreaForUpdateDTO>(HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (Id == default || Id == Guid.Empty)
@@ -218,8 +232,8 @@ namespace Shop.Persistence.Services.WebUI
                     .FirstOrDefault(x => x.Id == Id);
                 if (topCategoryArea is null)
                     return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
-        var fileRemoveResult=  _fileService.RemoveFile(topCategoryArea.Image.Path);
-                if (!fileRemoveResult.IsSuccess)
+        IResult fileRemoveResult= topCategoryArea.Image is null? new SuccessResult(HttpStatusCode.OK) :_fileService.RemoveFile(topCategoryArea.Image.Path);
+                if (fileRemoveResult.IsSuccess)
                 {
                     _context.TopCategoryAreas.Remove(topCategoryArea);
                     _context.SaveChanges();

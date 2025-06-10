@@ -49,10 +49,10 @@ namespace Shop.Application.Validators.WebUIValidators.TopCategoryAreaDTOValidati
                 .NotNull()
                 .NotEmpty()
                 .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PictureİsRequired",cultureInfo));
-            RuleFor(x => x)
-            .Must(dto => !((dto.CategoryId == null || dto.CategoryId == Guid.Empty) &&
-            (dto.SubCategoryId == null || dto.SubCategoryId == Guid.Empty)))
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("SubCategoryAndCategoryIdIsrequired",cultureInfo));
+            //RuleFor(x => x)
+            //.Must(dto => !((dto.CategoryId == null || dto.CategoryId == Guid.Empty) &&
+            //(dto.SubCategoryId == null || dto.SubCategoryId == Guid.Empty)))
+            //    .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("SubCategoryAndCategoryIdIsrequired",cultureInfo));
 
 
         }

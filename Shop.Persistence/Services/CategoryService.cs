@@ -142,7 +142,7 @@ namespace Shop.Persistence.Services
             x.Id.ToString().ToLower().Contains(search.ToLower())
             )
             ;
-            var returnData = await PaginatedList<GetCategoryDTO>.CreateAsync(queryCategory, page, 1);
+            var returnData = await PaginatedList<GetCategoryDTO>.CreateAsync(queryCategory, page, 10);
             return new SuccessDataResult<PaginatedList<GetCategoryDTO>>(data: returnData, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }
 

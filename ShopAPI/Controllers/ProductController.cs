@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.RateLimiting;
 using Shop.Application.Abstraction.Services;
 using Shop.Application.DTOs.ProductDTOs;
 using Shop.Persistence;
-using System.Threading.Tasks;
 
 namespace ShopAPI.Controllers
 {

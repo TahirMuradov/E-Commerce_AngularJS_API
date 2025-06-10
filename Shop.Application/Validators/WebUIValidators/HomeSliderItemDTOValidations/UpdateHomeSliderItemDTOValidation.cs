@@ -19,10 +19,10 @@ namespace Shop.Application.Validators.WebUIValidators.HomeSliderItemDTOValidatio
               .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("IdInvalid",cultureInfo));
 
 
-            // Validate CurrentPictureUrls and NewPictures
-            RuleFor(x => x)
-                .Must(x => !(x.CurrentPictureUrls == null) || !(x.NewImage == null || x.NewImage == default))
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PictureUrlsOrNewPicturesRequired",cultureInfo));
+            //// Validate CurrentPictureUrls and NewPictures
+            //RuleFor(x => x)
+            //    .Must(x => !(x.CurrentPictureUrls == null) || !(x.NewImage == null || x.NewImage == default))
+            //    .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PictureUrlsOrNewPicturesRequired",cultureInfo));
 
             // Validate that DescriptionContent is not null and contains at least three entries
             RuleFor(dto => dto.Description)

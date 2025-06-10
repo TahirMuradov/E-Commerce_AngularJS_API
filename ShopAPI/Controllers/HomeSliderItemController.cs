@@ -59,7 +59,7 @@ namespace ShopAPI.Controllers
         }
         [HttpGet("[action]")]
 
-        public async Task<IActionResult> GetAllHomeSliderItem([FromQuery] int page, [FromQuery] string? search=null)
+        public async Task<IActionResult> GetAllHomeSliderItemByPageOrSearch([FromQuery] int page, [FromQuery] string? search=null)
         {
             string LangCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString() ?? DefaultLaunguage;
             var result = await _homeSliderItemService.GetAllHomeSliderByPageOrSearchAsync(LangCode, page);

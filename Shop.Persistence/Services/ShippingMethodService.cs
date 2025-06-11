@@ -161,7 +161,7 @@ namespace Shop.Persistence.Services
         {
             if (id==default ||string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<GetShippingMethodDetailDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
-       GetShippingMethodDetailDTO getShippingMethodDTO =_context.ShippingMethods.Where(x=>x.Id==id)
+       GetShippingMethodDetailDTO? getShippingMethodDTO =_context.ShippingMethods.Where(x=>x.Id==id)
                 .Select(x => new GetShippingMethodDetailDTO{
                     Id = x.Id,
                     Price = x.Price,
@@ -177,15 +177,15 @@ namespace Shop.Persistence.Services
             if (updateShippingMethodDTO.Id==default ||string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             try { 
-            ShippingMethod shippingMethod=_context.ShippingMethods.Include(x=>x.ShippingMethodLanguages).FirstOrDefault(x => x.Id == updateShippingMethodDTO.Id);
+            ShippingMethod? shippingMethod=_context.ShippingMethods.Include(x=>x.ShippingMethodLanguages).FirstOrDefault(x => x.Id == updateShippingMethodDTO.Id);
                 if (shippingMethod is null)
                     return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
                 shippingMethod.DisCountPrice = updateShippingMethodDTO.DisCountPrice;
                 shippingMethod.Price = updateShippingMethodDTO.Price;
                 foreach (var methodLang in updateShippingMethodDTO.Content)
                 {
-                    ShippingMethodLanguage shippingMethodLanguage = shippingMethod.ShippingMethodLanguages.FirstOrDefault(x => x.LangCode == methodLang.Key);
-                    if (shippingMethodLanguage != null)
+                    ShippingMethodLanguage? shippingMethodLanguage = shippingMethod.ShippingMethodLanguages.FirstOrDefault(x => x.LangCode == methodLang.Key);
+                    if (shippingMethodLanguage is not null)
                     {
                         shippingMethodLanguage.Content = methodLang.Value;
                     }

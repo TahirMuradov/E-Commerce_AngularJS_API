@@ -9,7 +9,7 @@ namespace Shop.Application.Abstraction.Services
         public IResult AddPaymentMethod(AddPaymentMethodDTO addPaymentMethodDTO, string locale);
         public IResult UdpatePaymentMethod(UpdatePaymentMethodDTO updatePaymentMethodDTO, string locale);
         public IResult DeletePaymentMethod(Guid id, string locale);
-        public IDataResult<GetPaymentMethodDetailDTO> GetPaymentMethodById(Guid id, string locale);
+        public Task<IDataResult<GetPaymentMethodDetailDTO>> GetPaymentMethodByIdAsync(Guid id, string locale);
         public IDataResult<IQueryable<GetPaymentMethodDTO>> GetAllPaymentMethods(string locale);
         public Task<IDataResult<PaginatedList<GetPaymentMethodDTO>>> GetAllPaymentMethodsByPageOrSearchAsync(int page, string locale, string? search = null);
     }

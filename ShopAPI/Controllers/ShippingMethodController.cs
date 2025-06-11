@@ -28,7 +28,7 @@ namespace ShopAPI.Controllers
         [HttpPost("[action]")]
         public IActionResult AddShippingMethod([FromBody] AddShippingMethodDTO addShippingMethodDTO)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+            string? headerLocale = _contextAccessor?.HttpContext?.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
 
             var result = _shippingMethodService.AddShippingMethod(addShippingMethodDTO, headerLocale);
             return StatusCode((int)result.StatusCode, result);
@@ -36,7 +36,7 @@ namespace ShopAPI.Controllers
         [HttpPut("[action]")]
         public IActionResult UdpateShippingMethod([FromBody] UpdateShippingMethodDTO updateShippingMethodDTO)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+            string? headerLocale = _contextAccessor?.HttpContext?.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
 
             var result = _shippingMethodService.UdpateShippingMethod(updateShippingMethodDTO, headerLocale);
             return StatusCode((int)result.StatusCode, result);
@@ -44,7 +44,7 @@ namespace ShopAPI.Controllers
         [HttpDelete("[action]")]
         public IActionResult DeleteShippingMethod([FromQuery] Guid id)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+            string? headerLocale = _contextAccessor?.HttpContext?.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
 
             var result = _shippingMethodService.DeleteShippingMethod(id, headerLocale);
             return StatusCode((int)result.StatusCode, result);
@@ -52,7 +52,7 @@ namespace ShopAPI.Controllers
         [HttpGet("[action]")]
         public IActionResult GetShippingMethodById([FromQuery] Guid id)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+            string? headerLocale = _contextAccessor?.HttpContext?.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
 
             var result = _shippingMethodService.GetShippingMethodById(id, headerLocale);
             return StatusCode((int)result.StatusCode, result);
@@ -60,7 +60,7 @@ namespace ShopAPI.Controllers
         [HttpGet("[action]")]
         public IActionResult GetAllShippingMethods()
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+            string? headerLocale = _contextAccessor?.HttpContext?.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
 
             var result = _shippingMethodService.GetAllShippingMethods(headerLocale);
             return StatusCode((int)result.StatusCode, result);
@@ -68,7 +68,7 @@ namespace ShopAPI.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> GetAllShippingMethodsByPage([FromQuery] int page = 1, [FromQuery] string? search=null)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+            string? headerLocale = _contextAccessor?.HttpContext?.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
 
             var result = await _shippingMethodService.GetAllShippingMethodsByPageOrSearchAsync(page, headerLocale,search);
             return StatusCode((int)result.StatusCode, result);

@@ -13,6 +13,7 @@ using Shop.Application.Validators.PaymentMethodValidations;
 using Shop.Domain.Entities;
 using Shop.Persistence.Context;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Shop.Persistence.Services
 {
@@ -95,7 +96,7 @@ namespace Shop.Persistence.Services
                 return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             try
             {
-                PaymentMethod paymentMethod = _context.PaymentMethods.FirstOrDefault(x => x.Id == id);
+                PaymentMethod? paymentMethod = _context.PaymentMethods.FirstOrDefault(x => x.Id == id);
                 if (paymentMethod is null)
                     return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
                 _context.PaymentMethods.Remove(paymentMethod);
@@ -148,17 +149,17 @@ namespace Shop.Persistence.Services
             return new SuccessDataResult<PaginatedList<GetPaymentMethodDTO>>(paginatedList, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }
 
-        public IDataResult<GetPaymentMethodDetailDTO> GetPaymentMethodById(Guid id, string locale)
+        public async Task<IDataResult<GetPaymentMethodDetailDTO>> GetPaymentMethodByIdAsync(Guid id, string locale)
         {
             if (id == default || string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<GetPaymentMethodDetailDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
 
-            GetPaymentMethodDetailDTO getPaymentMethodDTO = _context.PaymentMethods.AsNoTracking().Where(x => x.Id == id).Select(x => new GetPaymentMethodDetailDTO
+            GetPaymentMethodDetailDTO? getPaymentMethodDTO = await _context.PaymentMethods.AsNoTracking().Where(x => x.Id == id).Select(x => new GetPaymentMethodDetailDTO
             {
                 Id = x.Id,
                 IsCash = x.IsCash,
                 Content = x.PaymentMethodLanguages.Select(y => new KeyValuePair<string, string>(y.LangCode, y.Content)).ToDictionary()
-            }).FirstOrDefault();
+            }).FirstOrDefaultAsync();
             if (getPaymentMethodDTO is null)
                 return new ErrorDataResult<GetPaymentMethodDetailDTO>(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
 
@@ -177,14 +178,14 @@ namespace Shop.Persistence.Services
             try
             {
 
-                PaymentMethod paymentMethod = _context.PaymentMethods.Include(x => x.PaymentMethodLanguages).FirstOrDefault(x => x.Id == updatePaymentMethodDTO.Id);
+                PaymentMethod? paymentMethod = _context.PaymentMethods.Include(x => x.PaymentMethodLanguages).FirstOrDefault(x => x.Id == updatePaymentMethodDTO.Id);
                 if (paymentMethod is null)
                     return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
-
+                paymentMethod.IsCash = updatePaymentMethodDTO.IsCash;
                 foreach (var methodLang in updatePaymentMethodDTO.Content)
                 {
-                    PaymentMethodLanguages Language = paymentMethod.PaymentMethodLanguages.FirstOrDefault(x => x.LangCode == methodLang.Key);
-                    if (Language.Content != methodLang.Value)
+                    PaymentMethodLanguages? Language = paymentMethod.PaymentMethodLanguages.FirstOrDefault(x => x.LangCode == methodLang.Key);
+                    if (Language is not null)
                     {
                         Language.Content = methodLang.Value;
                         _context.PaymentMethodLanguages.Update(Language);
@@ -200,6 +201,7 @@ namespace Shop.Persistence.Services
                         _context.PaymentMethodLanguages.Add(newLang);
                     }
                 }
+                _context.PaymentMethods.Update(paymentMethod);
                 _context.SaveChanges();
                 return new SuccessResult(message: HttpStatusErrorMessages.Created[locale], HttpStatusCode.Created);
             }

@@ -125,7 +125,7 @@ namespace Shop.Persistence.Services.WebUI
 
         public async Task<IDataResult<PaginatedList<GetDisCountAreaDTO>>> GetAllDisCountByPageOrSearchAsync(string LangCode, int page, string? search = null)
         {
-            if (string.IsNullOrEmpty(LangCode)||!SupportedLaunguages.Contains(LangCode))
+            if (string.IsNullOrEmpty(LangCode)||!SupportedLaunguages.Contains(LangCode))  
         return new ErrorDataResult<PaginatedList<GetDisCountAreaDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             IQueryable<GetDisCountAreaDTO> disCountAreas = search is null? _context.DisCountAreas.AsNoTracking().AsSplitQuery()
                 .Select(x => new GetDisCountAreaDTO

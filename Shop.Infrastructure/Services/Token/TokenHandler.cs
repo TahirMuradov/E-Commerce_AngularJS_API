@@ -44,7 +44,7 @@ namespace Shop.Infrastructure.Services.Token
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Token:SecurityKey"]));
 
-            token.Expiration = DateTime.UtcNow.AddMinutes(1);
+            token.Expiration = DateTime.UtcNow.AddDays(1);
             JwtSecurityToken securityToken = new(
                 issuer: _configuration["Token:Audience"],
                 audience: _configuration["Token:Issuer"],

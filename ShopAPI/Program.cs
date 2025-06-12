@@ -101,7 +101,7 @@ builder.Services.AddAuthentication(auth =>
         ValidateIssuerSigningKey = true,
         ValidAudience = builder.Configuration["Token:Audience"],
         ValidIssuer = builder.Configuration["Token:Issuer"],
-        ClockSkew = TimeSpan.Zero, // Disable the default 5 minute clock skew
+        ClockSkew = TimeSpan.Zero,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:SecurityKey"])),
         LifetimeValidator = (notBefore, expires, securityToken, validationParameters) =>
             expires != null ? expires > DateTime.UtcNow : false,

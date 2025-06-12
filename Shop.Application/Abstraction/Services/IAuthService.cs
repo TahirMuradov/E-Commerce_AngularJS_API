@@ -7,7 +7,7 @@ namespace Shop.Application.Abstraction.Services
 {
    public interface IAuthService
     {
-        Task<IDataResult<PaginatedList<GetUserDTO>>> GetAllUserAsnyc(int page);
+        Task<IDataResult<PaginatedList<GetUserDTO>>> GetAllUserByPageOrSearchAsync(int page,string?search=null);
         Task<IResult> ChecekdConfirmedEmailTokenAsnyc(string email, string token, string culture);
         Task<IResult> EditUserProfileAsnyc(UpdateUserDTO updateUserDTO, string culture);
         Task<IResult> DeleteUserAsnyc(Guid Id, string culture);

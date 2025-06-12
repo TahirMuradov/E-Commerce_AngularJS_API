@@ -5,13 +5,13 @@ using Shop.Application.Abstraction.Services;
 using Shop.Application.Abstraction.Token;
 using Shop.Application.DTOs;
 using Shop.Application.DTOs.AuthDTOs;
-using Shop.Domain.Exceptions;
 using Shop.Application.PaginationHelper;
 using Shop.Application.ResultTypes.Abstract;
 using Shop.Application.ResultTypes.Concrete.ErrorResults;
 using Shop.Application.ResultTypes.Concrete.SuccessResults;
 using Shop.Application.Validators.AuthValidations;
 using Shop.Domain.Entities;
+using Shop.Domain.Exceptions;
 using Shop.Persistence;
 using System.Net;
 using System.Web;
@@ -112,7 +112,7 @@ namespace Shop.Infrastructure
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token)) return new ErrorResult(HttpStatusCode.BadRequest);
             if (string.IsNullOrEmpty(culture) || !SupportedLaunguages.Contains(culture))
                 culture = DefaultLaunguage;
-    
+
             var checekedEmail = await _userManager.FindByEmailAsync(email);
             if (checekedEmail is null) return new ErrorResult(message: AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
 
@@ -132,10 +132,11 @@ namespace Shop.Infrastructure
             else
             {
 
-                if (checekedResult.Errors.Any(x=>x.Code== "InvalidToken"))
+                if (checekedResult.Errors.Any(x => x.Code == "InvalidToken"))
                 {
                     await _userManager.DeleteAsync(checekedEmail);
-                    return new ErrorResult(messages: checekedResult.Errors.Select(x => {
+                    return new ErrorResult(messages: checekedResult.Errors.Select(x =>
+                    {
                         if (x.Code == "InvalidToken")
                             return AuthStatusException.InvalidTokenForEmailConfirmation[culture];
                         else
@@ -151,14 +152,14 @@ namespace Shop.Infrastructure
 
         public async Task<IResult> CheckTokenForForgotPasswordAsync(string Email, string token, string LangCode)
         {
-            if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(token)) return new ErrorResult(messages:new List<string> { AuthStatusException.EmailInvalid[LangCode], AuthStatusException.InvalidToken[LangCode] },HttpStatusCode.BadRequest);
+            if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(token)) return new ErrorResult(messages: new List<string> { AuthStatusException.EmailInvalid[LangCode], AuthStatusException.InvalidToken[LangCode] }, HttpStatusCode.BadRequest);
 
             var user = await _userManager.FindByEmailAsync(Email);
 
             if (user is null)
                 return new ErrorResult(AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
-         
-       
+
+
             bool tokenResult = await _userManager.VerifyUserTokenAsync(
       user: user,
        tokenProvider: _userManager.Options.Tokens.PasswordResetTokenProvider,
@@ -167,7 +168,7 @@ namespace Shop.Infrastructure
                   );
 
             if (tokenResult) return new SuccessResult(HttpStatusCode.OK);
-            return new ErrorResult(message: AuthStatusException.InvalidToken[LangCode],HttpStatusCode.BadRequest);
+            return new ErrorResult(message: AuthStatusException.InvalidToken[LangCode], HttpStatusCode.BadRequest);
         }
 
         public async Task<IResult> DeleteUserAsnyc(Guid Id, string culture)
@@ -216,27 +217,67 @@ namespace Shop.Infrastructure
 
         }
 
-        public async Task<IDataResult<PaginatedList<GetUserDTO>>> GetAllUserAsnyc(int page)
+        public async Task<IDataResult<PaginatedList<GetUserDTO>>> GetAllUserByPageOrSearchAsync(int page, string? search = null)
         {
             if (page < 1)
                 page = 1;
-            var usersQuery = _userManager.Users.AsNoTracking();
+            var usersQuery = await _userManager.Users.AsNoTracking().ToListAsync();
+
+
             List<GetUserDTO> result = new();
             foreach (var user in usersQuery)
             {
-                var roles = await _userManager.GetRolesAsync(user);
 
-                result.Add(new GetUserDTO
+
+
+                var roles = await _userManager.GetRolesAsync(user);
+                if (search is not null)
                 {
-                    Id = user.Id,
-                    Adress = user.Adress,
-                    Email = user.Email,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    PhoneNumber = user.PhoneNumber,
-                    UserName = user.UserName,
-                    Roles = roles.ToList()
-                });
+                    search=search.ToLower().Trim();
+                    if (roles.Any(x=>x.Contains(search,StringComparison.CurrentCultureIgnoreCase)) ||
+                        user.Email.Contains(search,StringComparison.CurrentCultureIgnoreCase) ||
+                       user.FirstName.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
+                      user.LastName.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
+                     user.UserName.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
+                    user.PhoneNumber.Contains(search, StringComparison.CurrentCultureIgnoreCase) ||
+                   user.Adress.Contains(search,StringComparison.CurrentCultureIgnoreCase))
+                    {
+
+                        result.Add(new GetUserDTO
+                        {
+                            Id = user.Id,
+                            Adress = user.Adress,
+                            Email = user.Email,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            PhoneNumber = user.PhoneNumber,
+                            UserName = user.UserName,
+                            Roles = roles.ToList()
+                        });
+                    }
+
+
+
+                }
+                else
+                {
+
+
+
+                    result.Add(new GetUserDTO
+                    {
+                        Id = user.Id,
+                        Adress = user.Adress,
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        PhoneNumber = user.PhoneNumber,
+                        UserName = user.UserName,
+                        Roles = roles.ToList()
+                    });
+                }
+
+
             }
 
             var paginatedList = PaginatedList<GetUserDTO>.Create(result, page, 10);
@@ -452,14 +493,14 @@ namespace Shop.Infrastructure
             if (user is null)
                 return new ErrorResult(message: AuthStatusException.UserNotFound[LangCode], HttpStatusCode.NotFound);
             string token = await _userManager.GeneratePasswordResetTokenAsync(user);
-           
+
             var encodedToken = HttpUtility.UrlEncode(token);
             var encodedEmail = HttpUtility.UrlEncode(Email);
 
             var url = $"{_configuration["Domain:Front"]}/auth/changepasswordforforgot?email={encodedEmail}&token={encodedToken}";
 
 
-            var emailResult = await _emailService.SendEmailAsync(user.Email, url, user.FirstName + " " + user.LastName,isForgotPass:true);
+            var emailResult = await _emailService.SendEmailAsync(user.Email, url, user.FirstName + " " + user.LastName, isForgotPass: true);
 
 
             if (emailResult.IsSuccess)

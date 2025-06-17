@@ -10,17 +10,17 @@ namespace Shop.Application.ResultTypes.Concrete.ErrorResults
         public ErrorDataResult(T response, string message, HttpStatusCode statusCode) : base(response, false, message, statusCode)
         {
         }
-        public ErrorDataResult(T response, HttpStatusCode statusCode) : base(response, false, statusCode)
+        public ErrorDataResult(T response,  HttpStatusCode statusCode) : base(response, false, statusCode)
         {
         }
 
-        public ErrorDataResult(List<string> messages, HttpStatusCode statusCode) : base(default, false, messages, statusCode)
+        public ErrorDataResult(List<string> messages, HttpStatusCode statusCode) : base(default, false,  messages , statusCode)
         {
         }
-        public ErrorDataResult(string message, HttpStatusCode statusCode) : base(default, false, message, statusCode)
+        public ErrorDataResult(string message, HttpStatusCode statusCode) : base(default, false,  message,  statusCode)
         {
         }
-        public ErrorDataResult(HttpStatusCode statusCode) : base(default, false, statusCode)
+        public ErrorDataResult( HttpStatusCode statusCode) : base(default, false,  statusCode)
         {
         }
     }

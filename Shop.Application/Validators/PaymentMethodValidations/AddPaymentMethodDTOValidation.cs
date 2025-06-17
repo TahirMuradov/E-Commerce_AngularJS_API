@@ -12,7 +12,7 @@ namespace Shop.Application.Validators.PaymentMethodValidations
             RuleFor(dto => dto.Content)
                .NotNull()
                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty", culture))
-               .Must(langContent => langContent != null && langContent.Count == 3)
+               .Must(langContent => langContent != null && langContent.Count > 3)
                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort", culture));
 
             // Validate that each key in LangContent is a valid language code

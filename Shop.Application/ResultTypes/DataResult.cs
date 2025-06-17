@@ -11,6 +11,7 @@ namespace Shop.Application.ResultTypes
         public DataResult(T data, bool Issuccess, string message, HttpStatusCode statusCode) : base(Issuccess, message, statusCode)
         {
             Data = data;
+
         }
         public DataResult(T data, bool Issuccess, List<string> messages, HttpStatusCode statusCode) : base(Issuccess, messages, statusCode)
         {

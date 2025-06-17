@@ -25,15 +25,12 @@ namespace Shop.Infrastructure.Services
             if (string.IsNullOrWhiteSpace(headerLang))
                 return defaultLanguage;
 
-            // Accept-Language genelde şöyle gelir: "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7"
-            // O yüzden ilk parçaları virgülle ayır, sonra dil kodlarını normalize et (küçük harfe çevir ve - sonrası varsa almayı bırak)
             var acceptedLanguages = headerLang
                 .Split(',')
-                .Select(lang => lang.Split(';')[0])         // "ru-RU;q=0.9" -> "ru-RU"
-                .Select(lang => lang.Split('-')[0].Trim().ToLower())  // "ru-RU" -> "ru"
+                .Select(lang => lang.Split(';')[0])        
+                .Select(lang => lang.Split('-')[0].Trim().ToLower())  
                 .ToList();
 
-            // Desteklenen ilk dili bul
             var matchedLang = acceptedLanguages.FirstOrDefault(lang => supportedLanguages.Contains(lang));
 
             return matchedLang ?? defaultLanguage;

@@ -7,7 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Shop.Application;
+using Shop.Application.Abstraction.Services;
 using Shop.Application.CustomLanguageMessage;
+using Shop.Application.ResultTypes;
 using Shop.Infrastructure;
 using Shop.Persistence;
 using Shop.Persistence.Context;
@@ -151,6 +153,8 @@ builder.Services.AddRateLimiter(option =>
 });
 var app = builder.Build();
 
+var langService = app.Services.GetRequiredService<IGetRequestLangService>();
+Result.Configure(langService);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

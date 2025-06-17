@@ -13,7 +13,7 @@ namespace Shop.Application.Validators.WebUIValidators.TopCategoryAreaDTOValidati
             RuleFor(dto => dto.Description)
             .NotNull()
             .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty",cultureInfo))
-            .Must(langContent => langContent != null && langContent.Count == 3)
+            .Must(langContent => langContent != null && langContent.Count > 3)
             .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort",cultureInfo));
 
             // Validate that each key in DescriptionContent is a valid language code
@@ -30,7 +30,7 @@ namespace Shop.Application.Validators.WebUIValidators.TopCategoryAreaDTOValidati
             RuleFor(dto => dto.Title)
                 .NotNull()
                 .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty",cultureInfo))
-                .Must(langContent => langContent != null && langContent.Count == 3)
+                .Must(langContent => langContent != null && langContent.Count > 3)
                 .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort",cultureInfo));
 
             // Validate that each key in TitleContent is a valid language code

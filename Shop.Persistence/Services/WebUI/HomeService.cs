@@ -79,7 +79,7 @@ namespace Shop.Persistence.Services.WebUI
                 Title = x.ProductLanguages.Where(y => y.LanguageCode == LangCode).Select(s => s.Title).FirstOrDefault(),
                 Price = x.Price,
                 DisCount = x.DisCount,
-                ImgUrls = x.Images.Select(sl=>sl.Path).ToList(),
+                ImgUrl = x.Images.Select(sl => sl.Path).FirstOrDefault(),
                 Category = new GetIsFeaturedCategoryDTO
                 {
                     Id = x.CategoryId,

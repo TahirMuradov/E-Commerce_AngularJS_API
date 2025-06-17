@@ -237,7 +237,8 @@ namespace Shop.Persistence.Services.WebUI
                             LangCode = content.Key,
                             Description = updateHomeSliderItemDTO.Description[content.Key],
                             Title = content.Value,                            
-                            HomeSliderItemId = homeSliderItem.Id
+                            HomeSliderItemId = homeSliderItem.Id,
+                            HomeSliderItem=homeSliderItem
                         };
                         _context.HomeSliderLanguages.Add(homeSliderLanguage);
                     }

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Shop.Domain.Entities;
 using Shop.Domain.Entities.WebUIEntites;
+using System.Reflection.Emit;
 
 namespace Shop.Persistence.Context
 {
@@ -41,7 +42,39 @@ namespace Shop.Persistence.Context
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+
+
+            //for decimal precision(example decimal value 123456789012345678.99)
+
+            builder.Entity<Order>()
+      .Property(o => o.ShippingPrice)
+            .HasPrecision(18, 2);
+
+            builder.Entity<Product>()
+                .Property(p => p.Price)
+            .HasPrecision(18, 2);
+
+            builder.Entity<Product>()
+                .Property(p => p.DisCount)
+            .HasPrecision(18, 2);
+
+            builder.Entity<ShippingMethod>()
+                .Property(s => s.Price)
+            .HasPrecision(18, 2);
+
+            builder.Entity<ShippingMethod>()
+                .Property(s => s.DisCountPrice)
+                .HasPrecision(18, 2);
+
+            builder.Entity<SoldProduct>()
+                .Property(sp => sp.SoldPrice)
+                .HasPrecision(18, 2);
+
+
+
             base.OnModelCreating(builder);
+
+
             builder.Entity<User>().ToTable("Users");
             builder.Entity<Role>().ToTable("Roles");
        builder.Entity<HomeSliderItem>()

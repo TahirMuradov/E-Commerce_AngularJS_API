@@ -156,11 +156,11 @@ var app = builder.Build();
 var langService = app.Services.GetRequiredService<IGetRequestLangService>();
 Result.Configure(langService);
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 app.UseRateLimiter();
 app.UseCors("AllowSpecificOrigin");
 

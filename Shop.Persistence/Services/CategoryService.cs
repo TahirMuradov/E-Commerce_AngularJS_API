@@ -26,7 +26,7 @@ namespace Shop.Persistence.Services
 
 
 
-                return Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+                return Configuration.SupportedLaunguageKeys;
 
 
             }
@@ -36,7 +36,7 @@ namespace Shop.Persistence.Services
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+                return Configuration.DefaultLanguageKey;
             }
         }
         public CategoryService(AppDBContext context, ILogger<CategoryService> logger)
@@ -98,7 +98,7 @@ namespace Shop.Persistence.Services
         {
             if (Id == default || string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
-            Category category = _context.Categories.FirstOrDefault(x => x.Id == Id);
+            Category? category = _context.Categories.FirstOrDefault(x => x.Id == Id);
             if (category is null)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
             _context.Categories.Remove(category);
@@ -150,7 +150,7 @@ namespace Shop.Persistence.Services
         {
             if (Id == default || string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<GetCategoryDetailDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
-            GetCategoryDetailDTO category = _context.Categories.AsNoTracking()
+            GetCategoryDetailDTO? category = _context.Categories.AsNoTracking()
                  .Where(x => x.Id == Id)
                  .Select(x => new GetCategoryDetailDTO
                  {

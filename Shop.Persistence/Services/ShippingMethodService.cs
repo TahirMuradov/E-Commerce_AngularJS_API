@@ -25,7 +25,7 @@ namespace Shop.Persistence.Services
 
 
 
-                return Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+                return Configuration.SupportedLaunguageKeys;
 
 
             }
@@ -35,7 +35,7 @@ namespace Shop.Persistence.Services
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+                return Configuration.DefaultLanguageKey;
             }
         }
         public ShippingMethodService(AppDBContext context, ILogger<ShippingMethodService> logger)

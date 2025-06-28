@@ -26,7 +26,7 @@ namespace Shop.Persistence.Services
 
 
 
-                return Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+                return Configuration.SupportedLaunguageKeys;
 
 
             }
@@ -35,7 +35,7 @@ namespace Shop.Persistence.Services
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+                return Configuration.DefaultLanguageKey;
             }
         }
 
@@ -83,7 +83,7 @@ namespace Shop.Persistence.Services
         {
             if (id==default||string.IsNullOrEmpty(locale)||!SupportedLaunguages.Contains(locale))
                 return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
-            Size size = _context.Sizes.FirstOrDefault(x => x.Id == id);
+            Size? size = _context.Sizes.FirstOrDefault(x => x.Id == id);
             if (size == null)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
             try {
@@ -144,7 +144,7 @@ namespace Shop.Persistence.Services
 
             if (id==default|| string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<GetSizeDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
-            GetSizeDTO getSizeDTO = _context.Sizes
+            GetSizeDTO? getSizeDTO = _context.Sizes
                 .Where(size => size.Id == id)
                 .Select(size => new GetSizeDTO
                 {
@@ -168,7 +168,7 @@ namespace Shop.Persistence.Services
            
             try
             {
-            Size size = _context.Sizes.FirstOrDefault(x => x.Id == updateSizeDTO.Id);
+            Size? size = _context.Sizes.FirstOrDefault(x => x.Id == updateSizeDTO.Id);
             if (size is null)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
                 size.Content = updateSizeDTO.Size;

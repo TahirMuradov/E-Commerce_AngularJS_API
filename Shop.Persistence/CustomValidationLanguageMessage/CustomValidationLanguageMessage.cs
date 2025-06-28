@@ -8,7 +8,7 @@ namespace Shop.Application.CustomLanguageMessage
     {
         public CustomValidationLanguageMessage()
         {
-            string[] supportedLaunguages = Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+            string[] supportedLaunguages = Configuration.SupportedLaunguageKeys;
             string languagesList = string.Join(", ", supportedLaunguages);
             #region CategoryValidationMessages
             #region CategoryAddValidationMessages

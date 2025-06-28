@@ -13,7 +13,7 @@ using Shop.Application.Validators.ProductValidations;
 using Shop.Domain.Entities;
 using Shop.Persistence.Context;
 using System.Net;
-using System.Threading.Tasks;
+
 
 namespace Shop.Persistence.Services
 {
@@ -29,7 +29,7 @@ namespace Shop.Persistence.Services
 
 
 
-                return Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+                return Configuration.SupportedLaunguageKeys;
 
 
             }
@@ -39,7 +39,7 @@ namespace Shop.Persistence.Services
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+                return Configuration.DefaultLanguageKey;
             }
         }
         public ProductService(AppDBContext context, ILogger<ProductService> logger, IFileService fileService)
@@ -150,7 +150,7 @@ namespace Shop.Persistence.Services
         {
             if (id == Guid.Empty)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
-            Product product = _context.Products.Include(x=>x.Images).FirstOrDefault(x => x.Id == id);
+            Product? product = _context.Products.Include(x=>x.Images).FirstOrDefault(x => x.Id == id);
             if (product is null)
                 return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
            IResult removingResult=  _fileService.RemoveFileRange(product.Images.Select(x=>x.Path).ToList());
@@ -254,7 +254,7 @@ namespace Shop.Persistence.Services
         {
             try
             {
-                GetProductDetailDTO productQuery =await _context.Products
+                GetProductDetailDTO ?productQuery =await _context.Products
    .AsNoTracking()
 
    .Select(x => new GetProductDetailDTO
@@ -388,7 +388,7 @@ namespace Shop.Persistence.Services
             {
                 foreach (var urlToDelete in updateProductDTO.DeletedImageUrls)
                 {
-            Image deletedImage=product.Images.FirstOrDefault(img => img.Path == urlToDelete);
+            Image? deletedImage=product.Images.FirstOrDefault(img => img.Path == urlToDelete);
                     if (deletedImage is not  null)
                     {
                      

@@ -27,7 +27,7 @@ namespace Shop.Infrastructure
 
 
 
-                return Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+                return Configuration.SupportedLaunguageKeys;
 
 
             }
@@ -37,7 +37,7 @@ namespace Shop.Infrastructure
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+                return Configuration.DefaultLanguageKey;
             }
         }
         private readonly UserManager<User> _userManager;
@@ -66,14 +66,14 @@ namespace Shop.Infrastructure
             if (!validationResult.IsValid)
                 return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), statusCode: HttpStatusCode.BadRequest);
 
-            User user = await _userManager.FindByIdAsync(assignRoleDTO.UserId.ToString());
+            User? user = await _userManager.FindByIdAsync(assignRoleDTO.UserId.ToString());
             string responseMessage = string.Empty;
             if (user == null)
                 return new ErrorResult(AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
             else
             {
-                Role role = await _roleManager.FindByIdAsync(assignRoleDTO.RoleId.ToString());
-                if (role == null)
+                Role? role = await _roleManager.FindByIdAsync(assignRoleDTO.RoleId.ToString());
+                if (role is null)
                     return new ErrorResult(AuthStatusException.RoleNotFound[culture], HttpStatusCode.NotFound);
                 IdentityResult identityResult = await _userManager.AddToRoleAsync(user, role.Name);
                 if (!identityResult.Succeeded)
@@ -174,8 +174,8 @@ namespace Shop.Infrastructure
         public async Task<IResult> DeleteUserAsnyc(Guid Id, string culture)
         {
 
-            User ChecekdUSerId = await _userManager.FindByIdAsync(Id.ToString());
-            if (ChecekdUSerId == null) return new ErrorResult(message: AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
+            User? ChecekdUSerId = await _userManager.FindByIdAsync(Id.ToString());
+            if (ChecekdUSerId is null) return new ErrorResult(message: AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
             IdentityResult result = await _userManager.DeleteAsync(ChecekdUSerId);
             if (result.Succeeded)
                 return new SuccessResult(HttpStatusCode.OK);
@@ -309,7 +309,7 @@ namespace Shop.Infrastructure
             var validationResult = await validationRules.ValidateAsync(loginDTO);
             if (!validationResult.IsValid)
                 return new ErrorDataResult<Token>(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
-            User user = await _userManager.FindByEmailAsync(loginDTO.Email);
+            User? user = await _userManager.FindByEmailAsync(loginDTO.Email);
             if (user is null)
                 return new ErrorDataResult<Token>(message: AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
             SignInResult result = await _signInManager.CheckPasswordSignInAsync(user, loginDTO.Password, false);
@@ -462,7 +462,7 @@ namespace Shop.Infrastructure
                 return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
 
 
-            User user = await _userManager.FindByIdAsync(removeRoleUserDTO.UserId.ToString());
+            User? user = await _userManager.FindByIdAsync(removeRoleUserDTO.UserId.ToString());
 
             if (user is null)
                 return new ErrorResult(AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
@@ -470,7 +470,7 @@ namespace Shop.Infrastructure
             {
                 foreach (var roleid in removeRoleUserDTO.RoleId)
                 {
-                    Role role = await _roleManager.FindByIdAsync(roleid.ToString());
+                    Role? role = await _roleManager.FindByIdAsync(roleid.ToString());
                     if (role == null)
                         return new ErrorResult(AuthStatusException.RoleNotFound[culture], HttpStatusCode.NotFound);
                     IdentityResult identityResult = await _userManager.RemoveFromRoleAsync(user, role.Name);

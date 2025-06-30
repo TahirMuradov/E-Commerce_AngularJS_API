@@ -47,7 +47,7 @@ namespace Shop.Persistence.Services
         public IResult AddShippingMethod(AddShippingMethodDTO addShippingMethodDTO, string locale)
         {
             if (string.IsNullOrEmpty(locale)||!SupportedLaunguages.Contains(locale))
-           return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+           return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
            
             try
             {
@@ -71,33 +71,33 @@ namespace Shop.Persistence.Services
                 }
 
                 _context.SaveChanges();
-                return new SuccessResult(message: HttpStatusErrorMessages.Created[locale] , HttpStatusCode.Created);
+                return new SuccessResult(locale,message: HttpStatusErrorMessages.Created[locale] , HttpStatusCode.Created);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: ex.Message, HttpStatusCode.InternalServerError);
+                return new ErrorResult(locale,message: ex.Message, HttpStatusCode.InternalServerError);
             }
         }
 
         public IResult DeleteShippingMethod(Guid id, string locale)
         {
             if (id==default||string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(locale,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             try {
             
             ShippingMethod? shippingMethod = _context.ShippingMethods.FirstOrDefault(x=>x.Id==id);
                 if (shippingMethod == null)
-                    return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
+                    return new ErrorResult(locale,message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
                 _context.ShippingMethods.Remove(shippingMethod);
                 _context.SaveChanges();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+                return new SuccessResult(locale,message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: ex.Message, HttpStatusCode.InternalServerError);
+                return new ErrorResult(locale,message: ex.Message, HttpStatusCode.InternalServerError);
             }
 
         }
@@ -105,7 +105,7 @@ namespace Shop.Persistence.Services
         public IDataResult<IQueryable<GetShippingMethodDTO>> GetAllShippingMethods(string locale)
         {
             if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
-                return new ErrorDataResult<IQueryable<GetShippingMethodDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<IQueryable<GetShippingMethodDTO>>(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
         return new SuccessDataResult<IQueryable<GetShippingMethodDTO>>(data:_context.ShippingMethods
                 .Select(x => new GetShippingMethodDTO
                 {
@@ -113,14 +113,14 @@ namespace Shop.Persistence.Services
                     Price = x.Price,
                     DisCount = x.DisCountPrice,
                     content = x.ShippingMethodLanguages.FirstOrDefault(y => y.LangCode == locale).Content
-                }).AsNoTracking(), message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+                }).AsNoTracking(), locale,message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
 
         }
 
         public async Task<IDataResult<PaginatedList<GetShippingMethodDTO>>> GetAllShippingMethodsByPageOrSearchAsync(int page, string locale, string? search = null)
         {
             if ( string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
-                return new ErrorDataResult<PaginatedList<GetShippingMethodDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<PaginatedList<GetShippingMethodDTO>>(locale,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
 
             if (page < 1)
                 page = 1;
@@ -152,7 +152,7 @@ namespace Shop.Persistence.Services
                     )
                  ;
             PaginatedList<GetShippingMethodDTO>paginatedData =await PaginatedList<GetShippingMethodDTO>.CreateAsync(queryShippingMethod, page, 10);
-            return new SuccessDataResult<PaginatedList<GetShippingMethodDTO>>(data: paginatedData, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+            return new SuccessDataResult<PaginatedList<GetShippingMethodDTO>>(data: paginatedData, locale,message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
 
 
         }
@@ -160,7 +160,7 @@ namespace Shop.Persistence.Services
         public IDataResult<GetShippingMethodDetailDTO> GetShippingMethodById(Guid id, string locale)
         {
             if (id==default ||string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
-                return new ErrorDataResult<GetShippingMethodDetailDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<GetShippingMethodDetailDTO>(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
        GetShippingMethodDetailDTO? getShippingMethodDTO =_context.ShippingMethods.Where(x=>x.Id==id)
                 .Select(x => new GetShippingMethodDetailDTO{
                     Id = x.Id,
@@ -168,18 +168,18 @@ namespace Shop.Persistence.Services
                     DisCount = x.DisCountPrice,
                     content = x.ShippingMethodLanguages.Select(y=> new KeyValuePair<string,string>(y.LangCode,y.Content)).ToDictionary()
                 }).AsNoTracking().FirstOrDefault();
-            return new SuccessDataResult<GetShippingMethodDetailDTO>(data: getShippingMethodDTO, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+            return new SuccessDataResult<GetShippingMethodDetailDTO>(data: getShippingMethodDTO, locale,message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
 
         }
 
         public IResult UdpateShippingMethod(UpdateShippingMethodDTO updateShippingMethodDTO, string locale)
         {
             if (updateShippingMethodDTO.Id==default ||string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             try { 
             ShippingMethod? shippingMethod=_context.ShippingMethods.Include(x=>x.ShippingMethodLanguages).FirstOrDefault(x => x.Id == updateShippingMethodDTO.Id);
                 if (shippingMethod is null)
-                    return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
+                    return new ErrorResult(locale,message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
                 shippingMethod.DisCountPrice = updateShippingMethodDTO.DisCountPrice;
                 shippingMethod.Price = updateShippingMethodDTO.Price;
                 foreach (var methodLang in updateShippingMethodDTO.Content)
@@ -202,14 +202,14 @@ namespace Shop.Persistence.Services
                     _context.ShippingMethodLanguages.Update(shippingMethodLanguage);
                 }
                 _context.SaveChanges();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+                return new SuccessResult(locale,message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
 
 
             } catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: ex.Message, HttpStatusCode.InternalServerError);
+                return new ErrorResult(locale,message: ex.Message, HttpStatusCode.InternalServerError);
             }
         }
     }

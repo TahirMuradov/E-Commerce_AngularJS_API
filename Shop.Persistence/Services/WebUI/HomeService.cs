@@ -34,7 +34,7 @@ namespace Shop.Persistence.Services.WebUI
 
 
 
-                return Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+                return Configuration.SupportedLaunguageKeys;
 
 
             }
@@ -44,13 +44,13 @@ namespace Shop.Persistence.Services.WebUI
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+                return Configuration.DefaultLanguageKey;
             }
         }
         public IDataResult<GetHomeAllDataDTO> GetHomeAllData(string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorDataResult<GetHomeAllDataDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<GetHomeAllDataDTO>(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
 
             IQueryable<GetDisCountAreaForUiDTO> DisCountAreas = _context.DisCountAreas.AsNoTracking().AsSplitQuery().Select(x => new GetDisCountAreaForUiDTO
             {
@@ -101,7 +101,7 @@ namespace Shop.Persistence.Services.WebUI
                 TopCategoryAreas = TopCategoryAreas,
                 NewArriwalProducts = NewArriwalProducts,
                 IsFeaturedCategorys = NewArriwalCategory
-            }, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+            }, LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
 
         }
     }

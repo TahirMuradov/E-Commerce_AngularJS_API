@@ -15,26 +15,21 @@ namespace ShopAPI.Controllers
     [EnableRateLimiting("Fixed")]
     public class AuthController : ControllerBase
     {
-        private string DefaultLaunguage
-        {
-            get
-            {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
-            }
-        }
         private readonly IAuthService _authService;
-        private readonly IHttpContextAccessor _contextAccessor;
-        public AuthController(IAuthService authService, IHttpContextAccessor contextAccessor)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+     private readonly IGetRequestLangService _getRequestLangService;
+        public AuthController(IAuthService authService, IGetRequestLangService getRequestLangService, IHttpContextAccessor httpContextAccessor)
         {
             _authService = authService;
-            _contextAccessor = contextAccessor;
+            _getRequestLangService = getRequestLangService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _authService.LoginAsync(loginDTO, headerLocale);
+            
+            var result = await _authService.LoginAsync(loginDTO, _getRequestLangService.GetRequestLanguage());
             return StatusCode((int)result.StatusCode, result);
 
         }
@@ -60,9 +55,9 @@ namespace ShopAPI.Controllers
 
         public async Task<IActionResult> LogOut()
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            string? currentUserId = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var result = await _authService.LogOutAsync(currentUserId, headerLocale);
+  
+            string? currentUserId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var result = await _authService.LogOutAsync(currentUserId,_getRequestLangService.GetRequestLanguage());
 
             return StatusCode((int)result.StatusCode, result); ;
         }
@@ -71,69 +66,69 @@ namespace ShopAPI.Controllers
         [Authorize(Policy = "AllRole")]
         public async Task<IActionResult> EditUserProfile([FromBody] UpdateUserDTO updateUserDTO)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _authService.EditUserProfileAsnyc(updateUserDTO, headerLocale);
+    
+            var result = await _authService.EditUserProfileAsnyc(updateUserDTO, _getRequestLangService.GetRequestLanguage());
             return StatusCode((int)result.StatusCode, result); ;
         }
         [HttpDelete("[action]")]
         [Authorize(Policy = "SuperAdminRole")]
         public async Task<IActionResult> DeleteUser([FromQuery] Guid Id)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _authService.DeleteUserAsnyc(Id, headerLocale);
+           
+            var result = await _authService.DeleteUserAsnyc(Id, _getRequestLangService.GetRequestLanguage());
             return StatusCode((int)result.StatusCode, result); ;
         }
         [HttpDelete("[action]")]
         [Authorize(Policy = "SuperAdminRole")]
         public async Task<IActionResult> RemoveRoleFromUser([FromBody] RemoveRoleUserDTO removeRoleUserDTO)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _authService.RemoveRoleFromUserAsync(removeRoleUserDTO, headerLocale);
+         
+            var result = await _authService.RemoveRoleFromUserAsync(removeRoleUserDTO, _getRequestLangService.GetRequestLanguage());
             return StatusCode((int)result.StatusCode, result); ;
         }
         [HttpPost("[action]")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
+           
 
-            var result = await _authService.RegisterAsync(registerDTO, headerLocale);
+            var result = await _authService.RegisterAsync(registerDTO, _getRequestLangService.GetRequestLanguage());
             return StatusCode((int)result.StatusCode, result); ;
         }
         [HttpPatch("[action]")]
         [Authorize(Policy = "SuperAdminRole")]
         public async Task<IActionResult> AssignRoleToUser([FromBody] AssignRoleDTO assignRoleDTO)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _authService.AssignRoleToUserAsnyc(assignRoleDTO, headerLocale);
+            
+            var result = await _authService.AssignRoleToUserAsnyc(assignRoleDTO, _getRequestLangService.GetRequestLanguage());
             return StatusCode((int)result.StatusCode, result); ;
         }
         [HttpPut("[action]")]
         public async Task<IActionResult> ChecekdConfirmedEmailToken([FromBody] ConfirmedEmailDTO confirmedEmailDTO)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _authService.ChecekdConfirmedEmailTokenAsnyc(confirmedEmailDTO.token, confirmedEmailDTO.Email, headerLocale);
+       
+            var result = await _authService.ChecekdConfirmedEmailTokenAsnyc(confirmedEmailDTO.token, confirmedEmailDTO.Email, _getRequestLangService.GetRequestLanguage());
             return StatusCode((int)result.StatusCode, result); ;
         }
         [HttpPut("[action]")]
         public async Task<IActionResult> SendEmailTokenForForgotPassword([FromQuery] string Email)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _authService.SendEmailTokenForForgotPasswordAsync(Email, headerLocale);
+        
+            var result = await _authService.SendEmailTokenForForgotPasswordAsync(Email, _getRequestLangService.GetRequestLanguage());
             return StatusCode((int)result.StatusCode, result); ;
         }
         [HttpGet("[action]")]
         public async Task<IActionResult> CheckTokenForForgotPassword([FromQuery] string Email, [FromQuery] string Token)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _authService.CheckTokenForForgotPasswordAsync(Email, Token, headerLocale);
+            
+            var result = await _authService.CheckTokenForForgotPasswordAsync(Email, Token, _getRequestLangService.GetRequestLanguage());
 
             return StatusCode((int)result.StatusCode, result); ;
         }
         [HttpPut("[action]")]
         public async Task<IActionResult> ChangePasswordForTokenForgotPassword([FromBody] UpdateForgotPasswordDTO updateForgotPasswordDTO)
         {
-            string headerLocale = _contextAccessor.HttpContext.Request?.Headers["Accept-Language"] ?? DefaultLaunguage;
-            var result = await _authService.ChangePasswordForTokenForgotPasswordAsync(updateForgotPasswordDTO, headerLocale);
+          
+            var result = await _authService.ChangePasswordForTokenForgotPasswordAsync(updateForgotPasswordDTO, _getRequestLangService.GetRequestLanguage());
             return StatusCode((int)result.StatusCode, result); ;
         }
         [Authorize(Roles = "SuperAdmin")]

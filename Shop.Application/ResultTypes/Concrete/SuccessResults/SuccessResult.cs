@@ -5,13 +5,14 @@ namespace Shop.Application.ResultTypes.Concrete.SuccessResults
    public class SuccessResult : Result
     {
   
-        public SuccessResult( string message, HttpStatusCode statusCode) : base(true,  message, statusCode)
+        public SuccessResult(string LangCode,HttpStatusCode statusCode) : base(true, LangCode,statusCode)
         {
         }
-        public SuccessResult(List<string> messages, HttpStatusCode statusCode) : base(true,  messages, statusCode)
+  
+        public SuccessResult(string LangCode, string message, HttpStatusCode statusCode) : base(true, LangCode, message, statusCode)
         {
         }
-        public SuccessResult( HttpStatusCode statusCode) : base(true, statusCode)
+        public SuccessResult(string LangCode,List<string> messages, HttpStatusCode statusCode) : base(true,  LangCode,messages, statusCode)
         {
         }
     }

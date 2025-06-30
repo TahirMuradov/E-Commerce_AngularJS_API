@@ -4,7 +4,7 @@ using System.Net;
 
 namespace Shop.Application.ResultTypes
 {
-  public  class Result : IResult
+    public class Result : IResult
     {
         public bool IsSuccess { get; }
 
@@ -12,37 +12,29 @@ namespace Shop.Application.ResultTypes
         public List<string> Messages { get; }
         public HttpStatusCode StatusCode { get; }
 
-        public string LanguageCode { get; }
-        private static IGetRequestLangService _langService;
-        public static void Configure(IGetRequestLangService langService)
+        public string ResponseLangCode { get; }
+
+
+   
+        public Result(bool IsSuccess, string LangCode, HttpStatusCode statusCode)
         {
-            _langService = langService;
-           
-        }
-        private static string GetLang()
-        => _langService?.GetRequestLanguage();
-        public Result()
-        {
-            LanguageCode = _langService?.GetRequestLanguage();
-        }
-        public Result(bool IsSuccess,  HttpStatusCode statusCode)
-        {
-         
-           
+
+
             this.IsSuccess = IsSuccess;
             StatusCode = statusCode;
-            LanguageCode = GetLang();
+            ResponseLangCode = LangCode;
         }
-        public Result(bool IsSuccess, string message, HttpStatusCode statusCode) : this(IsSuccess,statusCode)
+        public Result(bool IsSuccess, string LangCode, string message, HttpStatusCode statusCode) : this(IsSuccess, LangCode, statusCode)
         {
             Message = message;
 
 
         }
-        public Result(bool IsSuccess, List<string> messages, HttpStatusCode statusCode) : this(IsSuccess,  statusCode)
+        public Result(bool IsSuccess, string LangCode, List<string> messages, HttpStatusCode statusCode) : this(IsSuccess, LangCode, statusCode)
         {
             Messages = messages;
 
         }
+     
     }
 }

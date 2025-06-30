@@ -1,5 +1,4 @@
 ﻿using iText.Html2pdf;
-
 using Shop.Application.Abstraction.Services;
 using Shop.Application.DTOs.OrderPdfGeneratorDTOs;
 using Shop.Application.ResultTypes.Abstract;
@@ -14,31 +13,31 @@ namespace Shop.Infrastructure.Services
 {
     public class FileService : IFileService
     {
-        public IResult RemoveFile(string FilePaths)
+        public IResult RemoveFile(string LangCode,string FilePaths)
         {
             string filePath = Path.Combine(WebRootPathProvider.GetwwwrootPath + FilePaths);
 
             if (File.Exists(filePath))
             
                 File.Delete(filePath);            
-            else return new ErrorResult(HttpStatusCode.NotFound);
-            return new SuccessResult(HttpStatusCode.OK);
+            else return new ErrorResult(LangCode,HttpStatusCode.NotFound);
+            return new SuccessResult(LangCode,HttpStatusCode.OK);
         }
 
-        public IResult RemoveFileRange(List<string> FilePaths)
+        public IResult RemoveFileRange(string LangCode,List<string> FilePaths)
         {
             foreach (var path in FilePaths)
             {
-         var result= RemoveFile(path);
+         var result= RemoveFile(LangCode,path);
 
                 if (!result.IsSuccess)
                     return result;
 
             }
-            return new SuccessResult(HttpStatusCode.OK);
+            return new SuccessResult(LangCode,HttpStatusCode.OK);
         }
 
-        public async Task<IDataResult<string>> SaveImageAsync(Microsoft.AspNetCore.Http.IFormFile image, bool isProductImage = false)
+        public async Task<IDataResult<string>> SaveImageAsync(string Langcode,Microsoft.AspNetCore.Http.IFormFile image, bool isProductImage = false)
         {
 
             string filePath = string.Empty;
@@ -54,7 +53,7 @@ namespace Shop.Infrastructure.Services
       
             using FileStream fileStream = new(Path.Combine(WebRootPathProvider.GetwwwrootPath + path), FileMode.Create);
             await image.CopyToAsync(fileStream);
-            return new SuccessDataResult<string>(data:path,HttpStatusCode.OK);
+            return new SuccessDataResult<string>(data:path,Langcode,HttpStatusCode.OK);
         }
         /// <summary>
         /// /// Saves a list of files to the specified WebUIPictures folder in web root path.
@@ -63,13 +62,13 @@ namespace Shop.Infrastructure.Services
         /// <param name="file">File is photo or other file type</param>
         /// <param name="WebRootPath"> WebRootPath is wwwroot folder`s path</param>
         /// <returns></returns>
-        public async Task<IDataResult<List<string>>> SaveImageRangeAsync(Microsoft.AspNetCore.Http.IFormFileCollection images, bool isProductImages = false)
+        public async Task<IDataResult<List<string>>> SaveImageRangeAsync(string LangCode,Microsoft.AspNetCore.Http.IFormFileCollection images, bool isProductImages = false)
         {
-            SuccessDataResult< List<string>> result = new SuccessDataResult<List<string>>(new List<string> (),HttpStatusCode.OK);
+            SuccessDataResult< List<string>> result = new SuccessDataResult<List<string>>(new List<string> (),LangCode,HttpStatusCode.OK);
 
             foreach (var image in images)
             {
-                IDataResult<string> path = await SaveImageAsync(image,isProductImages);
+                IDataResult<string> path = await SaveImageAsync(LangCode,image,isProductImages);
                 if (result.IsSuccess)
                 {
                     
@@ -87,7 +86,7 @@ namespace Shop.Infrastructure.Services
         /// <param name="shippingMethod">Shipping method</param>
         /// <param name="paymentMethod"> Payment Method</param>
         /// <returns></returns>
-        public IDataResult<List<string>> SaveOrderPdf(List<OrderProductDTO> items, OrderShippingMethodDTO shippingMethod, OrderPaymentMethodDTO paymentMethod, OrderUserInfoDTO userInfoDTO)
+        public IDataResult<List<string>> SaveOrderPdf(string LangCode,List<OrderProductDTO> items, OrderShippingMethodDTO shippingMethod, OrderPaymentMethodDTO paymentMethod, OrderUserInfoDTO userInfoDTO)
         {
             decimal totalPrice = items.Sum(x => x.Price);
             var tableProductBuilder = new StringBuilder();
@@ -163,7 +162,7 @@ namespace Shop.Infrastructure.Services
           </thead>
        
             <tbody>
-                {tableProductBuilder.ToString()}
+                {tableProductBuilder}
     <tr>
          
               <td style='text-align: left;border: 1px solid #ccc;
@@ -317,7 +316,7 @@ namespace Shop.Infrastructure.Services
     {
         $"\\uploads\\OrderPDFs\\{shortGuid}.pdf",
         shortGuid
-    }, HttpStatusCode.OK);
+    },LangCode, HttpStatusCode.OK);
 
             return result;
         }

@@ -17,7 +17,7 @@ namespace Shop.Infrastructure.Services
         {
             _configuration = configuration;
         }
-        public async Task<IResult> SendEmailAsync(string userEmail, string confirmationLink, string UserName,bool isForgotPass)
+        public async Task<IResult> SendEmailAsync(string LangCode,string userEmail, string confirmationLink, string UserName,bool isForgotPass)
         {
 
             try
@@ -42,16 +42,16 @@ namespace Shop.Infrastructure.Services
                     await smtp.SendAsync(email);
                     await smtp.DisconnectAsync(true);
                 }
-                return new SuccessResult(statusCode: HttpStatusCode.OK);
+                return new SuccessResult(LangCode,statusCode: HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
 
-                return new ErrorResult(message: ex.Message, statusCode: HttpStatusCode.BadRequest);
+                return new ErrorResult(LangCode,message: ex.Message, statusCode: HttpStatusCode.BadRequest);
             }
         }
 
-        public async Task<IResult> SendEmailPdfAsync(string userEmail, string UserName, string pdfLink)
+        public async Task<IResult> SendEmailPdfAsync(string LangCode,string userEmail, string UserName, string pdfLink)
         {
             try
             {
@@ -82,12 +82,12 @@ namespace Shop.Infrastructure.Services
                     await smtp.SendAsync(email);
                     await smtp.DisconnectAsync(true);
                 }
-                return new SuccessResult(statusCode: HttpStatusCode.OK);
+                return new SuccessResult(LangCode,statusCode: HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
 
-                return new ErrorResult(message: ex.Message, statusCode: HttpStatusCode.BadRequest);
+                return new ErrorResult(LangCode,message: ex.Message, statusCode: HttpStatusCode.BadRequest);
             }
         }
     }

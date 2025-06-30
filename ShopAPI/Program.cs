@@ -153,8 +153,7 @@ builder.Services.AddRateLimiter(option =>
 });
 var app = builder.Build();
 
-var langService = app.Services.GetRequiredService<IGetRequestLangService>();
-Result.Configure(langService);
+
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{

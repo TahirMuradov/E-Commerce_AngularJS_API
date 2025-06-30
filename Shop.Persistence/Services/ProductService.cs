@@ -52,14 +52,14 @@ namespace Shop.Persistence.Services
         public async Task<IResult> AddProductAsync(AddProductDTO addProductDTO, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
+                return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
             AddProductDTOValidation validationRules = new AddProductDTOValidation(LangCode, SupportedLaunguages);
             var validationResult = validationRules.Validate(addProductDTO);
             if (!validationResult.IsValid)
-                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
             Category? category = _context.Categories.AsNoTracking().FirstOrDefault(x => x.Id == addProductDTO.CategoryId);
             if (category is null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
 
             Product product = new Product()
             {
@@ -94,15 +94,15 @@ namespace Shop.Persistence.Services
                 }
             }
             else
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], statusCode: HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], statusCode: HttpStatusCode.NotFound);
 
             foreach (Microsoft.AspNetCore.Http.IFormFile image in addProductDTO.ProductImages)
             {
                 if (image.Length > 0)
                 {
-                    IDataResult<string> imageUrl = await _fileService.SaveImageAsync(image, true);
+                    IDataResult<string> imageUrl = await _fileService.SaveImageAsync(LangCode,image, true);
                     if (!imageUrl.IsSuccess)
-                        return new ErrorResult(message: HttpStatusErrorMessages.FileUploadFailed[LangCode], HttpStatusCode.InternalServerError);
+                        return new ErrorResult(LangCode,message: HttpStatusErrorMessages.FileUploadFailed[LangCode], HttpStatusCode.InternalServerError);
                     
 
                     Image imageEntity = new Image()
@@ -133,12 +133,12 @@ namespace Shop.Persistence.Services
             try
             {
                 await _context.SaveChangesAsync();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.Created);
+                return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.Created);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
             }
 
 
@@ -149,24 +149,24 @@ namespace Shop.Persistence.Services
         public IResult DeleteProduct(Guid id, string LangCode)
         {
             if (id == Guid.Empty)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             Product? product = _context.Products.Include(x=>x.Images).FirstOrDefault(x => x.Id == id);
             if (product is null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
-           IResult removingResult=  _fileService.RemoveFileRange(product.Images.Select(x=>x.Path).ToList());
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+           IResult removingResult=  _fileService.RemoveFileRange(LangCode,product.Images.Select(x=>x.Path).ToList());
             if (removingResult.IsSuccess)          
             _context.Products.Remove(product);
             else
-                return new ErrorResult(message: removingResult.Message, removingResult.StatusCode);
+                return new ErrorResult(LangCode,message: removingResult.Message, removingResult.StatusCode);
             try
             {
                 _context.SaveChanges();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
             }
         }
 
@@ -215,7 +215,7 @@ namespace Shop.Persistence.Services
             x.Id.ToString().ToLower().Contains(search.ToLower())
             );
             PaginatedList<GetProductDTO> paginatedProducts = await PaginatedList<GetProductDTO>.CreateAsync(productQuery, page, 10);
-            return new SuccessDataResult<PaginatedList<GetProductDTO>>(paginatedProducts, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+            return new SuccessDataResult<PaginatedList<GetProductDTO>>(paginatedProducts, LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
         }
 
         public IDataResult<IQueryable<GetProductDTO>> GetProductByFeatured(string LangCode)
@@ -238,12 +238,12 @@ namespace Shop.Persistence.Services
 
                 });
                
-                return new SuccessDataResult<IQueryable<GetProductDTO>>(productQuery, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new SuccessDataResult<IQueryable<GetProductDTO>>(productQuery, LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorDataResult<IQueryable<GetProductDTO>>(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorDataResult<IQueryable<GetProductDTO>>(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
 
 
             }
@@ -291,8 +291,8 @@ namespace Shop.Persistence.Services
 
 
                 return productQuery is null ?
-                  new ErrorDataResult<GetProductDetailDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound) :
-                    new SuccessDataResult<GetProductDetailDTO>(data: productQuery, HttpStatusCode.OK);
+                  new ErrorDataResult<GetProductDetailDTO>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound) :
+                    new SuccessDataResult<GetProductDetailDTO>(data: productQuery,LangCode, HttpStatusCode.OK);
 
 
             }
@@ -300,19 +300,19 @@ namespace Shop.Persistence.Services
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorDataResult<GetProductDetailDTO>(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorDataResult<GetProductDetailDTO>(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
             }
           
         }
         public async Task<IResult> UpdateProductAsync(UpdateProductDTO updateProductDTO, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
+                return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
 
             var validationRules = new UpdateProductDTOValidation(LangCode, SupportedLaunguages);
             var validationResult = validationRules.Validate(updateProductDTO);
             if (!validationResult.IsValid)
-                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
 
             // Find product to update
             var product = await _context.Products
@@ -322,10 +322,10 @@ namespace Shop.Persistence.Services
                 .FirstOrDefaultAsync(p => p.Id == updateProductDTO.Id);
 
             if (product == null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             Category? category = _context.Categories.AsNoTracking().FirstOrDefault(x => x.Id == updateProductDTO.CategoryId);
             if (category is null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             // Update basic fields
             product.ProductCode = updateProductDTO.ProductCode;
             product.Price = updateProductDTO.Price;
@@ -361,7 +361,7 @@ namespace Shop.Persistence.Services
             var existingSizeIds = _context.Sizes.Select(s => s.Id).ToHashSet();
             bool allSizesExist = updateProductDTO.Sizes.Keys.All(id => existingSizeIds.Contains(id));
             if (!allSizesExist)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], statusCode: HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], statusCode: HttpStatusCode.NotFound);
 
             // Update or add size products
             foreach (var sizeEntry in updateProductDTO.Sizes)
@@ -392,10 +392,10 @@ namespace Shop.Persistence.Services
                     if (deletedImage is not  null)
                     {
                      
-                        var fileRemovalResult = _fileService.RemoveFile(deletedImage.Path);
+                        var fileRemovalResult = _fileService.RemoveFile(LangCode,deletedImage.Path);
                        
                         if (!fileRemovalResult.IsSuccess)
-                            return new ErrorResult(message: fileRemovalResult.Message, fileRemovalResult.StatusCode);
+                            return new ErrorResult(LangCode,message: fileRemovalResult.Message, fileRemovalResult.StatusCode);
                         _context.Images.Remove(deletedImage);
                     }
                 }
@@ -408,9 +408,9 @@ namespace Shop.Persistence.Services
                 {
                     if (newImage.Length > 0)
                     {
-                        var imageUrlResult = await _fileService.SaveImageAsync(newImage, true);
+                        var imageUrlResult = await _fileService.SaveImageAsync(LangCode,newImage, true);
                         if (!imageUrlResult.IsSuccess)
-                            return new ErrorResult(message: HttpStatusErrorMessages.FileUploadFailed[LangCode], HttpStatusCode.InternalServerError);
+                            return new ErrorResult(LangCode,message: HttpStatusErrorMessages.FileUploadFailed[LangCode], HttpStatusCode.InternalServerError);
 
                         Image newPicture = new Image
                         {
@@ -429,21 +429,21 @@ namespace Shop.Persistence.Services
             try
             {
                 await _context.SaveChangesAsync();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
             }
         }
 
         public async Task<IDataResult<GetProductForUpdateDTO>> GetProductByIdForUpdateAsync(Guid id, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorDataResult<GetProductForUpdateDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
+                return new ErrorDataResult<GetProductForUpdateDTO>(LangCode,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
             if (id == Guid.Empty)
-                return new ErrorDataResult<GetProductForUpdateDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorDataResult<GetProductForUpdateDTO>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             var product = await _context.Products.AsNoTracking().Where(x => x.Id == id)
                 .Select(x => new GetProductForUpdateDTO
                 {
@@ -465,8 +465,8 @@ namespace Shop.Persistence.Services
 
                 }).FirstOrDefaultAsync();
             if (product is null)           
-                return new ErrorDataResult<GetProductForUpdateDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
-            return new SuccessDataResult<GetProductForUpdateDTO>(data: product, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new ErrorDataResult<GetProductForUpdateDTO>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+            return new SuccessDataResult<GetProductForUpdateDTO>(data: product, LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
 
         }
     }

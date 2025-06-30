@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Shop.Application.Abstraction.Services;
 using Shop.Application.Abstraction.Services.WebUI;
 using Shop.Persistence;
 
@@ -10,27 +11,21 @@ namespace ShopAPI.Controllers
     [EnableRateLimiting("Fixed")]
     public class HomeController : ControllerBase
     {
-        private string DefaultLaunguage
-        {
-            get
-            {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
-            }
-        }
+     
         private readonly IHomeService _homeService;
-        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IGetRequestLangService _getRequestLangService;
 
-        public HomeController(IHomeService homeService, IHttpContextAccessor contextAccessor)
+        public HomeController(IHomeService homeService, IGetRequestLangService getRequestLangService)
         {
             _homeService = homeService;
-            _contextAccessor = contextAccessor;
+            _getRequestLangService = getRequestLangService;
         }
 
         [HttpGet("[action]")]
         public IActionResult GetAllData()
         {
-            string LangCode = _contextAccessor.HttpContext?.Request.Headers["Accept-Language"].ToString() ?? DefaultLaunguage;
-            var result = _homeService.GetHomeAllData(LangCode);
+            
+            var result = _homeService.GetHomeAllData(_getRequestLangService.GetRequestLanguage());
             return StatusCode((int)result.StatusCode, result);
 
 

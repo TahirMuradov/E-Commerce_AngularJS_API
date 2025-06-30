@@ -26,7 +26,7 @@ namespace Shop.Persistence.Services.WebUI
 
 
 
-                return Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+                return Configuration.SupportedLaunguageKeys;
 
 
             }
@@ -36,7 +36,7 @@ namespace Shop.Persistence.Services.WebUI
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+                return Configuration.DefaultLanguageKey;
             }
         }
         public DisCountAreaService(ILogger<DisCountAreaService> logger, AppDBContext context)
@@ -47,11 +47,11 @@ namespace Shop.Persistence.Services.WebUI
         public IResult AddDiscountArea(AddDisCountAreaDTO addDisCountAreaDTO, string langCode)
         {
             if (string.IsNullOrEmpty(langCode) || !SupportedLaunguages.Contains(langCode))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             AddDiscountAreaDTOValidation validationRules = new AddDiscountAreaDTOValidation(langCode, SupportedLaunguages);
             var validationResult = validationRules.Validate(addDisCountAreaDTO);
             if (!validationResult.IsValid)
-                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new ErrorResult(langCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
             try
             {
                 DisCountArea disCountArea = new DisCountArea();
@@ -70,14 +70,14 @@ namespace Shop.Persistence.Services.WebUI
 
                 }
                 _context.SaveChanges();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[langCode], HttpStatusCode.Created);
+                return new SuccessResult(langCode,message: HttpStatusErrorMessages.Success[langCode], HttpStatusCode.Created);
 
             }
             catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: HttpStatusErrorMessages.InternalServerError[langCode], HttpStatusCode.InternalServerError);
+                return new ErrorResult(langCode,message: HttpStatusErrorMessages.InternalServerError[langCode], HttpStatusCode.InternalServerError);
             }
         }
 
@@ -86,23 +86,23 @@ namespace Shop.Persistence.Services.WebUI
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
 
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (Id == default || Id == Guid.Empty)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             try
             {
                 DisCountArea disCountArea = _context.DisCountAreas.FirstOrDefault(x => x.Id == Id);
                 if (disCountArea is null)
-                    return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                    return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
                 _context.DisCountAreas.Remove(disCountArea);
                 _context.SaveChanges();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
                 throw;
             }
 
@@ -111,7 +111,7 @@ namespace Shop.Persistence.Services.WebUI
         public IDataResult<IQueryable<GetDisCountAreaDTO>> GetAllDisCountArea(string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorDataResult<IQueryable<GetDisCountAreaDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<IQueryable<GetDisCountAreaDTO>>(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             IQueryable<GetDisCountAreaDTO> disCountAreas = _context.DisCountAreas.AsNoTracking()
                 .Select(x => new GetDisCountAreaDTO
                 {
@@ -120,13 +120,13 @@ namespace Shop.Persistence.Services.WebUI
                     Title = x.Languages.Where(y => y.LangCode == LangCode).Select(y => y.Title).FirstOrDefault()
                 });
 
-            return new SuccessDataResult<IQueryable<GetDisCountAreaDTO>>(disCountAreas, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+            return new SuccessDataResult<IQueryable<GetDisCountAreaDTO>>(disCountAreas,LangCode, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
         }
 
         public async Task<IDataResult<PaginatedList<GetDisCountAreaDTO>>> GetAllDisCountByPageOrSearchAsync(string LangCode, int page, string? search = null)
         {
             if (string.IsNullOrEmpty(LangCode)||!SupportedLaunguages.Contains(LangCode))  
-        return new ErrorDataResult<PaginatedList<GetDisCountAreaDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+        return new ErrorDataResult<PaginatedList<GetDisCountAreaDTO>>(LangCode,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             IQueryable<GetDisCountAreaDTO> disCountAreas = search is null? _context.DisCountAreas.AsNoTracking().AsSplitQuery()
                 .Select(x => new GetDisCountAreaDTO
                 {
@@ -146,16 +146,16 @@ namespace Shop.Persistence.Services.WebUI
                 )
                 ;
             PaginatedList<GetDisCountAreaDTO> paginatedList = await PaginatedList<GetDisCountAreaDTO>.CreateAsync(disCountAreas, page, 10);
-            return new SuccessDataResult<PaginatedList<GetDisCountAreaDTO>>(paginatedList, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+            return new SuccessDataResult<PaginatedList<GetDisCountAreaDTO>>(paginatedList,LangCode, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
 
         }
 
         public async Task<IDataResult<GetDisCountAreaForUpdateDTO>> GetDisCountAreaForUpdateAsync(Guid Id, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-          return new ErrorDataResult<GetDisCountAreaForUpdateDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+          return new ErrorDataResult<GetDisCountAreaForUpdateDTO>(LangCode,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (Id == default || Id == Guid.Empty)
-                return new ErrorDataResult<GetDisCountAreaForUpdateDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<GetDisCountAreaForUpdateDTO>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.UnsupportedMediaType);
             GetDisCountAreaForUpdateDTO? getDisCountAreaForUpdateDTO = await _context.DisCountAreas.AsNoTracking()
                 .Where(x => x.Id == Id)
                 .Select(x => new GetDisCountAreaForUpdateDTO
@@ -165,25 +165,25 @@ namespace Shop.Persistence.Services.WebUI
                     DescriptionContent = x.Languages.Select(kv => new KeyValuePair<string, string>(kv.LangCode, kv.Description)).ToDictionary()
                 }).FirstOrDefaultAsync();
             return getDisCountAreaForUpdateDTO is null
-                ? new ErrorDataResult<GetDisCountAreaForUpdateDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound)
-                : new SuccessDataResult<GetDisCountAreaForUpdateDTO>(getDisCountAreaForUpdateDTO, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                ? new ErrorDataResult<GetDisCountAreaForUpdateDTO>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound)
+                : new SuccessDataResult<GetDisCountAreaForUpdateDTO>(getDisCountAreaForUpdateDTO, LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
 
         }
 
         public IResult UpdateDisCountArea(UpdateDisCountAreaDTO updateDisCountAreaDTO, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
 
             UpdateDisCountAreaDTOValidation validationRules = new UpdateDisCountAreaDTOValidation(LangCode, SupportedLaunguages);
             var validationResult = validationRules.Validate(updateDisCountAreaDTO);
             if (!validationResult.IsValid)
-                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
             try
             {
                 DisCountArea? disCountArea = _context.DisCountAreas.Include(x => x.Languages).FirstOrDefault(x => x.Id == updateDisCountAreaDTO.Id);
                 if (disCountArea is null)
-                    return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                    return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
 
                 foreach (var newLang in updateDisCountAreaDTO.TitleContent)
                 {
@@ -208,13 +208,13 @@ namespace Shop.Persistence.Services.WebUI
                     }
             }
                     _context.SaveChanges();
-                    return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                    return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
                 }
             catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
             }
 
 

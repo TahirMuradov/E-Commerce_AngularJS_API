@@ -60,23 +60,23 @@ namespace Shop.Persistence.Services
         {
 
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             AddOrderDTOValidation validationRules = new AddOrderDTOValidation(LangCode);
             var validationResult = validationRules.Validate(addOrderDTO);
 
             if (!validationResult.IsValid)
-                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
 
 
             User? user = await _userManager.FindByIdAsync(addOrderDTO.UserID.ToString());
             if (user is null)
-                return new ErrorResult(message: HttpStatusErrorMessages.Unauthorized[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.Unauthorized[LangCode], HttpStatusCode.NotFound);
             ShippingMethod? shippingMethod = await _context.ShippingMethods.AsNoTracking().Where(x => x.Id == addOrderDTO.ShippingMethod.Id).FirstOrDefaultAsync();
             if (shippingMethod is null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             PaymentMethod? paymentMethod = await _context.PaymentMethods.AsNoTracking().Where(x => x.Id == addOrderDTO.PaymentMethod.Id).FirstOrDefaultAsync();
             if (paymentMethod is null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             Order order = new Order()
             {
                 UserId = addOrderDTO.UserID,
@@ -102,18 +102,18 @@ namespace Shop.Persistence.Services
                     .FirstOrDefaultAsync();
 
                 if (checkProduct is null)
-                    return new ErrorResult(message: HttpStatusErrorMessages.NotFoundProduct[LangCode], HttpStatusCode.NotFound);
+                    return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFoundProduct[LangCode], HttpStatusCode.NotFound);
 
 
                 if ((checkProduct.DisCount != 0 && checkProduct.DisCount != product.Price) || checkProduct.Price != product.Price)
 
-                    return new ErrorResult(message: HttpStatusErrorMessages.PriceNotMatch[LangCode], HttpStatusCode.BadRequest);
+                    return new ErrorResult(LangCode,message: HttpStatusErrorMessages.PriceNotMatch[LangCode], HttpStatusCode.BadRequest);
 
                 var checkSize = checkProduct.SizeProducts?.FirstOrDefault(x => x.Size.Content == product.size);
                 if (checkSize is null)
-                    return new ErrorResult(message: HttpStatusErrorMessages.SizeNotFound[LangCode], HttpStatusCode.NotFound);
+                    return new ErrorResult(LangCode,message: HttpStatusErrorMessages.SizeNotFound[LangCode], HttpStatusCode.NotFound);
                 if (checkSize.StockQuantity < product.Quantity)
-                    return new ErrorResult(message: HttpStatusErrorMessages.StockQuantityNotEnough[LangCode], HttpStatusCode.BadRequest);
+                    return new ErrorResult(LangCode,message: HttpStatusErrorMessages.StockQuantityNotEnough[LangCode], HttpStatusCode.BadRequest);
 
 
                 SoldProduct soldProduct = new()
@@ -136,7 +136,7 @@ namespace Shop.Persistence.Services
             }
 
 
-            IDataResult<List<string>> file = _fileService.SaveOrderPdf(addOrderDTO.Products, addOrderDTO.ShippingMethod, addOrderDTO.PaymentMethod, new OrderUserInfoDTO
+            IDataResult<List<string>> file = _fileService.SaveOrderPdf(LangCode,addOrderDTO.Products, addOrderDTO.ShippingMethod, addOrderDTO.PaymentMethod, new OrderUserInfoDTO
             {
                 Address = addOrderDTO.Address,
                 FullName = addOrderDTO.FullName,
@@ -147,7 +147,7 @@ namespace Shop.Persistence.Services
             if (file.IsSuccess)
             {
 
-                IResult mailResul = await _mailService.SendEmailPdfAsync(user.Email, user.FirstName + " " + user.LastName, file.Data[0]);
+                IResult mailResul = await _mailService.SendEmailPdfAsync(LangCode,user.Email, user.FirstName + " " + user.LastName, file.Data[0]);
                 if (mailResul.IsSuccess)
                 {
                     order.OrderNumber = file.Data[1];
@@ -161,19 +161,19 @@ namespace Shop.Persistence.Services
                 {
                     _logger.LogError("OrderService.AddOrderAsync: Email sending failed: ", mailResul.Message);
 
-                    return new ErrorResult(message: mailResul.Message, statusCode: mailResul.StatusCode);
+                    return new ErrorResult(LangCode,message: mailResul.Message, statusCode: mailResul.StatusCode);
                 }
             }
 
-            return new ErrorResult(message: file.Message, statusCode: file.StatusCode);
+            return new ErrorResult(LangCode,message: file.Message, statusCode: file.StatusCode);
         }
 
         public async Task<IDataResult<GetOrderDetailDTO>> GetOrderByIdAsync(Guid orderId, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorDataResult<GetOrderDetailDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<GetOrderDetailDTO>(LangCode,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (orderId == Guid.Empty)
-                return new ErrorDataResult<GetOrderDetailDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorDataResult<GetOrderDetailDTO>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
 
 
             try
@@ -233,22 +233,22 @@ namespace Shop.Persistence.Services
 
                 }).FirstOrDefaultAsync();
                 if (order is null)
-                    return new ErrorDataResult<GetOrderDetailDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                    return new ErrorDataResult<GetOrderDetailDTO>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
 
                 User? Orderby = await _userManager.FindByIdAsync(order.OrderBy.Id.ToString());
                 if (Orderby is null)
-                    return new ErrorDataResult<GetOrderDetailDTO>(message: HttpStatusErrorMessages.Unauthorized[LangCode], HttpStatusCode.NotFound);
+                    return new ErrorDataResult<GetOrderDetailDTO>(LangCode,message: HttpStatusErrorMessages.Unauthorized[LangCode], HttpStatusCode.NotFound);
 
                 var roles = await _userManager.GetRolesAsync(Orderby);
                 order.OrderBy.Roles = roles.ToList();
-                return new SuccessDataResult<GetOrderDetailDTO>(order, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new SuccessDataResult<GetOrderDetailDTO>(order,LangCode, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
 
             }
             catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorDataResult<GetOrderDetailDTO>(message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
+                return new ErrorDataResult<GetOrderDetailDTO>(LangCode,message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
 
             }
 
@@ -260,34 +260,34 @@ namespace Shop.Persistence.Services
         {
             if (orderId == Guid.Empty)
 
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             Order? order = await _context.Orders.Where(x => x.Id == orderId).FirstOrDefaultAsync();
             if (order is null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             try
             {
                 order.OrderStatus = status;
                 _context.Orders.Update(order);
                 await _context.SaveChangesAsync();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
+                return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
             }
         }
 
         public async Task<IResult> UpdateOrderAsync(UpdateOrderDTO updateOrderDTO, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             UpdateOrderDTOValidation validationRules = new UpdateOrderDTOValidation(LangCode);
             var validationResult = validationRules.Validate(updateOrderDTO);
             if (!validationResult.IsValid)
-                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
 
 
             try
@@ -298,7 +298,7 @@ namespace Shop.Persistence.Services
             .Include(x => x.PaymentMethod)
             .FirstOrDefault(x => x.Id == updateOrderDTO.OrderId);
                 if (order is null)
-                    return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                    return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
 
                 OrderShippingMethodDTO? shippingMethod = await _context.ShippingMethods.AsNoTracking().Where(x => x.Id == updateOrderDTO.ShippingMethod.Id)
                     .Select(x => new OrderShippingMethodDTO
@@ -310,7 +310,7 @@ namespace Shop.Persistence.Services
                     }).FirstOrDefaultAsync();
 
                 if (shippingMethod == default || shippingMethod.Id == Guid.Empty || shippingMethod is null)
-                    return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                    return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
 
 
                 order.ShippingMethodId = shippingMethod.Id;
@@ -324,7 +324,7 @@ namespace Shop.Persistence.Services
                 _context.Orders.Update(order);
 
 
-              var removeOldOrderResult=  _fileService.RemoveFile(order.OrderPdfPath);
+              var removeOldOrderResult=  _fileService.RemoveFile(LangCode,order.OrderPdfPath);
 
                 if (removeOldOrderResult.IsSuccess)
                 {
@@ -343,7 +343,7 @@ namespace Shop.Persistence.Services
 
 
 
-                    var fileResult = _fileService.SaveOrderPdf(orderProductDTOs, new OrderShippingMethodDTO
+                    var fileResult = _fileService.SaveOrderPdf(LangCode,orderProductDTOs, new OrderShippingMethodDTO
                     {
                         Id = shippingMethod.Id,
                         ShippingContent = shippingMethod.ShippingContent,
@@ -363,23 +363,23 @@ namespace Shop.Persistence.Services
 
                     });
                     if (!fileResult.IsSuccess)
-                        return new ErrorResult(message: fileResult.Message, statusCode: fileResult.StatusCode);
+                        return new ErrorResult(LangCode,message: fileResult.Message, statusCode: fileResult.StatusCode);
                     order.OrderPdfPath = fileResult.Data[0];
                     order.OrderNumber = fileResult.Data[1];
                     _context.Orders.Update(order);
                     await _context.SaveChangesAsync();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
+                return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
                     
                 }
                 else
-                    return new ErrorResult(message: removeOldOrderResult.Message, statusCode: removeOldOrderResult.StatusCode);
+                    return new ErrorResult(LangCode,message: removeOldOrderResult.Message, statusCode: removeOldOrderResult.StatusCode);
             }
             catch (Exception ex)
             {
 
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
             }
 
         
@@ -392,7 +392,7 @@ namespace Shop.Persistence.Services
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                    return new ErrorDataResult<PaginatedList<GetOrderDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                    return new ErrorDataResult<PaginatedList<GetOrderDTO>>(LangCode,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
 
             if (page < 1)
                 page = 1;
@@ -462,14 +462,14 @@ namespace Shop.Persistence.Services
             x.TotalPrice.ToString().Contains(search.ToLower())
             );
                 var paginatedData = await PaginatedList<GetOrderDTO>.CreateAsync(queryOrder, page, 10);
-                return new SuccessDataResult<PaginatedList<GetOrderDTO>>(data: paginatedData, message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
+                return new SuccessDataResult<PaginatedList<GetOrderDTO>>(data: paginatedData,LangCode, message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
 
             }
             catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorDataResult<PaginatedList<GetOrderDTO>>(message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
+                return new ErrorDataResult<PaginatedList<GetOrderDTO>>(LangCode,message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
 
 
             }
@@ -481,23 +481,23 @@ namespace Shop.Persistence.Services
         public async Task<IResult> DeleteOrderAsync(Guid orderId, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorDataResult<GetOrderDetailDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<GetOrderDetailDTO>(LangCode,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (orderId == Guid.Empty)
-                return new ErrorDataResult<GetOrderDetailDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorDataResult<GetOrderDetailDTO>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             Order? order = await _context.Orders.Include(x=>x.SoldProducts).Where(x => x.Id == orderId).FirstOrDefaultAsync();
             if (order is null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
             try
             {
                 _context.Orders.Remove(order);
                 _context.SoldProducts.RemoveRange(order.SoldProducts);
                await _context.SaveChangesAsync();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
+                return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
             }
 
         }
@@ -506,9 +506,9 @@ namespace Shop.Persistence.Services
         {
           
                 if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                    return new ErrorDataResult<PaginatedList<GetOrderByUserDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
+                    return new ErrorDataResult<PaginatedList<GetOrderByUserDTO>>(LangCode,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
             if (string.IsNullOrEmpty(userId))
-                return new ErrorDataResult<PaginatedList<GetOrderByUserDTO>>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorDataResult<PaginatedList<GetOrderByUserDTO>>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
 
             if (page < 1)
                 page = 1;
@@ -518,7 +518,7 @@ namespace Shop.Persistence.Services
             {
                 User? user=await _userManager.FindByIdAsync(userId);
                 if (user is null)
-                    return new ErrorDataResult<PaginatedList<GetOrderByUserDTO>>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                    return new ErrorDataResult<PaginatedList<GetOrderByUserDTO>>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
 
                 IQueryable<GetOrderByUserDTO> queryOrder = _context.Orders.AsNoTracking().Where(x=>x.UserId==user.Id).Select(x => new GetOrderByUserDTO
                 {
@@ -534,14 +534,14 @@ namespace Shop.Persistence.Services
                     TotalPrice = x.SoldProducts.Sum(sp => sp.SoldPrice * sp.Quantity),
                            });
                 var paginatedData = await PaginatedList<GetOrderByUserDTO>.CreateAsync(queryOrder, page, 10);
-                return new SuccessDataResult<PaginatedList<GetOrderByUserDTO>>(data: paginatedData, message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
+                return new SuccessDataResult<PaginatedList<GetOrderByUserDTO>>(data: paginatedData,LangCode, message: HttpStatusErrorMessages.Success[LangCode], statusCode: HttpStatusCode.OK);
 
             }
             catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorDataResult<PaginatedList<GetOrderByUserDTO>>(message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
+                return new ErrorDataResult<PaginatedList<GetOrderByUserDTO>>(LangCode,message: ex.Message, statusCode: HttpStatusCode.InternalServerError);
 
 
             }

@@ -31,7 +31,7 @@ namespace Shop.Persistence.Services.WebUI
 
 
 
-                return Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+                return Configuration.SupportedLaunguageKeys;
 
 
             }
@@ -41,27 +41,27 @@ namespace Shop.Persistence.Services.WebUI
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+                return Configuration.DefaultLanguageKey;
             }
         }
         public IDataResult<IQueryable<GetIsFeaturedCategoryDTO>> GetNewArriwalCategories(string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorDataResult<IQueryable<GetIsFeaturedCategoryDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorDataResult<IQueryable<GetIsFeaturedCategoryDTO>>(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
             IQueryable<GetIsFeaturedCategoryDTO> categories =  _context.Categories.AsNoTracking().AsSplitQuery().Where(x => x.IsFeatured).Select(x => new GetIsFeaturedCategoryDTO
             {
                 Id = x.Id,
                 CategoryName = x.CategoryLanguages.Where(y => y.LanguageCode == LangCode).Select(s => s.Name).FirstOrDefault(),
                 
             }) ;
-            return new SuccessDataResult<IQueryable<GetIsFeaturedCategoryDTO>>(categories, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+            return new SuccessDataResult<IQueryable<GetIsFeaturedCategoryDTO>>(categories, LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
 
         }
 
         public IDataResult<IQueryable<GetNewArriwalProductDTO>> GetNewArriwalProducts(string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorDataResult<IQueryable<GetNewArriwalProductDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorDataResult<IQueryable<GetNewArriwalProductDTO>>(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
             IQueryable<GetNewArriwalProductDTO> categories = _context.Products.AsNoTracking().AsSplitQuery().Where(x => x.IsFeatured).Select(x => new GetNewArriwalProductDTO
             {
                 Id = x.Id,
@@ -77,7 +77,7 @@ namespace Shop.Persistence.Services.WebUI
                 
 
             });
-            return new SuccessDataResult<IQueryable<GetNewArriwalProductDTO>>(categories, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+            return new SuccessDataResult<IQueryable<GetNewArriwalProductDTO>>(categories, LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
         }
     }
 }

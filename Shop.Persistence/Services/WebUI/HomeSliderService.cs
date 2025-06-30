@@ -37,7 +37,7 @@ namespace Shop.Persistence.Services.WebUI
 
 
 
-                return Configuration.config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
+                return Configuration.SupportedLaunguageKeys;
 
 
             }
@@ -47,18 +47,18 @@ namespace Shop.Persistence.Services.WebUI
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+                return Configuration.DefaultLanguageKey;
             }
         }
         public async Task<IResult> AddHomeSliderItemAsync(AddHomeSliderItemDTO addHomeSliderItemDTO, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
 
             AddHomeSliderItemDTOValidation validationRules = new AddHomeSliderItemDTOValidation(LangCode, SupportedLaunguages);
             var validationResult = await validationRules.ValidateAsync(addHomeSliderItemDTO);
             if (!validationResult.IsValid)
-                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
             try
             {
                 HomeSliderItem newSliderItem = new HomeSliderItem();
@@ -76,9 +76,9 @@ namespace Shop.Persistence.Services.WebUI
                     _context.HomeSliderLanguages.Add(homeSliderLanguage);
                 }
 
-              var resultFile=   await    _fileService.SaveImageAsync(addHomeSliderItemDTO.BackgroundImage, false);
+              var resultFile=   await    _fileService.SaveImageAsync(LangCode,addHomeSliderItemDTO.BackgroundImage, false);
                 if (!resultFile.IsSuccess)
-                    return new ErrorResult(messages: resultFile.Messages, HttpStatusCode.BadRequest);
+                    return new ErrorResult(LangCode,messages: resultFile.Messages, HttpStatusCode.BadRequest);
               Image ımage = new Image
               {
                   Path = resultFile.Data,
@@ -87,13 +87,13 @@ namespace Shop.Persistence.Services.WebUI
               };
      _context.Images.Add(ımage);
                 await _context.SaveChangesAsync();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.Created);
+                return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.Created);
             }
             catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
             }
            
 
@@ -103,14 +103,14 @@ namespace Shop.Persistence.Services.WebUI
         public IResult DeleteHomeSliderItem(Guid Id, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
             if (Id==default||Guid.Empty==Id)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.BadRequest);
             HomeSliderItem? homeSliderItem = _context.HomeSliderItems.Include(x=>x.Image).FirstOrDefault(x => x.Id == Id);
             if (homeSliderItem == null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
 
-           IResult fileRemoveResult= _fileService.RemoveFile(homeSliderItem.Image.Path);
+           IResult fileRemoveResult= _fileService.RemoveFile(LangCode,homeSliderItem.Image.Path);
             if (!fileRemoveResult.IsSuccess)
                 return fileRemoveResult;
 
@@ -118,13 +118,13 @@ namespace Shop.Persistence.Services.WebUI
             {
                 _context.HomeSliderItems.Remove(homeSliderItem);
                 _context.SaveChanges();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: HttpStatusErrorMessages.InternalServerError[LangCode],HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode],HttpStatusCode.InternalServerError);
             }
 
         }
@@ -132,7 +132,7 @@ namespace Shop.Persistence.Services.WebUI
         public async Task<IDataResult<PaginatedList<GetHomeSliderItemDTO>>> GetAllHomeSliderByPageOrSearchAsync(string LangCode, int page,string? search=null)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorDataResult<PaginatedList<GetHomeSliderItemDTO>> (message: HttpStatusErrorMessages.UnsupportedLanguage[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorDataResult<PaginatedList<GetHomeSliderItemDTO>> (DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
             if (page < 1)
                 page = 1;
             try
@@ -155,14 +155,14 @@ namespace Shop.Persistence.Services.WebUI
                 x.Id.ToString().ToLower().Contains(search.ToLower()))
                 ;
                 PaginatedList<GetHomeSliderItemDTO> paginatedList = await PaginatedList<GetHomeSliderItemDTO>.CreateAsync(queryData, page, 10);
-                return new SuccessDataResult<PaginatedList<GetHomeSliderItemDTO>>(data: paginatedList, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new SuccessDataResult<PaginatedList<GetHomeSliderItemDTO>>(data: paginatedList, LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
 
             }
             catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorDataResult<PaginatedList<GetHomeSliderItemDTO>>(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorDataResult<PaginatedList<GetHomeSliderItemDTO>>(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
             }
         }
 
@@ -170,7 +170,7 @@ namespace Shop.Persistence.Services.WebUI
         {
 
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorDataResult<IQueryable<GetHomeSliderItemForUIDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorDataResult<IQueryable<GetHomeSliderItemForUIDTO>>(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
             try
             {
                 IQueryable<GetHomeSliderItemForUIDTO> queryData = _context.HomeSliderItems.AsNoTracking().AsSplitQuery().Select(x => new GetHomeSliderItemForUIDTO
@@ -180,21 +180,21 @@ namespace Shop.Persistence.Services.WebUI
                     Description = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Description).FirstOrDefault(),
                     Title = x.Languages.Where(y => y.LangCode == LangCode).Select(s => s.Title).FirstOrDefault(),
                 });
-                return new SuccessDataResult<IQueryable<GetHomeSliderItemForUIDTO>>(data: queryData, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new SuccessDataResult<IQueryable<GetHomeSliderItemForUIDTO>>(data: queryData, LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorDataResult<IQueryable<GetHomeSliderItemForUIDTO>>(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorDataResult<IQueryable<GetHomeSliderItemForUIDTO>>(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
             }
         }
 
         public async Task<IDataResult<GetHomeSliderItemForUpdateDTO>> GetHomeSliderItemForUpdateAsync(Guid Id, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorDataResult<GetHomeSliderItemForUpdateDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorDataResult<GetHomeSliderItemForUpdateDTO>(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
             if (Id == default || Guid.Empty == Id)
-                return new ErrorDataResult<GetHomeSliderItemForUpdateDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorDataResult<GetHomeSliderItemForUpdateDTO>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.BadRequest);
             GetHomeSliderItemForUpdateDTO? getHomeSliderItemForUpdateDTO= await _context.HomeSliderItems.AsNoTracking().Where(x=>x.Id==Id).Select(x => new GetHomeSliderItemForUpdateDTO
             {
                 Id = x.Id,
@@ -203,23 +203,23 @@ namespace Shop.Persistence.Services.WebUI
                 Description = x.Languages.Select(x=>new KeyValuePair<string,string>(x.LangCode,x.Description)).ToDictionary(),
             }).FirstOrDefaultAsync();
             if (getHomeSliderItemForUpdateDTO is null)
-                return new ErrorDataResult<GetHomeSliderItemForUpdateDTO>(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
-            return new SuccessDataResult<GetHomeSliderItemForUpdateDTO>(data: getHomeSliderItemForUpdateDTO, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new ErrorDataResult<GetHomeSliderItemForUpdateDTO>(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+            return new SuccessDataResult<GetHomeSliderItemForUpdateDTO>(data: getHomeSliderItemForUpdateDTO,LangCode, message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
         }
 
         public async Task<IResult> UpdateHomeSliderItemAsync(UpdateHomeSliderItemDTO updateHomeSliderItemDTO, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[LangCode], HttpStatusCode.BadRequest);
+                return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
             UpdateHomeSliderItemDTOValidation validationRules = new UpdateHomeSliderItemDTOValidation(LangCode, SupportedLaunguages);
             var validationResult = await validationRules.ValidateAsync(updateHomeSliderItemDTO);
             if (!validationResult.IsValid)
-                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
             try
             {
                 HomeSliderItem? homeSliderItem=_context.HomeSliderItems.Include(x => x.Languages).Include(x=>x.Image).FirstOrDefault(x => x.Id == updateHomeSliderItemDTO.Id);
                 if (homeSliderItem is null)
-                    return new ErrorResult(message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
+                    return new ErrorResult(LangCode,message: HttpStatusErrorMessages.NotFound[LangCode], HttpStatusCode.NotFound);
                 foreach (var content in updateHomeSliderItemDTO.Title)
                 {
                     HomeSliderLanguage? homeSliderLanguage = homeSliderItem.Languages.FirstOrDefault(x => x.LangCode == content.Key);
@@ -245,13 +245,13 @@ namespace Shop.Persistence.Services.WebUI
                 }
                 if (updateHomeSliderItemDTO.NewImage is not null)
                 {
-                    var fileResult = await _fileService.SaveImageAsync(updateHomeSliderItemDTO.NewImage, false);
+                    var fileResult = await _fileService.SaveImageAsync(LangCode,updateHomeSliderItemDTO.NewImage, false);
                     if (!fileResult.IsSuccess)
-                        return new ErrorResult(messages: fileResult.Messages, HttpStatusCode.BadRequest);
+                        return new ErrorResult(LangCode,messages: fileResult.Messages, HttpStatusCode.BadRequest);
 
-                    var deleteOldFileResult =  _fileService.RemoveFile(homeSliderItem.Image.Path);
+                    var deleteOldFileResult =  _fileService.RemoveFile(LangCode,homeSliderItem.Image.Path);
                     if (!deleteOldFileResult.IsSuccess)
-                        return new ErrorResult(messages: deleteOldFileResult.Messages, HttpStatusCode.BadRequest);
+                        return new ErrorResult(LangCode,messages: deleteOldFileResult.Messages, HttpStatusCode.BadRequest);
                  homeSliderItem.Image.Path = fileResult.Data;
 
                   
@@ -259,13 +259,13 @@ namespace Shop.Persistence.Services.WebUI
                 }
                 _context.HomeSliderItems.Update(homeSliderItem);
                 await   _context.SaveChangesAsync();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
+                return new SuccessResult(LangCode,message: HttpStatusErrorMessages.Success[LangCode], HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
+                return new ErrorResult(LangCode,message: HttpStatusErrorMessages.InternalServerError[LangCode], HttpStatusCode.InternalServerError);
             }
                     
         }

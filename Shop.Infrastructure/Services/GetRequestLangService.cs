@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Shop.Application.Abstraction.Services;
+using Shop.Persistence;
 
 namespace Shop.Infrastructure.Services
 {
@@ -8,30 +8,22 @@ namespace Shop.Infrastructure.Services
     {
 
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly IConfiguration _configuration;
 
-        public GetRequestLangService(IHttpContextAccessor contextAccessor, IConfiguration configuration)
+        public GetRequestLangService(IHttpContextAccessor contextAccessor)
         {
             _contextAccessor = contextAccessor;
-            _configuration = configuration;
+          
         }
         public string GetRequestLanguage()
         {
-            var supportedLanguages = _configuration.GetSection("SupportedLanguage:Launguages").Get<List<string>>();
-            var defaultLanguage = _configuration.GetValue<string>("SupportedLanguage:Default") ?? "az";
+            var supportedLanguages = Configuration.SupportedLaunguageKeys;
+            var defaultLanguage = Configuration.DefaultLanguageKey??"az";
 
             var headerLang = _contextAccessor.HttpContext?.Request?.Headers["Accept-Language"].ToString();
-
-            if (string.IsNullOrWhiteSpace(headerLang))
+             //en-US,en; q=0.9,ru; q=0.8,az; q=0.7
+            if (string.IsNullOrWhiteSpace(headerLang)||headerLang.Contains("q="))
                 return defaultLanguage;
-
-            var acceptedLanguages = headerLang
-                .Split(',')
-                .Select(lang => lang.Split(';')[0])        
-                .Select(lang => lang.Split('-')[0].Trim().ToLower())  
-                .ToList();
-
-            var matchedLang = acceptedLanguages.FirstOrDefault(lang => supportedLanguages.Contains(lang));
+            var matchedLang = supportedLanguages.FirstOrDefault(ln=>ln==headerLang);
 
             return matchedLang ?? defaultLanguage;
         }

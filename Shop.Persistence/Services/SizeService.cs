@@ -49,13 +49,13 @@ namespace Shop.Persistence.Services
         public IResult AddSize(AddSizeDTO addSizeDTO, string locale)
         {
             if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(DefaultLanguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
 
 
             AddSizeDTOValidation validationRules = new AddSizeDTOValidation(locale);
             var validationResult = validationRules.Validate(addSizeDTO);
             if (!validationResult.IsValid)
-                return new SuccessResult(validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new SuccessResult(locale,validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
 
 
             try
@@ -67,14 +67,14 @@ namespace Shop.Persistence.Services
                 };
                 _context.Sizes.Add(size);
                 _context.SaveChanges();
-                return new SuccessResult(message: HttpStatusErrorMessages.Created[locale], HttpStatusCode.Created);
+                return new SuccessResult(locale,message: HttpStatusErrorMessages.Created[locale], HttpStatusCode.Created);
 
             }
             catch (Exception ex)
             {
 
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: ex.Message, HttpStatusCode.BadRequest);
+                return new ErrorResult(locale,message: ex.Message, HttpStatusCode.BadRequest);
             }
 
         }
@@ -82,21 +82,21 @@ namespace Shop.Persistence.Services
         public IResult DeleteSize(Guid id, string locale)
         {
             if (id==default||string.IsNullOrEmpty(locale)||!SupportedLaunguages.Contains(locale))
-                return new ErrorResult(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorResult(locale,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             Size? size = _context.Sizes.FirstOrDefault(x => x.Id == id);
             if (size == null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
+                return new ErrorResult(locale,message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
             try {
             
             _context.Sizes.Remove(size);
                 _context.SaveChanges();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+                return new SuccessResult(locale,message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
 
             }
             catch(Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: ex.Message, HttpStatusCode.BadRequest);
+                return new ErrorResult(locale,message: ex.Message, HttpStatusCode.BadRequest);
             }
 
 
@@ -105,20 +105,20 @@ namespace Shop.Persistence.Services
         public IDataResult<IQueryable<GetSizeDTO>> GetAllSizes(string locale)
         {
             if (string.IsNullOrEmpty(locale)|| !SupportedLaunguages.Contains(locale))
-                return new ErrorDataResult<IQueryable<GetSizeDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<IQueryable<GetSizeDTO>>(locale,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             IQueryable<GetSizeDTO> querySize=_context.Sizes
                 .Select(size => new GetSizeDTO
                 {
                     Id = size.Id,
                     Size = size.Content
                 }).AsNoTracking();
-            return new SuccessDataResult<IQueryable<GetSizeDTO>>(querySize, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+            return new SuccessDataResult<IQueryable<GetSizeDTO>>(querySize, locale,message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
         }
 
         public async Task<IDataResult<PaginatedList<GetSizeDTO>>> GetAllSizesByPageOrSearchAsync(int page, string locale,string? search=null)
         {
             if (string.IsNullOrEmpty(locale)||!SupportedLaunguages.Contains(locale))
-        return new ErrorDataResult<PaginatedList<GetSizeDTO>>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
+        return new ErrorDataResult<PaginatedList<GetSizeDTO>>(locale,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             if (page < 1)
                 page = 1;
             IQueryable<GetSizeDTO> querySize = search is null? _context.Sizes.Select(size => new GetSizeDTO
@@ -134,7 +134,7 @@ namespace Shop.Persistence.Services
 
 
             PaginatedList<GetSizeDTO> paginatedList = await PaginatedList<GetSizeDTO>.CreateAsync(querySize, page, 10);
-            return new SuccessDataResult<PaginatedList<GetSizeDTO>>(paginatedList, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+            return new SuccessDataResult<PaginatedList<GetSizeDTO>>(paginatedList, locale,message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
 
 
         }
@@ -143,7 +143,7 @@ namespace Shop.Persistence.Services
         {
 
             if (id==default|| string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
-                return new ErrorDataResult<GetSizeDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<GetSizeDTO>(DefaultLanguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             GetSizeDTO? getSizeDTO = _context.Sizes
                 .Where(size => size.Id == id)
                 .Select(size => new GetSizeDTO
@@ -152,34 +152,34 @@ namespace Shop.Persistence.Services
                     Size = size.Content
                 }).AsNoTracking().FirstOrDefault();
             if (getSizeDTO == null)
-                return new ErrorDataResult<GetSizeDTO>(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
-            return new SuccessDataResult<GetSizeDTO>(getSizeDTO, message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+                return new ErrorDataResult<GetSizeDTO>(locale,message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
+            return new SuccessDataResult<GetSizeDTO>(getSizeDTO, locale,message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
 
         }
 
         public IResult UpdateSize(UpdateSizeDTO updateSizeDTO, string locale)
         {
             if ( string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
-                return new ErrorDataResult<GetSizeDTO>(message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
+                return new ErrorDataResult<GetSizeDTO>(DefaultLanguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
             UpdateSizeDTOValidation validationRules = new UpdateSizeDTOValidation(locale);
             var validationResult = validationRules.Validate(updateSizeDTO);
             if (!validationResult.IsValid)
-                return new ErrorResult(messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new ErrorResult(locale,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
            
             try
             {
             Size? size = _context.Sizes.FirstOrDefault(x => x.Id == updateSizeDTO.Id);
             if (size is null)
-                return new ErrorResult(message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
+                return new ErrorResult(locale,message: HttpStatusErrorMessages.NotFound[locale], HttpStatusCode.NotFound);
                 size.Content = updateSizeDTO.Size;
                 _context.Sizes.Update(size);
                 _context.SaveChanges();
-                return new SuccessResult(message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
+                return new SuccessResult(locale,message: HttpStatusErrorMessages.Success[locale], HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new ErrorResult(message: ex.Message, HttpStatusCode.BadRequest);
+                return new ErrorResult(locale,message: ex.Message, HttpStatusCode.BadRequest);
             }
         }
     }

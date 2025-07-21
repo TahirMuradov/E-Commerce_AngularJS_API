@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Shop.Application.DTOs.OrderPdfGeneratorDTOs;
+using System.Globalization;
 
 namespace Shop.Application.Validators.OrderValidations.AddOrderValidations
 {
@@ -7,39 +8,43 @@ namespace Shop.Application.Validators.OrderValidations.AddOrderValidations
     {
         public AddOrderDTOValidation(string langCode)
         {
-            var culture = new System.Globalization.CultureInfo(langCode);
+       
             RuleFor(x => x.UserID)
-                .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("UserIDRequired",culture))
-                .NotEqual(Guid.Empty).WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("UserIDInvalid", culture));
+                .NotEmpty().WithMessage(_ => GetTranslation("UserIDRequired"))
+                .NotEqual(Guid.Empty).WithMessage(_ => GetTranslation("UserIDInvalid"));
             RuleFor(x => x.FullName)
-           .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("FullNameIsRequired", culture))
-           .MaximumLength(100).WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("FullNameMaxLength", culture));
+           .NotEmpty().WithMessage(_ => GetTranslation("FullNameIsRequired"))
+           .MaximumLength(100).WithMessage(_ => GetTranslation("FullNameMaxLength"));
 
             RuleFor(x => x.PhoneNumber)
-                .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("PhoneNumberRequired", culture))
+                .NotEmpty().WithMessage(_ => GetTranslation("PhoneNumberRequired"))
                 .Matches(@"^\+994-\d{2}-\d{3}-\d{2}-\d{2}$")
-                .WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("PhoneNumberInvalid", culture));
+                .WithMessage(_ => GetTranslation("PhoneNumberInvalid"));
 
             RuleFor(x => x.Address)
-                .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("AddressRequired", culture))
-                .MaximumLength(200).WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("AddressMaxLength", culture));
+                .NotEmpty().WithMessage(_ => GetTranslation("AddressRequired"))
+                .MaximumLength(200).WithMessage(_ => GetTranslation("AddressMaxLength"));
 
             RuleFor(x => x.Note)
-                .MaximumLength(500).WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("NoteMaxLength", culture));
+                .MaximumLength(500).WithMessage(_ => GetTranslation("NoteMaxLength"));
 
 
             RuleFor(x => x.Products)
-                .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("ProductsRequired", culture));
+                .NotEmpty().WithMessage(_ => GetTranslation("ProductsRequired"));
 
-            RuleForEach(x => x.Products).SetValidator(new OrderProductDTOValidator(langCode));
+            RuleForEach(x => x.Products).SetValidator(new OrderProductDTOValidator());
 
             RuleFor(x => x.ShippingMethod)
-                .NotNull().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("ShippingMethodRequired", culture))
-                .SetValidator(new OrderShippingMethodDTOValidator(langCode));
+                .NotNull().WithMessage(_ =>     GetTranslation("ShippingMethodRequired"))
+                .SetValidator(new OrderShippingMethodDTOValidator());
 
             RuleFor(x => x.PaymentMethod)
-                .NotNull().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("PaymentMethodRequired", culture))
-                .SetValidator(new OrderPaymentMethodDTOValidator(langCode));
+                .NotNull().WithMessage(_ => GetTranslation("PaymentMethodRequired"))
+                .SetValidator(new OrderPaymentMethodDTOValidator());
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

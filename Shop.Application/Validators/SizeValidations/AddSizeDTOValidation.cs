@@ -6,16 +6,20 @@ namespace Shop.Application.Validators.SizeValidations
 {
    public class AddSizeDTOValidation:AbstractValidator<AddSizeDTO>
     {
-        public AddSizeDTOValidation(string langCode)
+        public AddSizeDTOValidation()
         {
 
             RuleFor(dto => dto.Size)
                .NotEmpty()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("SizesRequired", new CultureInfo(langCode)))
+                .WithMessage(GetTranslation("SizesRequired"))
                ;
 
       
 
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

@@ -6,19 +6,23 @@ namespace Shop.Application.Validators.SizeValidations
 {
    public class UpdateSizeDTOValidation:AbstractValidator<UpdateSizeDTO>
     {
-        public UpdateSizeDTOValidation(string langCode)
+        public UpdateSizeDTOValidation()
         {
-            var culture = new CultureInfo(langCode);
+   
 
             RuleFor(dto => dto.Size)
                .NotNull()
-               .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("SizesRequired", culture));
+               .WithMessage(GetTranslation("SizesRequired"));
             RuleFor(dto => dto.Id)
                .Must(langContent => langContent != default)
-               .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("IdInvalid", culture))
+               .WithMessage(GetTranslation("IdInvalid"))
                .NotEmpty()
-               .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("IdRequired", culture));
+               .WithMessage(GetTranslation("IdRequired"));
 
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

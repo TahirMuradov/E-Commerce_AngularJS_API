@@ -284,7 +284,7 @@ namespace Shop.Persistence.Services
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
-            UpdateOrderDTOValidation validationRules = new UpdateOrderDTOValidation(LangCode);
+            UpdateOrderDTOValidation validationRules = new UpdateOrderDTOValidation();
             var validationResult = validationRules.Validate(updateOrderDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);

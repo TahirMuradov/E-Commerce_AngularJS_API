@@ -6,60 +6,64 @@ namespace Shop.Application.Validators.WebUIValidators.TopCategoryAreaDTOValidati
 {
   public  class UpdateTopCategoryAreaDTOValidation :AbstractValidator<UpdateTopCategoryAreaDTO>
     {
-        public UpdateTopCategoryAreaDTOValidation(string langCode, string[] SupportedLaunguages)
+        public UpdateTopCategoryAreaDTOValidation( string[] SupportedLaunguages)
         {
-            CultureInfo cultureInfo = new CultureInfo(langCode);
+            
             RuleFor(x => x.Id)
             .NotNull()
-             .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("IdRequired",cultureInfo))
+             .WithMessage(GetTranslation("IdRequired"))
             .NotEmpty()
-             .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("IdRequired",cultureInfo))
+             .WithMessage(GetTranslation("IdRequired"))
             .NotEqual(Guid.Empty)
-             .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("IdInvalid",cultureInfo));
+             .WithMessage(GetTranslation("IdInvalid"));
             // Validate that DescriptionContent is not null and contains at least three entries
             RuleFor(dto => dto.Description)
             .NotNull()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty",cultureInfo))
+                .WithMessage(GetTranslation("ContentEmpty"))
                 .Must(langContent => langContent != null && langContent.Count > 3)
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort",cultureInfo));
+                .WithMessage(GetTranslation("LangContentTooShort"));
 
             // Validate that each key in DescriptionContent is a valid language code
             RuleFor(dto => dto.Description.Keys)
        .Must(keys => keys.All(key => (SupportedLaunguages).Contains(key)))
-       .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidLangCode",cultureInfo));
+       .WithMessage(GetTranslation("InvalidLangCode"));
 
 
             // Validate that each value in DescriptionContent is not null or empty
             RuleForEach(dto => dto.Description.Values)
             .NotEmpty()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty",cultureInfo));
+                .WithMessage(GetTranslation("ContentEmpty"));
             // Validate that TitleContent is not null and contains at least three entries
             RuleFor(dto => dto.Title)
             .NotNull()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty",cultureInfo))
+                .WithMessage(GetTranslation("ContentEmpty"))
                 .Must(langContent => langContent != null && langContent.Count > 3)
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort",cultureInfo));
+                .WithMessage(GetTranslation("LangContentTooShort"));
 
             // Validate that each key in TitleContent is a valid language code
             RuleFor(dto => dto.Title.Keys)
        .Must(keys => keys.All(key => (SupportedLaunguages).Contains(key)))
-       .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidLangCode",cultureInfo));
+       .WithMessage(GetTranslation("InvalidLangCode"));
 
 
             // Validate that each value in TitleContent is not null or empty
             RuleForEach(dto => dto.Title.Values)
             .NotEmpty()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty",cultureInfo));
+                .WithMessage(GetTranslation("ContentEmpty"));
 
             //// Validate Pictures
             RuleFor(x => x)
                 .Must(dto => dto.CurrentPictureUrl is null && dto.NewImage is null)
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PictureİsRequired",cultureInfo));
+                .WithMessage(GetTranslation("PictureİsRequired"));
             RuleFor(x => x)
             .Must(dto => !((dto.CategoryId == null || dto.CategoryId == Guid.Empty) &&
             (dto.SubCategoryId == null || dto.SubCategoryId == Guid.Empty)))
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("SubCategoryAndCategoryIdIsrequired",cultureInfo));
+                .WithMessage(GetTranslation("SubCategoryAndCategoryIdIsrequired"));
 
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
 
     }

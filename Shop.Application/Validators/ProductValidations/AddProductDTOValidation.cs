@@ -11,47 +11,47 @@ namespace Shop.Application.Validators.ProductValidations
         {
             _SupportLanguages = SupportLanguages;
 
-            var culture = new CultureInfo(LangCode);
+
             RuleFor(x => x.ProductCode)
-    .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("ProductCodeRequired", culture));
+    .NotEmpty().WithMessage(_ => GetTranslation("ProductCodeRequired"));
 
             RuleFor(x => x.Title)
-             .NotNull().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("ProductNameRequired", culture))
-             .Must(HaveValidLanguages).WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("InvalidLangCode", culture))
-             .Must(AllValuesNotEmpty).WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort", culture));
+             .NotNull().WithMessage(_ => GetTranslation("ProductNameRequired"))
+             .Must(HaveValidLanguages).WithMessage(_ => GetTranslation("InvalidLangCode"))
+             .Must(AllValuesNotEmpty).WithMessage(_ => GetTranslation("LangContentTooShort"));
 
             RuleFor(x => x.CategoryId)
-                .Must(x=>x!=Guid.Empty).WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("CategoryIdRequired", culture));
+                .Must(x=>x!=Guid.Empty).WithMessage(_ => GetTranslation("CategoryIdRequired"));
 
             // Validate Description dictionary
             RuleForEach(x => x.Description)
                 .Must(keyValuePair => SupportLanguages.Contains(keyValuePair.Key))
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidLangCode", culture));
+                .WithMessage(GetTranslation("InvalidLangCode"));
 
             // Ensure the number of supported languages matches the number of dictionary entries
             RuleFor(x => x.Title)
                 .Must(productName => productName.Count == SupportLanguages.Length)
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort", culture));
+                .WithMessage(GetTranslation("LangContentTooShort"));
 
             RuleFor(x => x.Description)
                 .Must(description => description.Count == SupportLanguages.Length)
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort", culture));
+                .WithMessage(GetTranslation("LangContentTooShort"));
 
             RuleFor(x => x.Sizes)
-              .NotNull().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("SizesRequired", culture))
-              .Must(AllSizeValuesArePositiveIntegers).WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("SizesMustBePositiveInt", culture));
+              .NotNull().WithMessage(_ => GetTranslation("SizesRequired"))
+              .Must(AllSizeValuesArePositiveIntegers).WithMessage(_ => GetTranslation("SizesMustBePositiveInt"));
 
             RuleFor(x => x.ProductImages)
-                .NotNull().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("PictureİsRequired", culture))
-                .Must(x => x.Count > 0).WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("PictureİsRequired", culture));
+                .NotNull().WithMessage(_ => GetTranslation("PictureİsRequired"))
+                .Must(x => x.Count > 0).WithMessage(_ => GetTranslation("PictureİsRequired"));
 
             RuleFor(x => x.Discount)
                 .GreaterThanOrEqualTo(0)
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("DisCountChecked", culture));
+                .WithMessage(GetTranslation("DisCountChecked"));
 
             RuleFor(x => x.Price)
                 .GreaterThan(0)
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PriceChecked", culture));
+                .WithMessage(GetTranslation("PriceChecked"));
 
 
 
@@ -59,9 +59,13 @@ namespace Shop.Application.Validators.ProductValidations
             RuleFor(x => x.ProductCode)
                 .NotNull()
                .NotEmpty()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ProductCodeİsRequired", new CultureInfo(LangCode)));
+                .WithMessage(GetTranslation("ProductCodeİsRequired"));
 
 
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
         private bool HaveValidLanguages(Dictionary<string, string> dict)
         {

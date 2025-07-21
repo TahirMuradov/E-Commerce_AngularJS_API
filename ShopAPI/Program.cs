@@ -14,6 +14,7 @@ using Shop.Infrastructure;
 using Shop.Infrastructure.Utilities;
 using Shop.Persistence;
 using Shop.Persistence.Context;
+using ShopAPI.Middlewares;
 using System.Globalization;
 using System.Security.Claims;
 using System.Text;
@@ -159,6 +160,9 @@ builder.Services.AddRateLimiter(option =>
 
     });
 });
+
+builder.Services.AddTransient<LocalizationMiddleware>();
+
 var app = builder.Build();
 
 
@@ -175,7 +179,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseMiddleware<LocalizationMiddleware>();
 app.MapControllers();
 
 app.Run();

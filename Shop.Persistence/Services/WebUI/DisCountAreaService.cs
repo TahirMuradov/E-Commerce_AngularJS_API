@@ -48,7 +48,7 @@ namespace Shop.Persistence.Services.WebUI
         {
             if (string.IsNullOrEmpty(langCode) || !SupportedLaunguages.Contains(langCode))
                 return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
-            AddDiscountAreaDTOValidation validationRules = new AddDiscountAreaDTOValidation(langCode, SupportedLaunguages);
+            AddDiscountAreaDTOValidation validationRules = new AddDiscountAreaDTOValidation(SupportedLaunguages);
             var validationResult = validationRules.Validate(addDisCountAreaDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(langCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
@@ -175,7 +175,7 @@ namespace Shop.Persistence.Services.WebUI
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
 
-            UpdateDisCountAreaDTOValidation validationRules = new UpdateDisCountAreaDTOValidation(LangCode, SupportedLaunguages);
+            UpdateDisCountAreaDTOValidation validationRules = new UpdateDisCountAreaDTOValidation(SupportedLaunguages);
             var validationResult = validationRules.Validate(updateDisCountAreaDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);

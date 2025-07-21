@@ -62,7 +62,7 @@ namespace Shop.Infrastructure
         {
             if (!SupportedLaunguages.Contains(culture))
                 culture = DefaultLaunguage;
-            AssignRoleDTOValidator validationRules = new AssignRoleDTOValidator(culture);
+            AssignRoleDTOValidator validationRules = new AssignRoleDTOValidator();
             var validationResult = await validationRules.ValidateAsync(assignRoleDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(culture,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), statusCode: HttpStatusCode.BadRequest);
@@ -90,7 +90,7 @@ namespace Shop.Infrastructure
         {
             if (string.IsNullOrWhiteSpace(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 LangCode = DefaultLaunguage;
-            UpdateForgotPasswordDTOValidation validationRules = new UpdateForgotPasswordDTOValidation(LangCode);
+            UpdateForgotPasswordDTOValidation validationRules = new UpdateForgotPasswordDTOValidation();
             var validationResult = await validationRules.ValidateAsync(updateForgotPasswordDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
@@ -301,13 +301,13 @@ namespace Shop.Infrastructure
                 Email = x.Email
             }), null,HttpStatusCode.OK);
         }
-        //[ValidationAspect(typeof(LoginDTOValidation),"az")]
+        //[ValidationAspect(typeof(LoginDTOValidation))]
 
         public async Task<IDataResult<Token>> LoginAsync(LoginDTO loginDTO, string culture)
         {
             if (!SupportedLaunguages.Contains(culture))
                 culture = DefaultLaunguage;
-            LoginDTOValidation validationRules = new LoginDTOValidation(culture);
+            LoginDTOValidation validationRules = new LoginDTOValidation();
             var validationResult = await validationRules.ValidateAsync(loginDTO);
             if (!validationResult.IsValid)
                 return new ErrorDataResult<Token>(null, messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
@@ -330,7 +330,7 @@ namespace Shop.Infrastructure
                     Expiration = token.Expiration
                 }, null,HttpStatusCode.OK);
             }
-            return new ErrorDataResult<Token>(null,message: AuthStatusException.UserPasswordOrEmailWrong[culture],HttpStatusCode.BadRequest);
+            return new ErrorDataResult<Token>(null,message: AuthStatusException.UserPasswordOrEmailWrong[culture],HttpStatusCode.BadRequest );
 
         }
 
@@ -364,7 +364,7 @@ namespace Shop.Infrastructure
         {
             if (!SupportedLaunguages.Contains(culture))
                 culture = DefaultLaunguage;
-            RegisterDTOValidation validationRules = new RegisterDTOValidation(culture);
+            RegisterDTOValidation validationRules = new RegisterDTOValidation();
             var validationResult = await validationRules.ValidateAsync(registerDTO);
             if (!validationResult.IsValid) return new ErrorResult(culture,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
             var checkEmail = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == registerDTO.Email);

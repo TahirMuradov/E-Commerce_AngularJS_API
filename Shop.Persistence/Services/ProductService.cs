@@ -309,7 +309,7 @@ namespace Shop.Persistence.Services
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
 
-            var validationRules = new UpdateProductDTOValidation(LangCode, SupportedLaunguages);
+            var validationRules = new UpdateProductDTOValidation(SupportedLaunguages);
             var validationResult = validationRules.Validate(updateProductDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);

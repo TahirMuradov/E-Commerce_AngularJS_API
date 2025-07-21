@@ -55,7 +55,7 @@ namespace Shop.Persistence.Services.WebUI
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
 
-            AddHomeSliderItemDTOValidation validationRules = new AddHomeSliderItemDTOValidation(LangCode, SupportedLaunguages);
+            AddHomeSliderItemDTOValidation validationRules = new AddHomeSliderItemDTOValidation(SupportedLaunguages);
             var validationResult = await validationRules.ValidateAsync(addHomeSliderItemDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
@@ -211,7 +211,7 @@ namespace Shop.Persistence.Services.WebUI
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))
                 return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.BadRequest);
-            UpdateHomeSliderItemDTOValidation validationRules = new UpdateHomeSliderItemDTOValidation(LangCode, SupportedLaunguages);
+            UpdateHomeSliderItemDTOValidation validationRules = new UpdateHomeSliderItemDTOValidation(SupportedLaunguages);
             var validationResult = await validationRules.ValidateAsync(updateHomeSliderItemDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(LangCode,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);

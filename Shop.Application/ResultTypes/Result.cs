@@ -12,7 +12,7 @@ namespace Shop.Application.ResultTypes
         public List<string> Messages { get; }
         public HttpStatusCode StatusCode { get; }
 
-        public string ResponseLangCode { get; }
+        public string ResponseLangCode { get { return Thread.CurrentThread.CurrentCulture.Name; } }
 
 
    
@@ -22,7 +22,7 @@ namespace Shop.Application.ResultTypes
 
             this.IsSuccess = IsSuccess;
             StatusCode = statusCode;
-            ResponseLangCode = LangCode;
+            
         }
         public Result(bool IsSuccess, string LangCode, string message, HttpStatusCode statusCode) : this(IsSuccess, LangCode, statusCode)
         {

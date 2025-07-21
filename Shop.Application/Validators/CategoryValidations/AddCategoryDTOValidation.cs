@@ -8,25 +8,29 @@ namespace Shop.Application.Validators.CategoryValidations
     {
         public AddCategoryDTOValidation(string langCode, string[] SupportLanguages)
         {
-            var culture = new CultureInfo(langCode);
+       
 
             RuleFor(dto => dto.CategoryContent)
                .NotNull()
-               .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty", culture))
+               .WithMessage(GetTranslation("ContentEmpty"))
                .Must(langContent => langContent != null && langContent.Count == SupportLanguages.Count())
-               .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort", culture));
+               .WithMessage(GetTranslation("LangContentTooShort"));
 
             // Validate that each key in LangContent is a valid language code
             RuleFor(dto => dto.CategoryContent.Keys)
        .Must(keys => keys.All(key => (SupportLanguages).Contains(key)))
-       .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidLangCode", culture));
+       .WithMessage(GetTranslation("InvalidLangCode"));
 
 
             // Validate that each value in LangContent is not null or empty
             RuleForEach(dto => dto.CategoryContent.Values)
                 .NotEmpty()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty", culture));
+                .WithMessage(GetTranslation("ContentEmpty"));
 
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

@@ -5,14 +5,18 @@ namespace Shop.Application.Validators.OrderValidations.AddOrderValidations
 {
    public class OrderPaymentMethodDTOValidator : AbstractValidator<OrderPaymentMethodDTO>
     {
-        public OrderPaymentMethodDTOValidator(string langCode)
+        public OrderPaymentMethodDTOValidator()
         {
-            var culture = new System.Globalization.CultureInfo(langCode);
+          
             RuleFor(x => x.Id)
-                .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("PaymentIdIsRequired", culture));
+                .NotEmpty().WithMessage(_ => GetTranslation("PaymentIdIsRequired"));
 
             RuleFor(x => x.Content)
-                .NotEmpty().WithMessage(_ => ValidatorOptions.Global.LanguageManager.GetString("PaymentContentIsRequired", culture));
+                .NotEmpty().WithMessage(_ => GetTranslation("PaymentContentIsRequired"));
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new System.Globalization.CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

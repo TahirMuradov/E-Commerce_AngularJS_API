@@ -253,7 +253,7 @@ namespace Shop.Persistence.Services.WebUI
             if (string.IsNullOrEmpty(LangCode) || SupportedLaunguages.Contains(LangCode))
                 return new ErrorResult(DefaultLaunguage,HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
 
-            UpdateTopCategoryAreaDTOValidation validation = new UpdateTopCategoryAreaDTOValidation(LangCode, SupportedLaunguages);
+            UpdateTopCategoryAreaDTOValidation validation = new UpdateTopCategoryAreaDTOValidation( SupportedLaunguages);
             var validationResult = await validation.ValidateAsync(updateTopCategoryAreaDTO);
 
             if (!validationResult.IsValid)

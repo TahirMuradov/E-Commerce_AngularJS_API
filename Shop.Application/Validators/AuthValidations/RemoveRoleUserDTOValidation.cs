@@ -12,14 +12,18 @@ namespace Shop.Application.Validators.AuthValidations
 
             // UserId validation: must not be empty or default GUID value
             RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("UserIdRequired",culture))
-                .NotEqual(Guid.Empty).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("UserIdInvalid", culture));
+                .NotEmpty().WithMessage(GetTranslation("UserIdRequired"))
+                .NotEqual(Guid.Empty).WithMessage(GetTranslation("UserIdInvalid"));
 
             // RoleId validation: must not be null or empty, and at least one role ID is required
             RuleFor(x => x.RoleId)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("RoleIdRequired", culture))
-                .Must(x => x != null && x.Length > 0).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("RoleIdInvalid", culture));
+                .NotEmpty().WithMessage(GetTranslation("RoleIdRequired"))
+                .Must(x => x != null && x.Length > 0).WithMessage(GetTranslation("RoleIdInvalid"));
 
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

@@ -6,23 +6,27 @@ namespace Shop.Application.Validators.ShippingMethodValidations
 {
   public  class UpdateShippingMethodDTOValidation:AbstractValidator<UpdateShippingMethodDTO>
     {
-        public UpdateShippingMethodDTOValidation(string LangCode,string[] SupportLanguages)
+        public UpdateShippingMethodDTOValidation(string[] SupportLanguages)
         {
-            var culture = new CultureInfo(LangCode);
+    
             RuleFor(dto => dto.Id)
                 .Must(id => id != default)
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("IdInvalid", culture));
+                .WithMessage(GetTranslation("IdInvalid"));
 
             RuleFor(dto => dto.Content)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangDictionaryIsRequired", culture));
+                .NotEmpty().WithMessage(GetTranslation("LangDictionaryIsRequired"));
 
             RuleForEach(dto => dto.Content)
                 .Must(pair => !string.IsNullOrEmpty(pair.Key) && !string.IsNullOrEmpty(pair.Value))
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangKeyAndValueRequired", culture));
+                .WithMessage(GetTranslation("LangKeyAndValueRequired"));
 
             RuleForEach(dto => dto.Content.Keys)
                 .Must(key =>    SupportLanguages.Contains(key))
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidLangKey",culture));
+                .WithMessage(GetTranslation("InvalidLangKey"));
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Shop.Persistence.Services
         {
             if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
-            AddPaymentMethodDTOValidation validationRules = new AddPaymentMethodDTOValidation(locale, SupportedLaunguages);
+            AddPaymentMethodDTOValidation validationRules = new AddPaymentMethodDTOValidation(SupportedLaunguages);
             var validationResult = validationRules.Validate(addPaymentMethodDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(locale,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
@@ -171,7 +171,7 @@ namespace Shop.Persistence.Services
 
             if (string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorResult(DefaultLaunguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLaunguage], HttpStatusCode.UnsupportedMediaType);
-            UpdatePaymentMethodDTOValidation validationRules = new UpdatePaymentMethodDTOValidation(locale, SupportedLaunguages);
+            UpdatePaymentMethodDTOValidation validationRules = new UpdatePaymentMethodDTOValidation(SupportedLaunguages);
             var validationResult = validationRules.Validate(updatePaymentMethodDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(locale,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);

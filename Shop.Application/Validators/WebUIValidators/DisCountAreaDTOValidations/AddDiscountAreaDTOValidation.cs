@@ -6,45 +6,49 @@ namespace Shop.Application.Validators.WebUIValidators.DisCountAreaDTOValidations
 {
   public  class AddDiscountAreaDTOValidation: AbstractValidator<AddDisCountAreaDTO>
     {
-        public AddDiscountAreaDTOValidation(string culture, string[] SupportedLaunguages)
+        public AddDiscountAreaDTOValidation( string[] SupportedLaunguages)
         {
-            CultureInfo cultureInfo = new CultureInfo(culture);
+   
             RuleFor(dto => dto.DescriptionContent)
                 .NotNull()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty",cultureInfo))
+                .WithMessage(GetTranslation("ContentEmpty"))
                 .Must(langContent => langContent != null && langContent.Count > 3)
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort",cultureInfo));
+                .WithMessage(GetTranslation("LangContentTooShort"));
 
             // Validate that each key in DescriptionContent is a valid language code
             RuleFor(dto => dto.DescriptionContent.Keys)
        .Must(keys => keys.All(key => (SupportedLaunguages).Contains(key)))
-       .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidLangCode",cultureInfo));
+       .WithMessage(GetTranslation("InvalidLangCode"));
 
 
             // Validate that each value in DescriptionContent is not null or empty
             RuleForEach(dto => dto.DescriptionContent.Values)
                 .NotEmpty()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty",cultureInfo));
+                .WithMessage(GetTranslation("ContentEmpty"));
             // Validate that TitleContent is not null and contains at least three entries
             RuleFor(dto => dto.TitleContent)
                 .NotNull()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty",cultureInfo))
+                .WithMessage(GetTranslation("ContentEmpty"))
                 .Must(langContent => langContent != null && langContent.Count > 3)
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort",cultureInfo));
+                .WithMessage(GetTranslation("LangContentTooShort"));
 
             // Validate that each key in TitleContent is a valid language code
             RuleFor(dto => dto.TitleContent.Keys)
        .Must(keys => keys.All(key => (SupportedLaunguages).Contains(key)))
-       .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidLangCode",cultureInfo));
+       .WithMessage(GetTranslation("InvalidLangCode"));
 
 
             // Validate that each value in TitleContent is not null or empty
             RuleForEach(dto => dto.TitleContent.Values)
                 .NotEmpty()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty",cultureInfo));
+                .WithMessage(GetTranslation("ContentEmpty"));
 
 
 
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

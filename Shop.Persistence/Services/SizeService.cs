@@ -52,7 +52,7 @@ namespace Shop.Persistence.Services
                 return new ErrorResult(DefaultLanguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
 
 
-            AddSizeDTOValidation validationRules = new AddSizeDTOValidation(locale);
+            AddSizeDTOValidation validationRules = new AddSizeDTOValidation();
             var validationResult = validationRules.Validate(addSizeDTO);
             if (!validationResult.IsValid)
                 return new SuccessResult(locale,validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
@@ -161,7 +161,7 @@ namespace Shop.Persistence.Services
         {
             if ( string.IsNullOrEmpty(locale) || !SupportedLaunguages.Contains(locale))
                 return new ErrorDataResult<GetSizeDTO>(DefaultLanguage,message: HttpStatusErrorMessages.UnsupportedLanguage[DefaultLanguage], HttpStatusCode.UnsupportedMediaType);
-            UpdateSizeDTOValidation validationRules = new UpdateSizeDTOValidation(locale);
+            UpdateSizeDTOValidation validationRules = new UpdateSizeDTOValidation();
             var validationResult = validationRules.Validate(updateSizeDTO);
             if (!validationResult.IsValid)
                 return new ErrorResult(locale,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);

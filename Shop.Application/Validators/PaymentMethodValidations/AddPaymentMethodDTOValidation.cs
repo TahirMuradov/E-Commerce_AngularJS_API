@@ -6,24 +6,28 @@ namespace Shop.Application.Validators.PaymentMethodValidations
 {
    public class AddPaymentMethodDTOValidation:AbstractValidator<AddPaymentMethodDTO>
     {
-        public AddPaymentMethodDTOValidation(string langCode, string[] SupportLanguages)
+        public AddPaymentMethodDTOValidation( string[] SupportLanguages)
         {
-            var culture = new CultureInfo(langCode);
+
             RuleFor(dto => dto.Content)
                .NotNull()
-               .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty", culture))
+               .WithMessage(GetTranslation("ContentEmpty"))
                .Must(langContent => langContent != null && langContent.Count > 3)
-               .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LangContentTooShort", culture));
+               .WithMessage(GetTranslation("LangContentTooShort"));
 
             // Validate that each key in LangContent is a valid language code
             RuleForEach(dto => dto.Content.Keys)
                 .Must(key => SupportLanguages.Contains(key))
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("InvalidLangCode", culture));
+                .WithMessage(GetTranslation("InvalidLangCode"));
 
             // Validate that each value in LangContent is not null or empty
             RuleForEach(dto => dto.Content.Values)
                 .NotEmpty()
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ContentEmpty", culture));
+                .WithMessage(GetTranslation("ContentEmpty"));
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

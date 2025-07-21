@@ -1,14 +1,15 @@
 ﻿
 using Castle.DynamicProxy;
 using FluentValidation;
+using Shop.Application.Abstraction.Services;
 
 namespace Shop.Infrastructure;
 
 public class ValidationAspect : MethodInterception
 {
     private Type _validatorType;
-    private object _param;
-    public ValidationAspect(Type validatorType, object param)
+
+    public ValidationAspect(Type validatorType)
     {
         if (!typeof(IValidator).IsAssignableFrom(validatorType))
         {
@@ -16,11 +17,13 @@ public class ValidationAspect : MethodInterception
         }
 
         _validatorType = validatorType;
-        _param = param;
+      
     }
     protected override void OnBefore(IInvocation invocation)
     {
-        var validator = (IValidator)Activator.CreateInstance(_validatorType,_param);
+
+        var validator = (IValidator)Activator.CreateInstance(_validatorType);
+     
         var entityType = _validatorType.BaseType.GetGenericArguments()[0];
         var entities = invocation.Arguments.Where(t => t.GetType() == entityType);
         foreach (var entity in entities)

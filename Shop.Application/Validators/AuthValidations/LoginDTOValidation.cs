@@ -6,18 +6,21 @@ namespace Shop.Application.Validators.AuthValidations
 {
   public  class LoginDTOValidation:AbstractValidator<LoginDTO>
     {
-        public LoginDTOValidation(string LangCode)
+        public LoginDTOValidation()
         {
 
-            var culture = new CultureInfo(LangCode);
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("EmailRequired", culture ))
-                .EmailAddress().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("EmailInvalid", culture));
+                .NotEmpty().WithMessage(GetTranslation("EmailRequired"))
+                .EmailAddress().WithMessage(GetTranslation("EmailInvalid"));
 
            
             RuleFor(x => x.Password)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PasswordRequired",culture));
+                .NotEmpty().WithMessage(GetTranslation("PasswordRequired"));
 
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

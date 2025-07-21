@@ -6,26 +6,30 @@ namespace Shop.Application.Validators.AuthValidations
 {
     public class UpdateForgotPasswordDTOValidation:AbstractValidator<UpdateForgotPasswordDTO>
     {
-        public UpdateForgotPasswordDTOValidation(string LangCode)
+        public UpdateForgotPasswordDTOValidation()
         {
-            var culture = new CultureInfo(LangCode);
+
             RuleFor(x => x.Email)
-         .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("EmailRequired", culture))
-         .EmailAddress().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("EmailInvalid", culture));
+         .NotEmpty().WithMessage(GetTranslation("EmailRequired"))
+         .EmailAddress().WithMessage(GetTranslation("EmailInvalid"));
 
             RuleFor(x => x.Token)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("TokenRequired", culture));
+                .NotEmpty().WithMessage(GetTranslation("TokenRequired"));
 
             RuleFor(x => x.NewPassword)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PasswordRequired",culture));
+                .NotEmpty().WithMessage(GetTranslation("PasswordRequired"));
            
 
             RuleFor(x => x.NewConfirmPassword)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ConfirmPasswordRequired", culture))
-                .Equal(x => x.NewPassword).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PasswordsDoNotMatch", culture));
+                .NotEmpty().WithMessage(GetTranslation("ConfirmPasswordRequired"))
+                .Equal(x => x.NewPassword).WithMessage(GetTranslation("PasswordsDoNotMatch"));
 
 
     ;
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

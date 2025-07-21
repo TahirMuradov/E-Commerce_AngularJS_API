@@ -6,45 +6,48 @@ namespace Shop.Application.Validators.AuthValidations
 {
    public class RegisterDTOValidation:AbstractValidator<RegisterDTO>
     {
-        public RegisterDTOValidation(string LangCode)
+        public RegisterDTOValidation()
         {
-            var culture = new CultureInfo(LangCode);
+          
             // Firstname validation: not null or empty
             RuleFor(x => x.Firstname)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("FirstnameRequired",culture));
+                .NotEmpty().WithMessage(GetTranslation("FirstnameRequired"));
 
             // Lastname validation: not null or empty
             RuleFor(x => x.Lastname)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("LastnameRequired", culture));
+                .NotEmpty().WithMessage(GetTranslation("LastnameRequired"));
 
             // Email validation: not null or empty
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("EmailRequired", culture))
-                .EmailAddress().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("EmailInvalid",culture));
+                .NotEmpty().WithMessage(GetTranslation("EmailRequired"))
+                .EmailAddress().WithMessage(GetTranslation("EmailInvalid"));
 
             // PhoneNumber validation: +994-xx-xxx-xx-xx||xxx-xxx-xx-xx format
             RuleFor(x => x.PhoneNumber)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PhoneNumberRequired", culture))
+                .NotEmpty().WithMessage(    GetTranslation("PhoneNumberRequired"))
                 .Matches(@"^(?:\+994-?(?:\d{2}-?\d{3}-?\d{2}-?\d{2}|\d{2}-?\d{3}-?\d{2}-?\d{2})|(\d{3}-?\d{3}-?\d{2}-?\d{2}|\d{3}-?\d{3}-?\d{2}-?\d{2}-?))$")
-                .WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PhoneNumberInvalid", new CultureInfo(LangCode)));
+                .WithMessage(GetTranslation("PhoneNumberInvalid"));
 
             // Address validation: not null or empty
             RuleFor(x => x.Adress)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("AddressRequired", culture));
+                .NotEmpty().WithMessage(GetTranslation("AddressRequired"));
 
             // Username validation: not null or empty
             RuleFor(x => x.Username)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("UsernameRequired", culture));
+                .NotEmpty().WithMessage(GetTranslation("UsernameRequired"));
 
             // Password validation: not null or empty
             RuleFor(x => x.Password)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PasswordRequired",culture));
+                .NotEmpty().WithMessage(GetTranslation("PasswordRequired"));
 
             // ConfirmPassword validation: not null or empty and must match Password
             RuleFor(x => x.ConfirmPassword)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("ConfirmPasswordRequired", culture))
-                .Equal(x => x.Password).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("PasswordsDoNotMatch", culture));
+                .NotEmpty().WithMessage(GetTranslation("ConfirmPasswordRequired"))
+                .Equal(x => x.Password).WithMessage(GetTranslation("PasswordsDoNotMatch"));
         }
-
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
+        }
     }
 }

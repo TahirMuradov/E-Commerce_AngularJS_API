@@ -6,18 +6,22 @@ namespace Shop.Application.Validators.AuthValidations
 {
    public class AssignRoleDTOValidator:AbstractValidator<AssignRoleDTO>
     {
-        public AssignRoleDTOValidator(string LangCode)
+        public AssignRoleDTOValidator()
         {
-            var culture = new CultureInfo(LangCode);
+           
             RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("UserIdRequired", culture))
-            .NotEqual(Guid.Empty).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("UserIdInvalid", culture));
+            .NotEmpty().WithMessage(GetTranslation("UserIdRequired"))
+            .NotEqual(Guid.Empty).WithMessage(GetTranslation("UserIdInvalid"));
 
         
             RuleFor(x => x.RoleId)
-                .NotEmpty().WithMessage(ValidatorOptions.Global.LanguageManager.GetString("RoleIdRequired", culture))
-                .Must(x => x != null && x != default).WithMessage(ValidatorOptions.Global.LanguageManager.GetString("RoleIdInvalid", culture));
+                .NotEmpty().WithMessage(GetTranslation("RoleIdRequired"))
+                .Must(x => x != null && x != default).WithMessage(GetTranslation("RoleIdInvalid"));
 
+        }
+        private string GetTranslation(string key)
+        {
+            return ValidatorOptions.Global.LanguageManager.GetString(key, new CultureInfo(Thread.CurrentThread.CurrentUICulture.Name));
         }
     }
 }

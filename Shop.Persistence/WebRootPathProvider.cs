@@ -1,9 +1,10 @@
 ﻿
+
 namespace Shop.Persistence
 {
-    public static class WebRootPathProvider
+    public static  class WebRootPathProvider
     {
-        public static string GetwwwrootPath
+        public static  string GetwwwrootPath
         {
             get
             {

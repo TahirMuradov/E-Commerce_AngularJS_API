@@ -26,7 +26,7 @@ namespace Shop.Persistence.Services
 
 
 
-                return Configuration.SupportedLaunguageKeys;
+                return ConfigurationPersistence.SupportedLaunguageKeys;
 
 
             }
@@ -36,7 +36,7 @@ namespace Shop.Persistence.Services
         {
             get
             {
-                return Configuration.DefaultLanguageKey;
+                return ConfigurationPersistence.DefaultLanguageKey;
             }
         }
         public CategoryService(AppDBContext context, ILogger<CategoryService> logger)

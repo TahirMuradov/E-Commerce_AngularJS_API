@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Shop.Application
 {
@@ -6,7 +7,7 @@ namespace Shop.Application
     {
         public static void AddApplicationServices(this IServiceCollection collection)
         {
-    
+   
         }
     }
 }

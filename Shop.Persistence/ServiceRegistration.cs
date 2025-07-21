@@ -2,13 +2,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Shop.Application.Abstraction.Services;
-using Shop.Domain.Exceptions;
+using Shop.Application.Abstraction.Services.WebUI;
 using Shop.Domain.Entities;
+using Shop.Domain.Exceptions;
 using Shop.Infrastructure;
 using Shop.Persistence.Context;
 using Shop.Persistence.Services;
-using Shop.Application.Abstraction.Services.WebUI;
-using Shop.Domain.Entities.WebUIEntites;
 using Shop.Persistence.Services.WebUI;
 
 namespace Shop.Persistence
@@ -17,6 +16,8 @@ namespace Shop.Persistence
     {
         public static void AddPersistenceServices(this IServiceCollection services)
         {
+
+
             services.AddIdentity<User, Role>()
    .AddEntityFrameworkStores<AppDBContext>()
    .AddDefaultTokenProviders()
@@ -45,13 +46,13 @@ namespace Shop.Persistence
             });
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             {
-                options.TokenLifespan = TimeSpan.FromMinutes(15); 
+                options.TokenLifespan = TimeSpan.FromMinutes(15);
             });
 
-            services.AddTransient<IdentityErrorDescriber, MultilanguageIdentityErrorDescriber>();
+            services.AddSingleton<IdentityErrorDescriber, MultilanguageIdentityErrorDescriber>();
+      
 
             services.AddScoped<IAuthService, AuthService>();
-
 
 
             services.AddScoped<ICategoryService, CategoryService>();
@@ -64,7 +65,7 @@ namespace Shop.Persistence
 
             //WebUIService
             services.AddScoped<IDiscountAreaService, DisCountAreaService>();
-            services.AddScoped<IHomeSliderService,HomeSliderService >();
+            services.AddScoped<IHomeSliderService, HomeSliderService>();
             services.AddScoped<IHomeService, HomeService>();
             services.AddScoped<ITopCategoryAreaService, TopCategoryAreaService>();
             services.AddScoped<INewArriwalAreaService, NewArriwalAreaService>();

@@ -35,7 +35,7 @@ namespace Shop.Persistence.Services
 
 
 
-                return Configuration.SupportedLaunguageKeys;
+                return ConfigurationPersistence.SupportedLaunguageKeys;
 
 
             }
@@ -45,7 +45,7 @@ namespace Shop.Persistence.Services
         {
             get
             {
-                return Configuration.DefaultLanguageKey;
+                return ConfigurationPersistence.DefaultLanguageKey;
             }
         }
         public OrderService(AppDBContext context, IFileService fileService, IMailService mailService, ILogger<OrderService> logger, UserManager<User> userManager)

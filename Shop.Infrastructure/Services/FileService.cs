@@ -4,7 +4,7 @@ using Shop.Application.DTOs.OrderPdfGeneratorDTOs;
 using Shop.Application.ResultTypes.Abstract;
 using Shop.Application.ResultTypes.Concrete.ErrorResults;
 using Shop.Application.ResultTypes.Concrete.SuccessResults;
-using Shop.Persistence;
+using Shop.Infrastructure.Utilities;
 using System.Net;
 using System.Text;
 using System.Web;

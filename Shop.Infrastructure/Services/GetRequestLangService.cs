@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Shop.Application.Abstraction.Services;
-using Shop.Persistence;
+using Shop.Infrastructure.Utilities;
+
 
 namespace Shop.Infrastructure.Services
 {
@@ -16,8 +17,8 @@ namespace Shop.Infrastructure.Services
         }
         public string GetRequestLanguage()
         {
-            var supportedLanguages = Configuration.SupportedLaunguageKeys;
-            var defaultLanguage = Configuration.DefaultLanguageKey??"az";
+            var supportedLanguages = ConfigurationInfrastructure.SupportedLaunguageKeys;
+            var defaultLanguage = ConfigurationInfrastructure.DefaultLanguageKey??"az";
 
             var headerLang = _contextAccessor.HttpContext?.Request?.Headers["Accept-Language"].ToString();
              //en-US,en; q=0.9,ru; q=0.8,az; q=0.7

@@ -1,7 +1,9 @@
 ﻿using Shop.Application.DTOs.AuthDTOs;
 using Shop.Application.PaginationHelper;
 using Shop.Application.ResultTypes.Abstract;
+using Shop.Application.Validators.AuthValidations;
 using Shop.Domain.Entities;
+
 
 namespace Shop.Application.Abstraction.Services
 {
@@ -19,6 +21,7 @@ namespace Shop.Application.Abstraction.Services
         IDataResult<IQueryable<GetUserForSelectDTO>> GetAllUserForSelect();
         Task<IDataResult<string>> UpdateRefreshTokenAsnyc(string refreshToken, User user, string culture);
         Task<IResult> RemoveRoleFromUserAsync(RemoveRoleUserDTO removeRoleUserDTO, string culture);
+        
         Task<IDataResult<DTOs.Token>> LoginAsync(LoginDTO loginDTO, string culture);
         Task<IResult> LogOutAsync(string userId, string culture);
     }

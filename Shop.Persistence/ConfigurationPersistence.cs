@@ -2,7 +2,7 @@
 
 namespace Shop.Persistence
 {
-    public class Configuration
+    public class ConfigurationPersistence
     {
         static public string DefaultConnectionString
         {
@@ -50,17 +50,19 @@ namespace Shop.Persistence
                     }
                     return configurationManager.GetSection("SupportedLanguage:Launguages").Get<string[]>();
 
-                    
+
 
                 }
 
                 return config.GetSection("SupportedLanguage:Launguages").Get<string[]>();
-               
+
             }
         }
-static public string DefaultLanguageKey{get
+        static public string DefaultLanguageKey
+        {
+            get
             {
-             if (string.IsNullOrEmpty(config.GetConnectionString("Default")))
+                if (string.IsNullOrEmpty(config.GetConnectionString("Default")))
                 {
 
                     ConfigurationManager configurationManager = new();
@@ -75,12 +77,12 @@ static public string DefaultLanguageKey{get
                     }
                     return configurationManager.GetSection("SupportedLanguage:Default").Get<string>();
 
-                    
+
 
                 }
 
                 return config.GetSection("SupportedLanguage:Default").Get<string>();
-}
+            }
         }
 
         public static IConfiguration config;

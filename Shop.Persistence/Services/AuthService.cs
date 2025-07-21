@@ -13,7 +13,6 @@ using Shop.Application.Validators.AuthValidations;
 using Shop.Domain.Entities;
 using Shop.Domain.Exceptions;
 using Shop.Persistence;
-using System.Globalization;
 using System.Net;
 using System.Web;
 
@@ -28,7 +27,7 @@ namespace Shop.Infrastructure
 
 
 
-                return Configuration.SupportedLaunguageKeys;
+                return ConfigurationPersistence.SupportedLaunguageKeys;
 
 
             }
@@ -38,7 +37,7 @@ namespace Shop.Infrastructure
         {
             get
             {
-                return Configuration.DefaultLanguageKey;
+                return ConfigurationPersistence.DefaultLanguageKey;
             }
         }
         private readonly UserManager<User> _userManager;
@@ -47,8 +46,8 @@ namespace Shop.Infrastructure
         private readonly ITokenHandler _tokenHandler;
         private readonly IMailService _emailService;
         private readonly IConfiguration _configuration;
-
-        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<Role> roleManager, ITokenHandler tokenHandler, IMailService emailService, IConfiguration configuration)
+        private readonly IGetRequestLangService _getRequestLangService;
+        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<Role> roleManager, ITokenHandler tokenHandler, IMailService emailService, IConfiguration configuration, IGetRequestLangService getRequestLangService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -56,6 +55,7 @@ namespace Shop.Infrastructure
             _tokenHandler = tokenHandler;
             _emailService = emailService;
             _configuration = configuration;
+            _getRequestLangService = getRequestLangService;
         }
 
         public async Task<IResult> AssignRoleToUserAsnyc(AssignRoleDTO assignRoleDTO, string culture)
@@ -301,6 +301,7 @@ namespace Shop.Infrastructure
                 Email = x.Email
             }), null,HttpStatusCode.OK);
         }
+        //[ValidationAspect(typeof(LoginDTOValidation),"az")]
 
         public async Task<IDataResult<Token>> LoginAsync(LoginDTO loginDTO, string culture)
         {
@@ -309,7 +310,7 @@ namespace Shop.Infrastructure
             LoginDTOValidation validationRules = new LoginDTOValidation(culture);
             var validationResult = await validationRules.ValidateAsync(loginDTO);
             if (!validationResult.IsValid)
-                return new ErrorDataResult<Token>(null,messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
+                return new ErrorDataResult<Token>(null, messages: validationResult.Errors.Select(x => x.ErrorMessage).ToList(), HttpStatusCode.BadRequest);
             User? user = await _userManager.FindByEmailAsync(loginDTO.Email);
             if (user is null)
                 return new ErrorDataResult<Token>(null,message: AuthStatusException.UserNotFound[culture], HttpStatusCode.NotFound);
@@ -436,7 +437,7 @@ namespace Shop.Infrastructure
                 }
                 string token = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
 
-                string confimationLink = $"{Configuration.config.GetSection("Domain:Front").Get<string>()}/auth/emailconfirmed/{HttpUtility.UrlEncode(newUser.Email)}/{HttpUtility.UrlEncode(token)}";
+                string confimationLink = $"{ConfigurationPersistence.config.GetSection("Domain:Front").Get<string>()}/auth/emailconfirmed/{HttpUtility.UrlEncode(newUser.Email)}/{HttpUtility.UrlEncode(token)}";
                 var resultEmail = await _emailService.SendEmailAsync(LangCode:culture,newUser.Email, confimationLink, newUser.FirstName + " " + newUser.LastName, isForgotPass: false);
                 if (!resultEmail.IsSuccess)
                 {

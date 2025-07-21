@@ -29,7 +29,7 @@ namespace Shop.Persistence.Services
 
 
 
-                return Configuration.SupportedLaunguageKeys;
+                return ConfigurationPersistence.SupportedLaunguageKeys;
 
 
             }
@@ -39,7 +39,7 @@ namespace Shop.Persistence.Services
         {
             get
             {
-                return Configuration.DefaultLanguageKey;
+                return ConfigurationPersistence.DefaultLanguageKey;
             }
         }
         public ProductService(AppDBContext context, ILogger<ProductService> logger, IFileService fileService)
@@ -48,7 +48,7 @@ namespace Shop.Persistence.Services
             _logger = logger;
             _fileService = fileService;
         }
-
+       
         public async Task<IResult> AddProductAsync(AddProductDTO addProductDTO, string LangCode)
         {
             if (string.IsNullOrEmpty(LangCode) || !SupportedLaunguages.Contains(LangCode))

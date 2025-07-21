@@ -19,7 +19,7 @@ namespace ShopAPI.Controllers
         {
             get
             {
-                return Configuration.config.GetSection("SupportedLanguage:Default").Get<string>();
+                return ConfigurationPersistence.config.GetSection("SupportedLanguage:Default").Get<string>();
             }
         }
         private readonly IDiscountAreaService _countAreaService;

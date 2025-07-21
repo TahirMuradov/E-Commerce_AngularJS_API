@@ -2,6 +2,7 @@
 
 namespace Shop.Domain.Entities
 {
+  
    public class Category:BaseEntity
     {
         public bool IsFeatured { get; set; }

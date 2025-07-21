@@ -1,4 +1,6 @@
 
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
@@ -7,10 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Shop.Application;
-using Shop.Application.Abstraction.Services;
 using Shop.Application.CustomLanguageMessage;
-using Shop.Application.ResultTypes;
 using Shop.Infrastructure;
+using Shop.Infrastructure.Utilities;
 using Shop.Persistence;
 using Shop.Persistence.Context;
 using System.Globalization;
@@ -21,11 +22,18 @@ using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-Configuration.Initialize(builder.Configuration);
+ConfigurationPersistence.Initialize(builder.Configuration);
+ConfigurationInfrastructure.Initialize(builder.Configuration);
 
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
+.ConfigureContainer<ContainerBuilder>(options =>
+{
+ options.RegisterModule(new AutofacBusinessModule());
+});
 builder.Services.AddPersistenceServices();
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
+
 
 builder.Services.AddDbContext<AppDBContext>(options =>
 {

@@ -37,7 +37,7 @@ namespace Shop.Persistence.Services.WebUI
 
 
 
-                return Configuration.SupportedLaunguageKeys;
+                return ConfigurationPersistence.SupportedLaunguageKeys;
 
 
             }
@@ -47,7 +47,7 @@ namespace Shop.Persistence.Services.WebUI
         {
             get
             {
-                return Configuration.DefaultLanguageKey;
+                return ConfigurationPersistence.DefaultLanguageKey;
             }
         }
         public async Task<IResult> AddHomeSliderItemAsync(AddHomeSliderItemDTO addHomeSliderItemDTO, string LangCode)

@@ -3,6 +3,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +15,7 @@ using Shop.Infrastructure;
 using Shop.Infrastructure.Utilities;
 using Shop.Persistence;
 using Shop.Persistence.Context;
+using Shop.SignalR;
 using ShopAPI.Middlewares;
 using System.Globalization;
 using System.Security.Claims;
@@ -34,7 +36,7 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
 builder.Services.AddPersistenceServices();
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
-
+builder.Services.AddSignalRServices();
 
 builder.Services.AddDbContext<AppDBContext>(options =>
 {
@@ -177,6 +179,9 @@ app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.MapHubs();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<LocalizationMiddleware>();

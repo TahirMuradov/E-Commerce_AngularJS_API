@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="8.3.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.25.0" />
     <PackageReference Include="Castle.Core" Version="5.2.1" />
     <PackageReference Include="itext7.bouncy-castle-adapter" Version="9.2.0" />
     <PackageReference Include="itext7.pdfhtml" Version="6.2.0" />

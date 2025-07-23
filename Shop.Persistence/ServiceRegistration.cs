@@ -49,26 +49,31 @@ namespace Shop.Persistence
                 options.TokenLifespan = TimeSpan.FromMinutes(15);
             });
 
-            services.AddSingleton<IdentityErrorDescriber, MultilanguageIdentityErrorDescriber>();
-      
-
-            services.AddScoped<IAuthService, AuthService>();
 
 
-            services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<ISizeService, SizeService>();
-            services.AddScoped<IShippingMethodService, ShippingMethodService>();
-            services.AddScoped<IPaymentMethodService, PaymentMethodService>();
-            services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IOrderService, OrderService>();
+
+            services.Scan(scan => scan
+                   .FromAssemblyOf<ICategoryService>()
+                     .AddClasses()
+                        .AsImplementedInterfaces()
+                     .WithScopedLifetime());
+  
+
+
+            //services.AddScoped<ICategoryService, CategoryService>();
+            //services.AddScoped<ISizeService, SizeService>();
+            //services.AddScoped<IShippingMethodService, ShippingMethodService>();
+            //services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+            //services.AddScoped<IProductService, ProductService>();
+            //services.AddScoped<IOrderService, OrderService>();
 
 
             //WebUIService
-            services.AddScoped<IDiscountAreaService, DisCountAreaService>();
-            services.AddScoped<IHomeSliderService, HomeSliderService>();
-            services.AddScoped<IHomeService, HomeService>();
-            services.AddScoped<ITopCategoryAreaService, TopCategoryAreaService>();
-            services.AddScoped<INewArriwalAreaService, NewArriwalAreaService>();
+            //services.AddScoped<IDiscountAreaService, DisCountAreaService>();
+            //services.AddScoped<IHomeSliderService, HomeSliderService>();
+            //services.AddScoped<IHomeService, HomeService>();
+            //services.AddScoped<ITopCategoryAreaService, TopCategoryAreaService>();
+            //services.AddScoped<INewArriwalAreaService, NewArriwalAreaService>();
 
 
 

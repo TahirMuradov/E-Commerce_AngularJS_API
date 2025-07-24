@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.RateLimiting;
 using Shop.Application.Abstraction.Services;
 using Shop.Application.Abstraction.Services.WebUI;
-using Shop.Persistence;
+
 
 namespace ShopAPI.Controllers
 {

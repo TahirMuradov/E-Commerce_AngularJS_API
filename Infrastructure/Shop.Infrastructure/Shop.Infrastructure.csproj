@@ -19,11 +19,13 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.5" />
     <PackageReference Include="MimeKit" Version="4.12.0" />
+    <PackageReference Include="Scrutor" Version="6.1.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shop.Application\Shop.Application.csproj" />
+	  <ProjectReference Include="..\..\Core\Shop.Application\Shop.Application.csproj" />
+	
   </ItemGroup>
 
 </Project>

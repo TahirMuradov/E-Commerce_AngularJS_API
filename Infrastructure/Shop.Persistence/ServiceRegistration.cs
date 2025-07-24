@@ -1,14 +1,9 @@
 ﻿
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Shop.Application.Abstraction.Services;
-using Shop.Application.Abstraction.Services.WebUI;
 using Shop.Domain.Entities;
 using Shop.Domain.Exceptions;
-using Shop.Infrastructure;
 using Shop.Persistence.Context;
-using Shop.Persistence.Services;
-using Shop.Persistence.Services.WebUI;
 
 namespace Shop.Persistence
 {
@@ -22,6 +17,7 @@ namespace Shop.Persistence
    .AddEntityFrameworkStores<AppDBContext>()
    .AddDefaultTokenProviders()
       .AddErrorDescriber<MultilanguageIdentityErrorDescriber>();
+
             services.Configure<IdentityOptions>(options =>
             {
                 // Default User settings.
@@ -52,12 +48,12 @@ namespace Shop.Persistence
 
 
 
-            services.Scan(scan => scan
-                   .FromAssemblyOf<ICategoryService>()
-                     .AddClasses()
-                        .AsImplementedInterfaces()
-                     .WithScopedLifetime());
-  
+            //services.Scan(scan => scan
+            //    .FromAssemblyOf<ICategoryService>()
+            //    .AddClasses(classes => classes.InNamespaces("Shop.Persistence.Services"))
+            //    .AsImplementedInterfaces()
+            //    .WithScopedLifetime());
+
 
 
             //services.AddScoped<ICategoryService, CategoryService>();

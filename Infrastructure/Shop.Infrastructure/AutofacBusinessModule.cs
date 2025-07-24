@@ -19,8 +19,8 @@ namespace Shop.Infrastructure
                 .EnableInterfaceInterceptors(new ProxyGenerationOptions()
                 {
                     Selector = new AspectInterceptorSelector()
-                })
-                .InstancePerLifetimeScope();
+                });
+                
         }
     }
 }

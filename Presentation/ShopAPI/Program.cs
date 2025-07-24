@@ -37,11 +37,16 @@ builder.Services.AddPersistenceServices();
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
 builder.Services.AddSignalRServices();
-
 builder.Services.AddDbContext<AppDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
+builder.Services.BuildServiceProvider(new ServiceProviderOptions
+{
+    ValidateScopes = true,
+    ValidateOnBuild = true
+});
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Logging.ClearProviders();
